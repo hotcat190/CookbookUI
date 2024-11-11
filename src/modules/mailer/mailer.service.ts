@@ -5,13 +5,12 @@ import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class MailerService {
-  constructor(private mailer: NestMailerService, private readonly config: ConfigService) {}
+  constructor(private mailer: NestMailerService) {}
 
-  async sendVerificationEmail(username: string, email: string, token: string): Promise<void> {
+  async sendVerificationEmail(username: string, email: string, token: string, baseUrl: string): Promise<void> {
 
-    const baseUrl = this.config.get<string>('APP_URL');
     const url = `${baseUrl}/auth/verify-email?token=${token}`;
-    
+    console.log(url);
     try {
       await this.mailer.sendMail({
         to: email,
@@ -32,8 +31,7 @@ export class MailerService {
 
   async sendResetPasswordEmail(email: string, token: string): Promise<void> {
     
-    const baseUrl = this.config.get<string>('APP_URL');
-    const url = `${baseUrl}/auth/verify-email?token=${token}`;
+    const url = `/auth/verify-email?token=${token}`;
     
     try {
       await this.mailer.sendMail({

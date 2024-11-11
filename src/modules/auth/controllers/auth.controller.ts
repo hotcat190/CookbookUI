@@ -1,11 +1,12 @@
 // src/modules/auth/controllers/auth.controller.ts
-import { Controller, Post, Body, Get, Query } from '@nestjs/common';
+import { Controller, Post, Body, Get, Query, Req } from '@nestjs/common';
 import { AuthService } from '../auth.service';
 import { RegisterDto } from '../dtos/register.dto';
 import { LoginDto } from '../dtos/login.dto';
 import { ResetPasswordDto } from '../dtos/reset-password.dto';
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { ForgotDto } from '../dtos/forgot.dto';
+import {Request} from 'express';
 
 @ApiTags('auth')
 @Controller('auth')
@@ -16,8 +17,9 @@ export class AuthController {
   @ApiOperation({ summary: 'Đăng ký tài khoản mới' })
   @ApiResponse({ status: 201, description: 'Đăng ký thành công' })
   @ApiResponse({ status: 400, description: 'Dữ liệu không hợp lệ hoặc đã tồn tại' })
-  register(@Body() registerDto: RegisterDto) {
-    return this.authService.register(registerDto);
+  register(@Body() registerDto: RegisterDto, @Req() req: Request) {
+    const baseUrl = `${req.protocol}://${req.get('Host')}`;
+    return this.authService.register(registerDto, baseUrl);
   }
 
   @Post('login')
@@ -40,8 +42,9 @@ export class AuthController {
   @ApiOperation({ summary: 'Quên mật khẩu' })
   @ApiResponse({ status: 200, description: 'Liên kết đặt lại mật khẩu đã được gửi nếu email tồn tại' })
   @ApiResponse({ status: 400, description: 'Email không hợp lệ' })
-  forgotPassword(@Body() forgotDto: ForgotDto) {
-    return this.authService.forgotPassword(forgotDto);
+  forgotPassword(@Body() forgotDto: ForgotDto, @Req() req: Request) {
+    
+    return this.authService.forgotPassword(forgotDto );
   }
 
   @Post('reset-password')

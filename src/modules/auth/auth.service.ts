@@ -20,7 +20,7 @@ export class AuthService {
     private mailerService: MailerService,
   ) {}
 
-  async register(registerDto: RegisterDto): Promise<any> {
+  async register(registerDto: RegisterDto, baseUrl: string): Promise<any> {
     
     try {
       const { username, email, password } = registerDto;
@@ -44,7 +44,7 @@ export class AuthService {
 
       await this.usersRepository.save(user);
 
-      await this.mailerService.sendVerificationEmail(user.username, user.email, user.verificationToken);
+      await this.mailerService.sendVerificationEmail(user.username, user.email, user.verificationToken, baseUrl);
 
       return { message: 'Đăng ký thành công. Vui lòng kiểm tra email để xác thực.' };
     } 

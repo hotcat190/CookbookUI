@@ -5,7 +5,6 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { AppModule } from './app.module';
 import { AllExceptionsFilter } from './common/filters/all-exceptions.filter';
 import { LoggingInterceptor } from './common/interceptors/logging.interceptor';
-import { ConfigService } from '@nestjs/config';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -33,8 +32,5 @@ async function bootstrap() {
 
   const appUrl = await app.getUrl();
   console.log(`Application is running on: ${appUrl}`);
-
-  const configService = app.get(ConfigService);
-  configService.set('APP_URL', appUrl);
 }
 bootstrap();
