@@ -1,35 +1,34 @@
 // src/main.ts
-
+import { ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
-import { AppModule } from './app.module';
-import { ValidationPipe, Logger } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import { AppModule } from './app.module';
+import { AllExceptionsFilter } from './common/filters/all-exceptions.filter';
+import { LoggingInterceptor } from './common/interceptors/logging.interceptor';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
   // Global Validation Pipe
-  app.useGlobalPipes(new ValidationPipe({
-    whitelist: true,
-    forbidNonWhitelisted: true,
-    transform: true,
-  }));
+  app.useGlobalPipes(new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true }));
+
+  // Global Exception Filter
+  app.useGlobalFilters(new AllExceptionsFilter());
+
+  // Global Interceptors
+  app.useGlobalInterceptors(new LoggingInterceptor());
 
   // Swagger Setup
   const config = new DocumentBuilder()
-    .setTitle('Recipe App API')
-    .setDescription('API documentation for the Recipe App')
+    .setTitle('Recipe API')
+    .setDescription('API documentation for Recipe application')
     .setVersion('1.0')
     .addBearerAuth()
     .build();
-    
   const document = SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup('api-docs', app, document);
+  SwaggerModule.setup('api', app, document);
 
-  // Start server
-  const PORT = process.env.PORT || 3000;
-  await app.listen(PORT);
-  Logger.log(`Server is running on http://localhost:${PORT}`);
-  Logger.log(`Swagger is available on http://localhost:${PORT}/api-docs`);
+  await app.listen(process.env.PORT || 3000);
+  console.log(`Application is running on: ${await app.getUrl()}`);
 }
 bootstrap();

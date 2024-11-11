@@ -1,23 +1,56 @@
+// src/app.module.ts
 import { Module } from '@nestjs/common';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { ConfigModule } from '@nestjs/config';
+import configuration from './config/configuration';
+import { validationSchema } from './config/validation.schema';
+import { AuthModule } from './modules/auth/auth.module';
+import { UsersModule } from './modules/users/users.module';
+import { ProfilesModule } from './modules/profiles/profiles.module';
+import { RecipesModule } from './modules/recipes/recipes.module';
+import { FavoritesModule } from './modules/favorites/favorites.module';
+import { SearchModule } from './modules/search/search.module';
+import { NotificationsModule } from './modules/notifications/notifications.module';
+import { FollowsModule } from './modules/follows/follows.module';
+import { CommentsModule } from './modules/comments/comments.module';
+import { MailerModule } from './modules/mailer/mailer.module';
+import { AppController } from './app.controller';
+import { AppService } from './app.service';
 
 @Module({
   imports: [
-    ConfigModule.forRoot({ isGlobal: true }),
-    TypeOrmModule.forRoot({
-      type: 'mysql',
-      host: process.env.DB_HOST, 
-      port: parseInt(process.env.DB_PORT) || 3306,
-      username: process.env.DB_USERNAME,
-      password: process.env.DB_PASSWORD,
-      database: process.env.DB_NAME,
-      entities: [__dirname + '/**/*.entity{.ts,.js}'],
-      synchronize: true, 
+    
+    ConfigModule.forRoot({
+      load: [configuration],
+      isGlobal: true,
+      validationSchema,
     }),
-
+    TypeOrmModule.forRootAsync({
+      imports: [ConfigModule],
+      useFactory: async (configService: ConfigService) => ({
+        type: 'mysql',
+        host: configService.get<string>('database.host'),
+        port: configService.get<number>('database.port'),
+        username: configService.get<string>('database.username'),
+        password: configService.get<string>('database.password'),
+        database: configService.get<string>('database.database'),
+        entities: [__dirname + '/**/*.entity{.ts,.js}'],
+        synchronize: true, // Disable in production
+      }),
+      inject: [ConfigService],
+    }),
+    AuthModule,
+    UsersModule,
+    ProfilesModule,
+    RecipesModule,
+    FavoritesModule,
+    SearchModule,
+    NotificationsModule,
+    FollowsModule,
+    CommentsModule,
+    MailerModule,
   ],
-  controllers: [],
-  providers: [],
+  controllers: [AppController],
+  providers: [AppService],
 })
 export class AppModule {}
