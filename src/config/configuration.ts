@@ -7,11 +7,11 @@ export default () => ({
     expiresIn: process.env.JWT_EXPIRES_IN || '3600s',
   },
   database: {
-    host: process.env.DB_HOST || 'cookbook-hoapri123-95dd.a.aivencloud.com',
-    port: parseInt(process.env.DB_PORT, 10) || 16906,
-    username: process.env.DB_USERNAME || 'avnadmin',
-    password: process.env.DB_PASSWORD || 'AVNS_F5X1dhEyAZLQHfc71si',
-    database: process.env.DB_NAME || 'defaultdb',
+    host: process.env.DB_HOST,
+    port: parseInt(process.env.DB_PORT, 10),
+    username: process.env.DB_USERNAME,
+    password: process.env.DB_PASSWORD,
+    database: process.env.DB_NAME,
     ssl: {
      rejectUnauthorized: true,
     },

@@ -1,13 +1,15 @@
 // src/modules/mailer/mailer.service.ts
 import { Injectable } from '@nestjs/common';
 import { MailerService as NestMailerService } from '@nestjs-modules/mailer';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class MailerService {
-  constructor(private mailer: NestMailerService) {}
+  constructor(private mailer: NestMailerService, private readonly config: ConfigService) {}
 
   async sendVerificationEmail(username: string, email: string, token: string): Promise<void> {
-    const baseUrl = process.env.APP_URL;
+
+    const baseUrl = this.config.get<string>('APP_URL');
     const url = `${baseUrl}/auth/verify-email?token=${token}`;
     
     try {
@@ -15,11 +17,11 @@ export class MailerService {
         to: email,
         subject: `Xác thực Email của bạn`,
         html: `
-          <p>Đã có người đăng ký bằng Email của bạn. User: ${username}</p>
-          <p>Xác thực Email của bạn bằng cách click vào button bên dưới:</p>
           <a href="${url}" style="background: #4CAF50; color: white; padding: 14px 20px; text-decoration: none; border-radius: 8px; display: inline-block;">
           Xác thực Email
           </a>
+          <p>Đã có người đăng ký bằng Email của bạn. User: ${username}</p>
+          <p>Xác thực Email của bạn bằng cách click vào button</p>
         `,
       });
     } catch (error) {
@@ -29,17 +31,23 @@ export class MailerService {
   }
 
   async sendResetPasswordEmail(email: string, token: string): Promise<void> {
-    const baseUrl = process.env.APP_URL || 'https://cookbook.example.com';
-    const url = `${baseUrl}/reset-password?token=${token}`;
+    
+    const baseUrl = this.config.get<string>('APP_URL');
+    const url = `${baseUrl}/auth/verify-email?token=${token}`;
     
     try {
       await this.mailer.sendMail({
         to: email,
-        subject: 'Đặt lại mật khẩu',
-        text: `Để đặt lại mật khẩu của bạn, vui lòng nhấp vào liên kết sau: ${url}`,
+        subject: `Đặt lại mật khẩu`,
+        html: `
+          <a href="${url}" style="background: #4CAF50; color: white; padding: 14px 20px; text-decoration: none; border-radius: 8px; display: inline-block;">
+          Click here
+          </a>
+          <p>Click vào button để chuyển hướng đặt lại mật khẩu</p>
+        `,
       });
     } catch (error) {
-      console.error('Failed to send reset password email:', error);
+      console.error('Failed to send reset email:', error);
       throw error;
     }
   }

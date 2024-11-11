@@ -5,10 +5,10 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { AppModule } from './app.module';
 import { AllExceptionsFilter } from './common/filters/all-exceptions.filter';
 import { LoggingInterceptor } from './common/interceptors/logging.interceptor';
+import { ConfigService } from '@nestjs/config';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-
   // Global Validation Pipe
   app.useGlobalPipes(new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true }));
 
@@ -28,7 +28,13 @@ async function bootstrap() {
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, document);
 
+  
   await app.listen(process.env.PORT || 3000);
-  console.log(`Application is running on: ${await app.getUrl()}`);
+
+  const appUrl = await app.getUrl();
+  console.log(`Application is running on: ${appUrl}`);
+
+  const configService = app.get(ConfigService);
+  configService.set('APP_URL', appUrl);
 }
 bootstrap();
