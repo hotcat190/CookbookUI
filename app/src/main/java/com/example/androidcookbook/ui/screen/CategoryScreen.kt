@@ -1,17 +1,13 @@
 package com.example.androidcookbook.ui.screen
 
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.LazyRow
@@ -20,11 +16,10 @@ import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Card
-import androidx.compose.material.Text
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -36,13 +31,11 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.example.androidcookbook.R
 import com.example.androidcookbook.model.Category
-import com.example.androidcookbook.ui.theme.AndroidCookbookTheme
 import com.example.androidcookbook.ui.theme.Typography
 import com.example.androidcookbook.ui.uistate.CategoryUiState
 import kotlinx.coroutines.delay
@@ -82,16 +75,15 @@ fun RandomMeal(modifier: Modifier = Modifier, randomMeals: List<Category>) {
         modifier = modifier
     ) {
         items(items = randomMeals) { randomMeal ->
-
             Box(
                 modifier = Modifier
-                    .padding(8.dp)
+                    .padding(end = 16.dp)
                     .width(300.dp),
                 contentAlignment = Alignment.Center
             ) {
                 CategoryCard(
                     category = randomMeal,
-                    modifier = Modifier.fillMaxSize()
+                    modifier = Modifier
                 )
             }
         }
@@ -122,7 +114,7 @@ fun CategoryCard(category: Category, modifier: Modifier = Modifier) {
                     .crossfade(true)
                     .build(),
                 contentDescription = null,
-                contentScale = ContentScale.FillWidth,
+                contentScale = ContentScale.Crop,
                 error = painterResource(id = R.drawable.ic_broken_image),
                 placeholder = painterResource(id = R.drawable.loading_img)
             )
@@ -164,13 +156,3 @@ private fun CategoryListScreen(
     }
 }
 
-@Preview
-@Composable
-private fun CategoryText() {
-    AndroidCookbookTheme(darkTheme = true) {
-        Text(
-            text = "Category",
-            style = MaterialTheme.typography.bodyLarge
-        )
-    }
-}

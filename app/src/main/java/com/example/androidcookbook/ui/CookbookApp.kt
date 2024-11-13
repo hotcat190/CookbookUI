@@ -80,8 +80,8 @@ fun CookbookApp(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding),
-            enterTransition = { EnterTransition.None },
-            exitTransition = { ExitTransition.None }
+//            enterTransition = { EnterTransition.None },
+//            exitTransition = { ExitTransition.None }
         ) {
             composable(route = CookbookScreen.Category.name) {
                 CategoryScreen(categoryUiState = categoryViewModel.categoryUiState)
