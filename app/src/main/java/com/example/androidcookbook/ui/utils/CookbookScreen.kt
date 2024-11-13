@@ -5,5 +5,6 @@ enum class CookbookScreen {
     AIChat,
     Newsfeed,
     UserProfile,
-    Search
+    Search,
+    CreatePost,
 }

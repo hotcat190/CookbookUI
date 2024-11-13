@@ -49,7 +49,7 @@ fun CategoryScreen(modifier: Modifier = Modifier, categoryUiState: CategoryUiSta
                 categories = categoryUiState.categories,
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(start = 16.dp, top = 16.dp, end = 16.dp)
+                    .padding(start = 8.dp, top = 16.dp, end = 8.dp)
             )
         }
 
@@ -141,7 +141,7 @@ private fun CategoryListScreen(
         item {
             Text(
                 text = "Category",
-                style = MaterialTheme.typography.bodyLarge,
+                style = MaterialTheme.typography.headlineMedium,
                 color = MaterialTheme.colorScheme.onBackground,
             )
         }

@@ -49,31 +49,7 @@ fun NewsfeedCard(modifier: Modifier = Modifier) {
             .padding(16.dp)
             .fillMaxWidth()
     ) {
-        Row {
-            Icon(
-                imageVector = Icons.Default.AccountCircle,
-                contentDescription = "Profile Picture",
-                modifier = Modifier
-                    .size(32.dp)
-                    .clip(CircleShape),
-                tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.25f)
-            )
-            Spacer(modifier = Modifier.width(8.dp)) // Spacing between icon and username
-            Column {
-                Text(
-                    text = "Helia",
-                    fontSize = 19.sp,
-                    style = MaterialTheme.typography.labelMedium,
-                    color = MaterialTheme.colorScheme.onSurface
-                )
-                Text(
-                    text = "01/28/2024",
-                    fontSize = 12.sp,
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.4f)
-                )
-            }
-        }
+        PostHeader()
         Text(
             text = "Shrimp salad cooking :)",
             style = MaterialTheme.typography.titleMedium,
@@ -101,6 +77,35 @@ fun NewsfeedCard(modifier: Modifier = Modifier) {
             color = MaterialTheme.colorScheme.onSurface,
             modifier = Modifier.align(Alignment.End)
         )
+    }
+}
+
+@Composable
+fun PostHeader(modifier: Modifier = Modifier) {
+    Row(modifier = modifier) {
+        Icon(
+            imageVector = Icons.Default.AccountCircle,
+            contentDescription = "Profile Picture",
+            modifier = Modifier
+                .size(32.dp)
+                .clip(CircleShape),
+            tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.25f)
+        )
+        Spacer(modifier = Modifier.width(8.dp)) // Spacing between icon and username
+        Column {
+            Text(
+                text = "Helia",
+                fontSize = 19.sp,
+                style = MaterialTheme.typography.labelMedium,
+                color = MaterialTheme.colorScheme.onSurface
+            )
+            Text(
+                text = "01/28/2024",
+                fontSize = 12.sp,
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.4f)
+            )
+        }
     }
 }
 

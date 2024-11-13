@@ -21,4 +21,12 @@ class CookbookViewModel : ViewModel() {
            )
        }
     }
+
+    fun toggleCanNavigateBack() {
+        _uiState.update { currentState ->
+            currentState.copy(
+                canNavigateBack = !currentState.canNavigateBack
+            )
+        }
+    }
 }

@@ -22,6 +22,7 @@ import com.example.androidcookbook.ui.component.CookbookBottomNavigationBar
 import com.example.androidcookbook.ui.component.SearchBar
 import com.example.androidcookbook.ui.screen.AIChatScreen
 import com.example.androidcookbook.ui.screen.CategoryScreen
+import com.example.androidcookbook.ui.screen.CreatePostScreen
 import com.example.androidcookbook.ui.screen.NewsfeedScreen
 import com.example.androidcookbook.ui.screen.SearchScreen
 import com.example.androidcookbook.ui.screen.UserProfileScreen
@@ -33,7 +34,7 @@ import com.example.androidcookbook.ui.viewmodel.CookbookViewModel
 @Composable
 fun CookbookApp(
     modifier: Modifier = Modifier,
-    navController: NavHostController = rememberNavController()
+    navController: NavHostController = rememberNavController(),
 ) {
     val backStackEntry by navController.currentBackStackEntryAsState()
 
@@ -50,13 +51,29 @@ fun CookbookApp(
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
         topBar = {
             if (currentScreen != CookbookScreen.Search) {
-                CookbookAppBar(showBackButton = uiState.canNavigateBack, searchButtonAction = {
-                    navController.navigate(CookbookScreen.Search.name)
-                }, scrollBehavior = scrollBehavior)
+                CookbookAppBar(
+                    showBackButton = uiState.canNavigateBack,
+                    searchButtonAction = {
+                        navController.navigate(CookbookScreen.Search.name)
+                    },
+                    onCreatePostClick = {
+                        navController.navigate(CookbookScreen.CreatePost.name)
+                        viewModel.toggleCanNavigateBack()
+                    },
+                    onMenuButtonClick = {
+                        //TODO: Add menu button
+                    },
+                    onBackButtonClick = {
+                        navController.navigateUp()
+                        viewModel.toggleCanNavigateBack()
+                    },
+                    scrollBehavior = scrollBehavior
+                )
             } else {
                 SearchBar(
-                    onValueChange =
-                    { updatedSearchQuery -> viewModel.updateSearchQuery(updatedSearchQuery) },
+                    onValueChange = { updatedSearchQuery ->
+                        viewModel.updateSearchQuery(updatedSearchQuery)
+                    },
                     navigateBackAction = { navController.navigateUp() },
                     searchQuery = uiState.searchQuery
                 )
@@ -97,8 +114,7 @@ fun CookbookApp(
             composable(route = CookbookScreen.Category.name) {
                 CategoryScreen(categoryUiState = categoryViewModel.categoryUiState)
             }
-            composable(route = CookbookScreen.Search.name)
-            {
+            composable(route = CookbookScreen.Search.name) {
                 SearchScreen(uiState.searchQuery)
             }
             composable(route = CookbookScreen.AIChat.name) {
@@ -109,6 +125,9 @@ fun CookbookApp(
             }
             composable(route = CookbookScreen.UserProfile.name) {
                 UserProfileScreen()
+            }
+            composable(route = CookbookScreen.CreatePost.name) {
+                CreatePostScreen()
             }
         }
     }
