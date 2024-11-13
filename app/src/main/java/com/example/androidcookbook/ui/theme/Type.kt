@@ -24,8 +24,7 @@ val Typography = Typography(
         fontFamily = FontFamily(Font(R.font.lobster_regular)),
         fontSize = 36.sp,
         lineHeight = 16.sp,
-        letterSpacing = 0.5.sp,
-        color = Color.Black
+        letterSpacing = 0.5.sp
     )
     /* Other default text styles to override
     titleLarge = TextStyle(

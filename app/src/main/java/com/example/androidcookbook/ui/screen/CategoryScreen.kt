@@ -24,6 +24,7 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Card
 import androidx.compose.material.Text
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -35,11 +36,13 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.example.androidcookbook.R
 import com.example.androidcookbook.model.Category
+import com.example.androidcookbook.ui.theme.AndroidCookbookTheme
 import com.example.androidcookbook.ui.theme.Typography
 import com.example.androidcookbook.ui.uistate.CategoryUiState
 import kotlinx.coroutines.delay
@@ -147,7 +150,7 @@ private fun CategoryListScreen(
         item {
             Text(
                 text = "Category",
-                style = Typography.bodyLarge,
+                style = MaterialTheme.typography.bodyLarge,
                 modifier = Modifier.offset(y = -16.dp)
             )
         }
@@ -157,5 +160,16 @@ private fun CategoryListScreen(
         ) { category ->
             CategoryCard(category = category, modifier = Modifier.fillMaxSize())
         }
+    }
+}
+
+@Preview
+@Composable
+private fun CategoryText() {
+    AndroidCookbookTheme(darkTheme = true) {
+        Text(
+            text = "Category",
+            style = MaterialTheme.typography.bodyLarge
+        )
     }
 }

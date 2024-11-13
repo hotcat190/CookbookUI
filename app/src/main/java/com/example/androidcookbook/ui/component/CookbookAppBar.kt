@@ -122,6 +122,6 @@ fun CookbookAppBar(
 @OptIn(ExperimentalMaterial3Api::class)
 @Preview
 @Composable
-fun topAppBarPreview() {
+fun TopAppBarPreview() {
     CookbookAppBar()
 }
