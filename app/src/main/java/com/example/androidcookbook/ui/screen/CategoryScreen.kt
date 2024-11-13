@@ -145,14 +145,13 @@ private fun CategoryListScreen(
         horizontalArrangement = Arrangement.spacedBy(12.dp)
     ) {
         item(span = { GridItemSpan(maxCurrentLineSpan) },) {
-            RandomMeal(Modifier.fillMaxSize().background(Color.Blue), categories)
+            RandomMeal(randomMeals = categories)
         }
         item {
             Text(
                 text = "Category",
                 style = MaterialTheme.typography.bodyLarge,
                 color = MaterialTheme.colorScheme.onBackground,
-                modifier = Modifier.offset(y = -16.dp)
             )
         }
         item { }
