@@ -20,9 +20,11 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.androidcookbook.ui.component.CookbookAppBar
+import com.example.androidcookbook.ui.component.CookbookBottomNavigationBar
 import com.example.androidcookbook.ui.component.SearchBar
 import com.example.androidcookbook.ui.screen.CategoryScreen
 import com.example.androidcookbook.ui.screen.SearchScreen
+import com.example.androidcookbook.ui.theme.AndroidCookbookTheme
 import com.example.androidcookbook.ui.utils.CookbookScreen
 import com.example.androidcookbook.ui.viewmodel.CategoryViewModel
 import com.example.androidcookbook.ui.viewmodel.CookbookViewModel
@@ -61,11 +63,11 @@ fun CookbookApp(
                     searchQuery = uiState.searchQuery
                 )
             }
-
+        },
+        bottomBar = {
+            CookbookBottomNavigationBar()
         }
     ) { innerPadding ->
-
-
         NavHost(
             navController = navController,
             startDestination = CookbookScreen.Category.name,
@@ -75,7 +77,6 @@ fun CookbookApp(
             enterTransition = { EnterTransition.None },
             exitTransition = { ExitTransition.None }
         ) {
-
             composable(route = CookbookScreen.Category.name) {
                 CategoryScreen(categoryUiState = categoryViewModel.categoryUiState)
             }
@@ -90,6 +91,6 @@ fun CookbookApp(
 
 @Preview
 @Composable
-fun cookbookAppPreview() {
+fun CookbookAppPreview() {
     CookbookApp()
 }

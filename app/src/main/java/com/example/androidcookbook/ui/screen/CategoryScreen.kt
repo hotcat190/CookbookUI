@@ -151,6 +151,7 @@ private fun CategoryListScreen(
             Text(
                 text = "Category",
                 style = MaterialTheme.typography.bodyLarge,
+                color = MaterialTheme.colorScheme.onBackground,
                 modifier = Modifier.offset(y = -16.dp)
             )
         }
