@@ -6,20 +6,22 @@ import { ApiTags, ApiBearerAuth, ApiOperation, ApiResponse } from '@nestjs/swagg
 
 @ApiTags('follows')
 @ApiBearerAuth()
-@UseGuards(JwtAuthGuard)
 @Controller('follows')
 export class FollowsController {
   constructor(private readonly followsService: FollowsService) {}
 
+  @UseGuards(JwtAuthGuard)
   @Post(':userId')
   @ApiOperation({ summary: 'Theo dõi người dùng khác' })
   @ApiResponse({ status: 200, description: 'Đã theo dõi người dùng' })
   @ApiResponse({ status: 400, description: 'Bạn đã theo dõi hoặc không thể theo dõi chính mình' })
   @ApiResponse({ status: 404, description: 'Người dùng không tồn tại' })
   followUser(@Param('userId') userId: number, @Request() req) {
+    console.log(req.user);
     return this.followsService.followUser(userId, req.user.id);
   }
 
+  @UseGuards(JwtAuthGuard)
   @Delete(':userId')
   @ApiOperation({ summary: 'Hủy theo dõi người dùng' })
   @ApiResponse({ status: 200, description: 'Đã hủy theo dõi người dùng' })

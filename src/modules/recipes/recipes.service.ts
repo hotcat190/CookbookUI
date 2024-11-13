@@ -24,7 +24,7 @@ export class RecipesService {
       author: user,
     });
     await this.recipesRepository.save(recipe);
-    return { message: 'Tạo bài viết thành công.', recipe };
+    return { message: 'Tạo bài viết thành công.', recipe: { ...recipe, authorName: user.name } };
   }
 
   async updateRecipe(recipeId: number, updateRecipeDto: UpdateRecipeDto, userId: number): Promise<any> {
@@ -53,10 +53,11 @@ export class RecipesService {
   }
 
   async getRecipeById(recipeId: number): Promise<any> {
+    console.log('startt');
     const recipe = await this.recipesRepository.findOne({
-      where: { id: recipeId },
-      relations: ['author', 'comments', 'relatedRecipes'],
+      where: { id: recipeId }
     });
+    console.log('starttt');
     if (!recipe) {
       throw new NotFoundException('Bài viết không tồn tại.');
     }

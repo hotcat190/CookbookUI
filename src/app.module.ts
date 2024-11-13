@@ -5,8 +5,6 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import configuration from './config/configuration';
 import { validationSchema } from './config/validation.schema';
 import { AuthModule } from './modules/auth/auth.module';
-import { UsersModule } from './modules/users/users.module';
-import { ProfilesModule } from './modules/profiles/profiles.module';
 import { RecipesModule } from './modules/recipes/recipes.module';
 import { FavoritesModule } from './modules/favorites/favorites.module';
 import { SearchModule } from './modules/search/search.module';
@@ -40,8 +38,6 @@ import { AppService } from './app.service';
       inject: [ConfigService],
     }),
     AuthModule,
-    UsersModule,
-    ProfilesModule,
     RecipesModule,
     FavoritesModule,
     SearchModule,

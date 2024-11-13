@@ -1,5 +1,5 @@
 // src/modules/auth/auth.service.ts
-import { Injectable, BadRequestException, UnauthorizedException } from '@nestjs/common';
+import { Injectable, BadRequestException, UnauthorizedException, NotFoundException } from '@nestjs/common';
 import { RegisterDto } from './dtos/register.dto';
 import { LoginDto } from './dtos/login.dto';
 import { ForgotDto } from './dtos/forgot.dto';
@@ -11,15 +11,20 @@ import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
 import { MailerService } from '../mailer/mailer.service';
 import { v4 as uuidv4 } from 'uuid';
+import { UpdateProfileDto } from './dtos/update-profile.dto';
 
 @Injectable()
 export class AuthService {
+  [x: string]: any;
   constructor(
     @InjectRepository(User) private usersRepository: Repository<User>,
     private jwtService: JwtService,
     private mailerService: MailerService,
   ) {}
-
+  async getUserIdFromToKen(token: string): Promise<number> {
+    const payload = this.jwtService.decode(token);
+    return payload['sub'];
+  }
   async register(registerDto: RegisterDto, baseUrl: string): Promise<any> {
     
     try {
@@ -125,5 +130,31 @@ export class AuthService {
     await this.usersRepository.save(user);
 
     return { message: 'Đặt lại mật khẩu thành công.' };
+  }
+
+  async updateProfile(userId: number, updateProfileDto: UpdateProfileDto): Promise<any> {
+    let profile = await this.usersRepository.findOne({ where: { id: userId } });
+    if (!profile) {
+      return { message: 'Không tìm thấy profile.' };
+    }
+    Object.assign(profile, updateProfileDto);
+    await this.usersRepository.save(profile);
+    return { message: 'Cập nhật hồ sơ thành công.', profile };
+  }
+  async getProfileByUserId(userId: number): Promise<any> {
+    const profile = await this.usersRepository.findOne({
+      where: { id: userId },
+      relations: ['followers', 'following'],
+    });
+    if (!profile) {
+      throw new NotFoundException('Hồ sơ không tồn tại.');
+    }
+    const totalFollowers = profile.followers.length;
+    const totalFollowing = profile.following.length;
+
+    const { id, bio, name, avatar } = profile;
+    
+    return { userId: id, bio, name, avatar, totalFollowers, totalFollowing };
+
   }
 }

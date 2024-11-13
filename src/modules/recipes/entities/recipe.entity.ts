@@ -27,21 +27,22 @@ import {
     @Column({ nullable: true })
     cookTime: string;
   
-    @Column({ nullable: true })
-    servings: number;
+    @Column('simple-json', { nullable: true })
+    ingredient: { 
+      name: string; 
+      quantity: string; 
+    }[];
   
     @Column('simple-json', { nullable: true })
-    ingredients: { name: string; quantity: string; unit: string }[];
-  
-    @Column('simple-json', { nullable: true })
-    steps: { description: string }[];
+    //steps: { description: string }[];
+    steps: string[];
   
     @Column({ nullable: true })
     mainImage: string;
   
     @ManyToOne(() => User, (user) => user.recipes, { eager: true })
     author: User;
-  
+    
     @OneToMany(() => Comment, (comment) => comment.recipe, { cascade: true })
     comments: Comment[];
   

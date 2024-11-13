@@ -10,9 +10,10 @@ export class UpdateProfileDto {
   bio?: string;
 
   @IsOptional()
-  @IsPhoneNumber(null)
-  @ApiPropertyOptional({ description: 'Số điện thoại mới' })
-  phone?: string;
+  @IsString()
+  @MaxLength(30)
+  @ApiPropertyOptional({ description: 'Tên mới' })
+  name?: string;
 
   @IsOptional()
   @IsUrl()
