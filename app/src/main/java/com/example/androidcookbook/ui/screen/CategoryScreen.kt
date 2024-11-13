@@ -40,7 +40,6 @@ import com.example.androidcookbook.ui.theme.Typography
 import com.example.androidcookbook.ui.uistate.CategoryUiState
 import kotlinx.coroutines.delay
 
-
 @Composable
 fun CategoryScreen(modifier: Modifier = Modifier, categoryUiState: CategoryUiState) {
     when (categoryUiState) {
@@ -72,12 +71,12 @@ fun RandomMeal(modifier: Modifier = Modifier, randomMeals: List<Category>) {
 
     LazyRow(
         state = listState,
-        modifier = modifier
+        horizontalArrangement = Arrangement.spacedBy(16.dp),
+        modifier = modifier,
     ) {
         items(items = randomMeals) { randomMeal ->
             Box(
                 modifier = Modifier
-                    .padding(end = 16.dp)
                     .width(300.dp),
                 contentAlignment = Alignment.Center
             ) {
@@ -89,7 +88,6 @@ fun RandomMeal(modifier: Modifier = Modifier, randomMeals: List<Category>) {
         }
     }
 }
-
 
 @Composable
 fun CategoryCard(category: Category, modifier: Modifier = Modifier) {

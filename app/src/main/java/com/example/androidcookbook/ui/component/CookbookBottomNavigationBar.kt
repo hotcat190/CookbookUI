@@ -1,14 +1,18 @@
 package com.example.androidcookbook.ui.component
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.NavigationBar
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import com.example.androidcookbook.R
 import com.example.androidcookbook.ui.theme.AndroidCookbookTheme
 
@@ -19,7 +23,11 @@ fun CookbookBottomNavigationBar(
     onNewsfeedClick: () -> Unit,
     onUserProfileClick: () -> Unit,
 ) {
-    NavigationBar {
+    NavigationBar(
+        containerColor = Color.Transparent,
+        modifier = Modifier
+            .height(96.dp)
+    ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()

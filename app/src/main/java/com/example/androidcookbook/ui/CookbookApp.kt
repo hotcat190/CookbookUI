@@ -1,11 +1,9 @@
 package com.example.androidcookbook.ui
 
-import androidx.compose.animation.EnterTransition
-import androidx.compose.animation.ExitTransition
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -30,7 +28,6 @@ import com.example.androidcookbook.ui.screen.UserProfileScreen
 import com.example.androidcookbook.ui.utils.CookbookScreen
 import com.example.androidcookbook.ui.viewmodel.CategoryViewModel
 import com.example.androidcookbook.ui.viewmodel.CookbookViewModel
-
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -67,10 +64,26 @@ fun CookbookApp(
         },
         bottomBar = {
             CookbookBottomNavigationBar(
-                onHomeClick = { navController.navigate(route = CookbookScreen.Category.name) },
-                onChatClick = { navController.navigate(route = CookbookScreen.AIChat.name) },
-                onNewsfeedClick = { navController.navigate(route = CookbookScreen.Newsfeed.name) },
-                onUserProfileClick = { navController.navigate(route = CookbookScreen.UserProfile.name) }
+                onHomeClick = {
+                    if (currentScreen != CookbookScreen.Category) {
+                        navController.navigate(route = CookbookScreen.Category.name)
+                    }
+                },
+                onChatClick = {
+                    if (currentScreen != CookbookScreen.AIChat) {
+                        navController.navigate(route = CookbookScreen.AIChat.name)
+                    }
+                },
+                onNewsfeedClick = {
+                    if (currentScreen != CookbookScreen.Newsfeed) {
+                        navController.navigate(route = CookbookScreen.Newsfeed.name)
+                    }
+                },
+                onUserProfileClick = {
+                    if (currentScreen != CookbookScreen.UserProfile) {
+                        navController.navigate(route = CookbookScreen.UserProfile.name)
+                    }
+                }
             )
         }
     ) { innerPadding ->
@@ -80,8 +93,6 @@ fun CookbookApp(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding),
-//            enterTransition = { EnterTransition.None },
-//            exitTransition = { ExitTransition.None }
         ) {
             composable(route = CookbookScreen.Category.name) {
                 CategoryScreen(categoryUiState = categoryViewModel.categoryUiState)
