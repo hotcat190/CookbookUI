@@ -136,7 +136,8 @@ private fun CategoryListScreen(
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(8.dp)
 ) {
-
+    // TODO: Nesting a LazyRow inside of a LazyVerticalGrid seems incorrect,
+    //  should find a different solution.
     LazyVerticalGrid(
         columns = GridCells.Fixed(2),
         modifier = modifier,
