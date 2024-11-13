@@ -13,14 +13,19 @@ import com.example.androidcookbook.R
 import com.example.androidcookbook.ui.theme.AndroidCookbookTheme
 
 @Composable
-fun CookbookBottomNavigationBar() {
+fun CookbookBottomNavigationBar(
+    onHomeClick: () -> Unit,
+    onChatClick: () -> Unit,
+    onNewsfeedClick: () -> Unit,
+    onUserProfileClick: () -> Unit,
+) {
     NavigationBar {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
         ) {
             IconButton(
-                onClick = {},
+                onClick = onHomeClick,
                 modifier = Modifier.weight(1F)
             ) {
                 Icon(
@@ -29,25 +34,25 @@ fun CookbookBottomNavigationBar() {
                 )
             }
             IconButton(
-                onClick = {},
+                onClick = onChatClick,
                 modifier = Modifier.weight(1F)
             ) {
                 Icon(
-                    painter = painterResource(R.drawable.icon_message),
-                    contentDescription = "Message"
+                    painter = painterResource(R.drawable.icon_chat),
+                    contentDescription = "AI Chat"
                 )
             }
             IconButton(
-                onClick = {},
+                onClick = onNewsfeedClick,
                 modifier = Modifier.weight(1F)
             ) {
                 Icon(
-                    painter = painterResource(R.drawable.icon_create_post),
-                    contentDescription = "Create post"
+                    painter = painterResource(R.drawable.icon_newsfeed),
+                    contentDescription = "News Feed"
                 )
             }
             IconButton(
-                onClick = {},
+                onClick = onUserProfileClick,
                 modifier = Modifier.weight(1F)
             ) {
                 Icon(
@@ -63,7 +68,7 @@ fun CookbookBottomNavigationBar() {
 @Composable
 fun NavBarPreview() {
     AndroidCookbookTheme {
-        CookbookBottomNavigationBar()
+        CookbookBottomNavigationBar({},{},{},{},)
     }
 }
 
@@ -71,6 +76,6 @@ fun NavBarPreview() {
 @Composable
 fun NavBarDarkPreview() {
     AndroidCookbookTheme(darkTheme = true) {
-        CookbookBottomNavigationBar()
+        CookbookBottomNavigationBar({},{},{},{},)
     }
 }

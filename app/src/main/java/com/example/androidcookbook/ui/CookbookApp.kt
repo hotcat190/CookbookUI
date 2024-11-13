@@ -22,9 +22,11 @@ import androidx.navigation.compose.rememberNavController
 import com.example.androidcookbook.ui.component.CookbookAppBar
 import com.example.androidcookbook.ui.component.CookbookBottomNavigationBar
 import com.example.androidcookbook.ui.component.SearchBar
+import com.example.androidcookbook.ui.screen.AIChatScreen
 import com.example.androidcookbook.ui.screen.CategoryScreen
+import com.example.androidcookbook.ui.screen.NewsfeedScreen
 import com.example.androidcookbook.ui.screen.SearchScreen
-import com.example.androidcookbook.ui.theme.AndroidCookbookTheme
+import com.example.androidcookbook.ui.screen.UserProfileScreen
 import com.example.androidcookbook.ui.utils.CookbookScreen
 import com.example.androidcookbook.ui.viewmodel.CategoryViewModel
 import com.example.androidcookbook.ui.viewmodel.CookbookViewModel
@@ -51,7 +53,6 @@ fun CookbookApp(
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
         topBar = {
             if (currentScreen != CookbookScreen.Search) {
-
                 CookbookAppBar(showBackButton = uiState.canNavigateBack, searchButtonAction = {
                     navController.navigate(CookbookScreen.Search.name)
                 }, scrollBehavior = scrollBehavior)
@@ -65,7 +66,12 @@ fun CookbookApp(
             }
         },
         bottomBar = {
-            CookbookBottomNavigationBar()
+            CookbookBottomNavigationBar(
+                onHomeClick = { navController.navigate(route = CookbookScreen.Category.name) },
+                onChatClick = { navController.navigate(route = CookbookScreen.AIChat.name) },
+                onNewsfeedClick = { navController.navigate(route = CookbookScreen.Newsfeed.name) },
+                onUserProfileClick = { navController.navigate(route = CookbookScreen.UserProfile.name) }
+            )
         }
     ) { innerPadding ->
         NavHost(
@@ -80,10 +86,18 @@ fun CookbookApp(
             composable(route = CookbookScreen.Category.name) {
                 CategoryScreen(categoryUiState = categoryViewModel.categoryUiState)
             }
-
             composable(route = CookbookScreen.Search.name)
             {
                 SearchScreen(uiState.searchQuery)
+            }
+            composable(route = CookbookScreen.AIChat.name) {
+                AIChatScreen()
+            }
+            composable(route = CookbookScreen.Newsfeed.name) {
+                NewsfeedScreen()
+            }
+            composable(route = CookbookScreen.UserProfile.name) {
+                UserProfileScreen()
             }
         }
     }
