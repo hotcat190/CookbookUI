@@ -26,7 +26,7 @@ import com.example.androidcookbook.ui.screen.CreatePostScreen
 import com.example.androidcookbook.ui.screen.NewsfeedScreen
 import com.example.androidcookbook.ui.screen.SearchScreen
 import com.example.androidcookbook.ui.screen.UserProfileScreen
-import com.example.androidcookbook.ui.utils.CookbookScreen
+import com.example.androidcookbook.ui.screen.CookbookScreen
 import com.example.androidcookbook.ui.viewmodel.CategoryViewModel
 import com.example.androidcookbook.ui.viewmodel.CookbookViewModel
 
@@ -50,7 +50,19 @@ fun CookbookApp(
     Scaffold(
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
         topBar = {
-            if (currentScreen != CookbookScreen.Search) {
+            if (!currentScreen.hasTopBar) {
+                return@Scaffold
+            }
+            if (currentScreen == CookbookScreen.Search) {
+                SearchBar(
+                    onValueChange = { updatedSearchQuery ->
+                        viewModel.updateSearchQuery(updatedSearchQuery)
+                    },
+                    navigateBackAction = { navController.navigateUp() },
+                    searchQuery = uiState.searchQuery
+                )
+            }
+            else {
                 CookbookAppBar(
                     showBackButton = uiState.canNavigateBack,
                     searchButtonAction = {
@@ -69,17 +81,12 @@ fun CookbookApp(
                     },
                     scrollBehavior = scrollBehavior
                 )
-            } else {
-                SearchBar(
-                    onValueChange = { updatedSearchQuery ->
-                        viewModel.updateSearchQuery(updatedSearchQuery)
-                    },
-                    navigateBackAction = { navController.navigateUp() },
-                    searchQuery = uiState.searchQuery
-                )
             }
         },
         bottomBar = {
+            if (!currentScreen.hasBottomBar) {
+                return@Scaffold
+            }
             CookbookBottomNavigationBar(
                 onHomeClick = {
                     if (currentScreen != CookbookScreen.Category) {
@@ -127,7 +134,11 @@ fun CookbookApp(
                 UserProfileScreen()
             }
             composable(route = CookbookScreen.CreatePost.name) {
-                CreatePostScreen()
+                CreatePostScreen(
+                    onPostButtonClick = {
+                        //TODO: Connect to database
+                    }
+                )
             }
         }
     }
