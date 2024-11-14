@@ -8,7 +8,7 @@ enum class CookbookScreen(
     AIChat,
     Newsfeed,
     UserProfile,
-    Search(hasBottomBar = false), // No top bar for Search screen
-    CreatePost,
-    Login(hasTopBar = false, hasBottomBar = false); // No top or bottom bar for Login screen
+    Search(hasBottomBar = false),
+    CreatePost(hasBottomBar = false),
+    Login(hasTopBar = false, hasBottomBar = false),
 }
