@@ -26,7 +26,7 @@ import com.example.androidcookbook.ui.screen.CreatePostScreen
 import com.example.androidcookbook.ui.screen.NewsfeedScreen
 import com.example.androidcookbook.ui.screen.SearchScreen
 import com.example.androidcookbook.ui.screen.UserProfileScreen
-import com.example.androidcookbook.ui.screen.CookbookScreen
+import com.example.androidcookbook.ui.screen.CookbookScreens
 import com.example.androidcookbook.ui.viewmodel.CategoryViewModel
 import com.example.androidcookbook.ui.viewmodel.CookbookViewModel
 
@@ -38,8 +38,8 @@ fun CookbookApp(
 ) {
     val backStackEntry by navController.currentBackStackEntryAsState()
 
-    val currentScreen = CookbookScreen.valueOf(
-        backStackEntry?.destination?.route ?: CookbookScreen.Category.name
+    val currentScreen = CookbookScreens.valueOf(
+        backStackEntry?.destination?.route ?: CookbookScreens.Category.name
     )
 
     val viewModel: CookbookViewModel = viewModel()
@@ -53,7 +53,7 @@ fun CookbookApp(
             if (!currentScreen.hasTopBar) {
                 return@Scaffold
             }
-            if (currentScreen == CookbookScreen.Search) {
+            if (currentScreen == CookbookScreens.Search) {
                 SearchBar(
                     onValueChange = { updatedSearchQuery ->
                         viewModel.updateSearchQuery(updatedSearchQuery)
@@ -66,10 +66,10 @@ fun CookbookApp(
                 CookbookAppBar(
                     showBackButton = uiState.canNavigateBack,
                     searchButtonAction = {
-                        navController.navigate(CookbookScreen.Search.name)
+                        navController.navigate(CookbookScreens.Search.name)
                     },
                     onCreatePostClick = {
-                        navController.navigate(CookbookScreen.CreatePost.name)
+                        navController.navigate(CookbookScreens.CreatePost.name)
                         viewModel.updateCanNavigateBack(true)
                     },
                     onMenuButtonClick = {
@@ -89,23 +89,23 @@ fun CookbookApp(
             }
             CookbookBottomNavigationBar(
                 onHomeClick = {
-                    if (currentScreen != CookbookScreen.Category) {
-                        navController.navigate(route = CookbookScreen.Category.name)
+                    if (currentScreen != CookbookScreens.Category) {
+                        navController.navigate(route = CookbookScreens.Category.name)
                     }
                 },
                 onChatClick = {
-                    if (currentScreen != CookbookScreen.AIChat) {
-                        navController.navigate(route = CookbookScreen.AIChat.name)
+                    if (currentScreen != CookbookScreens.AIChat) {
+                        navController.navigate(route = CookbookScreens.AIChat.name)
                     }
                 },
                 onNewsfeedClick = {
-                    if (currentScreen != CookbookScreen.Newsfeed) {
-                        navController.navigate(route = CookbookScreen.Newsfeed.name)
+                    if (currentScreen != CookbookScreens.Newsfeed) {
+                        navController.navigate(route = CookbookScreens.Newsfeed.name)
                     }
                 },
                 onUserProfileClick = {
-                    if (currentScreen != CookbookScreen.UserProfile) {
-                        navController.navigate(route = CookbookScreen.UserProfile.name)
+                    if (currentScreen != CookbookScreens.UserProfile) {
+                        navController.navigate(route = CookbookScreens.UserProfile.name)
                     }
                 }
             )
@@ -113,15 +113,15 @@ fun CookbookApp(
     ) { innerPadding ->
         NavHost(
             navController = navController,
-            startDestination = CookbookScreen.Category.name,
+            startDestination = CookbookScreens.Category.name,
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding),
         ) {
-            composable(route = CookbookScreen.Category.name) {
+            composable(route = CookbookScreens.Category.name) {
                 CategoryScreen(categoryUiState = categoryViewModel.categoryUiState)
             }
-            composable(route = CookbookScreen.Search.name) {
+            composable(route = CookbookScreens.Search.name) {
                 SearchScreen(
                     result = uiState.searchQuery,
                     onBackButtonClick = {
@@ -130,16 +130,16 @@ fun CookbookApp(
                     }
                 )
             }
-            composable(route = CookbookScreen.AIChat.name) {
+            composable(route = CookbookScreens.AIChat.name) {
                 AIChatScreen()
             }
-            composable(route = CookbookScreen.Newsfeed.name) {
+            composable(route = CookbookScreens.Newsfeed.name) {
                 NewsfeedScreen()
             }
-            composable(route = CookbookScreen.UserProfile.name) {
+            composable(route = CookbookScreens.UserProfile.name) {
                 UserProfileScreen()
             }
-            composable(route = CookbookScreen.CreatePost.name) {
+            composable(route = CookbookScreens.CreatePost.name) {
                 CreatePostScreen(
                     onPostButtonClick = {
                         //TODO: Connect to database

@@ -1,6 +1,6 @@
 package com.example.androidcookbook.ui.screen
 
-enum class CookbookScreen(
+enum class CookbookScreens(
     val hasTopBar: Boolean = true,
     val hasBottomBar: Boolean = true
 ) {
