@@ -70,14 +70,14 @@ fun CookbookApp(
                     },
                     onCreatePostClick = {
                         navController.navigate(CookbookScreen.CreatePost.name)
-                        viewModel.toggleCanNavigateBack()
+                        viewModel.updateCanNavigateBack(true)
                     },
                     onMenuButtonClick = {
                         //TODO: Add menu button
                     },
                     onBackButtonClick = {
                         navController.navigateUp()
-                        viewModel.toggleCanNavigateBack()
+                        viewModel.updateCanNavigateBack(false)
                     },
                     scrollBehavior = scrollBehavior
                 )
@@ -122,7 +122,13 @@ fun CookbookApp(
                 CategoryScreen(categoryUiState = categoryViewModel.categoryUiState)
             }
             composable(route = CookbookScreen.Search.name) {
-                SearchScreen(uiState.searchQuery)
+                SearchScreen(
+                    result = uiState.searchQuery,
+                    onBackButtonClick = {
+                        navController.navigateUp()
+                        viewModel.updateCanNavigateBack(false)
+                    }
+                )
             }
             composable(route = CookbookScreen.AIChat.name) {
                 AIChatScreen()
@@ -137,7 +143,11 @@ fun CookbookApp(
                 CreatePostScreen(
                     onPostButtonClick = {
                         //TODO: Connect to database
-                    }
+                    },
+                    onBackButtonClick = {
+                        navController.navigateUp()
+                        viewModel.updateCanNavigateBack(false)
+                    },
                 )
             }
         }
