@@ -27,7 +27,6 @@ import com.example.androidcookbook.ui.screen.NewsfeedScreen
 import com.example.androidcookbook.ui.screen.SearchScreen
 import com.example.androidcookbook.ui.screen.UserProfileScreen
 import com.example.androidcookbook.ui.screen.CookbookScreens
-import com.example.androidcookbook.ui.screen.LoginScreen
 import com.example.androidcookbook.ui.viewmodel.CategoryViewModel
 import com.example.androidcookbook.ui.viewmodel.CookbookViewModel
 
@@ -119,14 +118,7 @@ fun CookbookApp(
                 .padding(innerPadding),
         ) {
             composable(route = CookbookScreens.Login.name) {
-                LoginScreen(
-                    onSignIn = { username, password ->
-                        //TODO: Connect to database
-                    },
-                    onSignUp = { username, password ->
-                        //TODO: Connect to database
-                    },
-                )
+                // TODO: add SignInScreen
             }
             composable(route = CookbookScreens.Category.name) {
                 CategoryScreen(categoryUiState = categoryViewModel.categoryUiState)
