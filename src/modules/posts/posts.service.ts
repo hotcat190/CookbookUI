@@ -3,7 +3,7 @@ import { Injectable, NotFoundException, ForbiddenException, BadRequestException 
 import { InjectRepository } from '@nestjs/typeorm';
 import { Post } from './entities/post.entity';
 import { Repository } from 'typeorm';
-import { CreatePostDto } from './dtos/create-post.dto';
+import { CreatePostDto, LiteReponsePostDto, ReponseUserDto } from './dtos/create-post.dto';
 import { UpdatePostDto } from './dtos/update-post.dto';
 import { User } from '../auth/entities/user.entity';
 import { MailerService } from '../mailer/mailer.service';
@@ -53,14 +53,13 @@ export class PostsService {
   }
 
   async getPostById(postId: number): Promise<any> {
-    console.log('startt');
     const post = await this.postsRepository.findOne({
       where: { id: postId }
     });
-    console.log('starttt');
     if (!post) {
       throw new NotFoundException('Bài viết không tồn tại.');
     }
+    post.totalView += 1;
     return post;
   }
 
@@ -75,12 +74,11 @@ export class PostsService {
     }
 
     post.likes.push({ id: userId } as User);
+    post.totalLike = post.likes.length;
+
     await this.postsRepository.save(post);
 
-    // Gửi thông báo đến tác giả
-    await this.mailerService.sendLikeNotification(post.author.email, post.title);
-
-    return { message: 'Đã thích bài viết.', likesCount: post.likes.length };
+    return { message: 'Đã thích bài viết.', totalLike: post.totalLike };
   }
 
   async unlikePost(postId: number, userId: number): Promise<any> {
@@ -95,11 +93,40 @@ export class PostsService {
     }
 
     post.likes.splice(likeIndex, 1);
+    post.totalLike = post.likes.length;
+
     await this.postsRepository.save(post);
 
-    // Gửi thông báo đến tác giả
-    await this.mailerService.sendUnlikeNotification(post.author.email, post.title);
-
-    return { message: 'Đã bỏ thích bài viết.', likesCount: post.likes.length };
+    return { message: 'Đã bỏ thích bài viết.', totalLike: post.totalLike };
   }
+  
+  async getNewfeeds(userId: number): Promise<any> {
+    const currentTime = new Date();
+
+    // Lấy danh sách bài viết nổi bật
+    const posts = await this.postsRepository.find();
+    // Tính điểm cho mỗi bài viết
+    const scoredPosts = posts.map(post => {
+
+      //const isFollow = this.followsService.isFollowing(userId, post.author.id) ? 1 : 0;
+      //const isRead = this.usersService.hasReadPost(userId, post.id) ? 1 : 0;
+      const isFollow = 0;
+      const isRead = 0;
+      const hoursAway = (currentTime.getTime() - post.createdAt.getTime()) / (1000 * 60 * 60);
+
+      const baseScore = (Math.sqrt(post.totalLike + post.totalComment + post.totalView / 5) *
+        (1 + isFollow) *
+        (1 - isRead * 0.9) +
+        isFollow * 2) /
+        Math.sqrt(hoursAway / 2 + 1);
+      console.log(post.title, baseScore);
+      return { post, score: baseScore };
+    });
+
+    // Sắp xếp bài viết theo điểm giảm dần
+    scoredPosts.sort((a, b) => b.score - a.score);
+    
+    return scoredPosts.map(sp => new LiteReponsePostDto(sp.post));
+  } 
+  
 }

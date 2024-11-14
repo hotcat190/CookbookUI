@@ -18,13 +18,13 @@ import {
   import { ApiTags, ApiBearerAuth, ApiOperation, ApiResponse } from '@nestjs/swagger';
   
   @ApiTags('posts')
-  @Controller('posts')
+  @Controller('')
   export class PostsController {
     constructor(private readonly postsService: PostsService) {}
 
     @ApiBearerAuth()
     @UseGuards(JwtAuthGuard)
-    @Post()
+    @Post('posts')
     @ApiOperation({ summary: 'Tạo bài viết mới' })
     @ApiResponse({ status: 201, description: 'Tạo bài viết thành công' })
     @ApiResponse({ status: 400, description: 'Dữ liệu không hợp lệ' })
@@ -34,7 +34,7 @@ import {
 
     @ApiBearerAuth()
     @UseGuards(JwtAuthGuard)
-    @Put(':postId')
+    @Put('posts/:postId')
     @ApiOperation({ summary: 'Chỉnh sửa bài viết' })
     @ApiResponse({ status: 200, description: 'Cập nhật bài viết thành công' })
     @ApiResponse({ status: 403, description: 'Không có quyền chỉnh sửa' })
@@ -49,7 +49,7 @@ import {
 
     @ApiBearerAuth()
     @UseGuards(JwtAuthGuard)
-    @Delete(':postId')
+    @Delete('posts/:postId')
     @ApiOperation({ summary: 'Xóa bài viết' })
     @ApiResponse({ status: 200, description: 'Xóa bài viết thành công' })
     @ApiResponse({ status: 403, description: 'Không có quyền xóa' })
@@ -58,19 +58,30 @@ import {
       return this.postsService.deletePost(postId, req.user.id);
     }
   
-    @Get(':postId')
-    @UseGuards() // Optional: Add guards if necessary
+    @Get('posts/:postId')
     @ApiOperation({ summary: 'Xem bài viết chi tiết' })
     @ApiResponse({ status: 200, description: 'Thông tin chi tiết của bài viết' })
     @ApiResponse({ status: 404, description: 'Bài viết không tồn tại' })
     getPostById(@Param('postId') postId: number) {
-      console.log('start', postId);
       return this.postsService.getPostById(postId);
     }
 
     @ApiBearerAuth()
     @UseGuards(JwtAuthGuard)
-    @Post(':postId/like')
+    @Get('newfeeds')
+    @ApiOperation({ summary: 'Lấy newfeeds' })
+    @ApiResponse({ status: 200, description: 'Newfeed' })
+    @ApiResponse({ status: 404, description: 'Error' })
+    getNewfeeds(@Request() req) {
+      console.log(req.user);
+      return this.postsService.getNewfeeds(req.user.id);
+    }
+
+
+
+    @ApiBearerAuth()
+    @UseGuards(JwtAuthGuard)
+    @Post('posts/:postId/like')
     @ApiOperation({ summary: 'Thích bài viết' })
     @ApiResponse({ status: 200, description: 'Đã thích bài viết' })
     @ApiResponse({ status: 400, description: 'Đã thích bài viết này trước đó' })
@@ -81,7 +92,7 @@ import {
 
     @ApiBearerAuth()
     @UseGuards(JwtAuthGuard)
-    @Delete(':postId/like')
+    @Delete('posts/:postId/like')
     @ApiOperation({ summary: 'Bỏ thích bài viết' })
     @ApiResponse({ status: 200, description: 'Đã bỏ thích bài viết' })
     @ApiResponse({ status: 400, description: 'Bạn chưa thích bài viết này' })
@@ -89,5 +100,6 @@ import {
     unlikePost(@Param('postId') postId: number, @Request() req) {
       return this.postsService.unlikePost(postId, req.user.id);
     }
+
   }
   

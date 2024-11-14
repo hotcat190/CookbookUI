@@ -66,5 +66,7 @@ import {
 
     @Column({ nullable: true })
     avatar: string;
+
+
   }
   

@@ -27,6 +27,18 @@ import {
     @Column({ nullable: true })
     cookTime: string;
   
+    @Column({default: 0})
+    totalLike: number;
+
+    @Column({default: 0})
+    totalComment: number;
+
+    @Column({default: 0})
+    totalView: number;
+
+    @Column({default: 0})
+    baseScore: number;
+
     @Column('simple-json', { nullable: true })
     ingredient: { 
       name: string; 
@@ -34,7 +46,6 @@ import {
     }[];
   
     @Column('simple-json', { nullable: true })
-    //steps: { description: string }[];
     steps: string[];
   
     @Column({ nullable: true })
@@ -55,5 +66,6 @@ import {
   
     @UpdateDateColumn()
     updatedAt: Date;
+
   }
   
