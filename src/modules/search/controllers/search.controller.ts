@@ -12,8 +12,8 @@ export class SearchController {
   @ApiOperation({ summary: 'Tìm kiếm bài viết' })
   @ApiResponse({ status: 200, description: 'Danh sách kết quả tìm kiếm' })
   @ApiResponse({ status: 400, description: 'Vui lòng cung cấp từ khóa tìm kiếm' })
-  async searchRecipes(@Query() query: any) {
-    return this.searchService.searchRecipes(query);
+  async searchPosts(@Query() query: any) {
+    return this.searchService.searchPosts(query);
   }
 
   @Get('recipes/suggestions')

@@ -2,10 +2,10 @@
 import { Module } from '@nestjs/common';
 import { SearchController } from './controllers/search.controller';
 import { SearchService } from './search.service';
-import { RecipesModule } from '../recipes/recipes.module';
+import { PostsModule } from '../posts/posts.module';
 
 @Module({
-  imports: [RecipesModule],
+  imports: [PostsModule],
   controllers: [SearchController],
   providers: [SearchService],
 })

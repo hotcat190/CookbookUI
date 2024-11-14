@@ -4,44 +4,44 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Favorite } from './entities/favorite.entity';
 import { Repository } from 'typeorm';
 import { User } from '../auth/entities/user.entity';
-import { RecipesService } from '../recipes/recipes.service';
+import { PostsService } from '../posts/posts.service';
 
 @Injectable()
 export class FavoritesService {
   constructor(
     @InjectRepository(Favorite) private favoritesRepository: Repository<Favorite>,
     @InjectRepository(User) private usersRepository: Repository<User>,
-    private recipesService: RecipesService,
+    private postsService: PostsService,
   ) {}
 
   async addToFavorites(userId: number): Promise<any> {
-    // Assuming that the recipeId is passed in CreateRecipeDto
-    // Adjust according to your CreateRecipeDto structure
-    // Here, since the controller doesn't pass recipeId, it's unclear
+    // Assuming that the postId is passed in CreatePostDto
+    // Adjust according to your CreatePostDto structure
+    // Here, since the controller doesn't pass postId, it's unclear
     // Adjust accordingly
-    throw new BadRequestException('Thiếu recipeId.');
+    throw new BadRequestException('Thiếu postId.');
   }
 
-  async addToFavoritesWithRecipeId(userId: number, recipeId: number): Promise<any> {
+  async addToFavoritesWithPostId(userId: number, postId: number): Promise<any> {
     const user = await this.usersRepository.findOne({ where: { id: userId }, relations: ['favorites'] });
-    const recipe = await this.recipesService.getRecipeById(recipeId);
+    const post = await this.postsService.getPostById(postId);
 
-    if (user.favorites.some((fav) => fav.recipe.id === recipeId)) {
+    if (user.favorites.some((fav) => fav.post.id === postId)) {
       throw new BadRequestException('Bài viết đã được thêm vào danh sách yêu thích.');
     }
 
-    const favorite = this.favoritesRepository.create({ user, recipe });
+    const favorite = this.favoritesRepository.create({ user, post });
     await this.favoritesRepository.save(favorite);
 
     // Gửi thông báo đến tác giả bài viết
-    await this.recipesService.sendFavoriteNotification(recipe.author.email, recipe.title);
+    await this.postsService.sendFavoriteNotification(post.author.email, post.title);
 
     return { message: 'Đã thêm bài viết vào danh sách yêu thích.', favoritesCount: user.favorites.length + 1 };
   }
 
-  async deleteFromFavorites(recipeId: number, userId: number): Promise<any> {
+  async deleteFromFavorites(postId: number, userId: number): Promise<any> {
     const favorite = await this.favoritesRepository.findOne({
-      where: { user: { id: userId }, recipe: { id: recipeId } },
+      where: { user: { id: userId }, post: { id: postId } },
     });
     if (!favorite) {
       throw new NotFoundException('Bài viết không nằm trong danh sách yêu thích của bạn.');
@@ -53,7 +53,7 @@ export class FavoritesService {
   async getFavorites(userId: number): Promise<any> {
     const favorites = await this.favoritesRepository.find({
       where: { user: { id: userId } },
-      relations: ['recipe'],
+      relations: ['post'],
     });
     return { favorites };
   }

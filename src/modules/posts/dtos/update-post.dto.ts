@@ -1,9 +1,9 @@
-// src/modules/recipes/dtos/update-recipe.dto.ts
+// src/modules/posts/dtos/update-post.dto.ts
 import { PartialType } from '@nestjs/mapped-types';
-import { CreateRecipeDto } from './create-recipe.dto';
+import { CreatePostDto } from './create-post.dto';
 import { ApiPropertyOptional } from '@nestjs/swagger';
 
-export class UpdateRecipeDto extends PartialType(CreateRecipeDto) {
+export class UpdatePostDto extends PartialType(CreatePostDto) {
   @ApiPropertyOptional({ description: 'Tiêu đề bài viết mới' })
   title?: string;
 

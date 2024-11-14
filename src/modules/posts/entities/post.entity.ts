@@ -1,4 +1,4 @@
-// src/modules/recipes/entities/recipe.entity.ts
+// src/modules/posts/entities/post.entity.ts
 import {
     Entity,
     PrimaryGeneratedColumn,
@@ -14,7 +14,7 @@ import {
   import { Comment } from './comment.entity';
   
   @Entity()
-  export class Recipe {
+  export class Post {
     @PrimaryGeneratedColumn()
     id: number;
   
@@ -40,10 +40,10 @@ import {
     @Column({ nullable: true })
     mainImage: string;
   
-    @ManyToOne(() => User, (user) => user.recipes, { eager: true })
+    @ManyToOne(() => User, (user) => user.posts, { eager: true })
     author: User;
     
-    @OneToMany(() => Comment, (comment) => comment.recipe, { cascade: true })
+    @OneToMany(() => Comment, (comment) => comment.post, { cascade: true })
     comments: Comment[];
   
     @ManyToMany(() => User, { eager: true })

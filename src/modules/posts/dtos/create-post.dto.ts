@@ -15,7 +15,7 @@ class IngredientDto {
   quantity: string;
 }
 
-export class CreateRecipeDto {
+export class CreatePostDto {
   @IsString()
   @IsNotEmpty()
   @ApiProperty({ description: 'Tiêu đề bài viết', example: 'Sườn xào chua ngọt' })

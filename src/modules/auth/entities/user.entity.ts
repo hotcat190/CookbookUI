@@ -5,7 +5,7 @@ import {
     Column,
     OneToMany,
   } from 'typeorm';
-  import { Recipe } from '../../recipes/entities/recipe.entity';
+  import { Post } from '../../posts/entities/post.entity';
   import { Follow } from '../../follows/entities/follow.entity';
   import { Favorite } from '../../favorites/entities/favorite.entity';
   import { Notification } from '../../notifications/entities/notification.entity';
@@ -43,8 +43,8 @@ import {
     })
     roles: string[];
   
-    @OneToMany(() => Recipe, (recipe) => recipe.author)
-    recipes: Recipe[];
+    @OneToMany(() => Post, (post) => post.author)
+    posts: Post[];
   
     @OneToMany(() => Follow, (follow) => follow.follower)
     following: Follow[];

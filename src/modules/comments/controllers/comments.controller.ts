@@ -12,17 +12,17 @@ import { ApiTags, ApiBearerAuth, ApiOperation, ApiResponse } from '@nestjs/swagg
 export class CommentsController {
   constructor(private readonly commentsService: CommentsService) {}
 
-  @Post(':recipeId')
+  @Post(':postId')
   @ApiOperation({ summary: 'Thêm bình luận' })
   @ApiResponse({ status: 201, description: 'Thêm bình luận thành công' })
   @ApiResponse({ status: 400, description: 'Nội dung bình luận không hợp lệ' })
   @ApiResponse({ status: 404, description: 'Bài viết không tồn tại' })
   createComment(
-    @Param('recipeId') recipeId: number,
+    @Param('postId') postId: number,
     @Body() createCommentDto: CreateCommentDto,
     @Request() req,
   ) {
-    return this.commentsService.createComment(recipeId, createCommentDto, req.user.id);
+    return this.commentsService.createComment(postId, createCommentDto, req.user.id);
   }
 
   @Delete(':commentId')
@@ -34,11 +34,11 @@ export class CommentsController {
     return this.commentsService.deleteComment(commentId, req.user.id);
   }
 
-  @Get(':recipeId')
+  @Get(':postId')
   @ApiOperation({ summary: 'Xem bình luận' })
   @ApiResponse({ status: 200, description: 'Danh sách bình luận' })
   @ApiResponse({ status: 404, description: 'Bài viết không tồn tại' })
-  getComments(@Param('recipeId') recipeId: number) {
-    return this.commentsService.getComments(recipeId);
+  getComments(@Param('postId') postId: number) {
+    return this.commentsService.getComments(postId);
   }
 }

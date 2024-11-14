@@ -4,7 +4,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Comment } from './entities/comment.entity';
 import { Repository } from 'typeorm';
 import { CreateCommentDto } from './dtos/create-comment.dto';
-import { Recipe } from '../recipes/entities/recipe.entity';
+import { Post } from '../posts/entities/post.entity';
 import { User } from '../auth/entities/user.entity';
 import { NotificationsService } from '../notifications/notifications.service';
 
@@ -12,14 +12,14 @@ import { NotificationsService } from '../notifications/notifications.service';
 export class CommentsService {
   constructor(
     @InjectRepository(Comment) private commentsRepository: Repository<Comment>,
-    @InjectRepository(Recipe) private recipesRepository: Repository<Recipe>,
+    @InjectRepository(Post) private postsRepository: Repository<Post>,
     @InjectRepository(User) private usersRepository: Repository<User>,
     private notificationsService: NotificationsService,
   ) {}
 
-  async createComment(recipeId: number, createCommentDto: CreateCommentDto, userId: number): Promise<any> {
-    const recipe = await this.recipesRepository.findOne({ where: { id: recipeId }, relations: ['author'] });
-    if (!recipe) {
+  async createComment(postId: number, createCommentDto: CreateCommentDto, userId: number): Promise<any> {
+    const post = await this.postsRepository.findOne({ where: { id: postId }, relations: ['author'] });
+    if (!post) {
       throw new NotFoundException('Bài viết không tồn tại.');
     }
 
@@ -27,7 +27,7 @@ export class CommentsService {
 
     const comment = this.commentsRepository.create({
       content: createCommentDto.content,
-      recipe,
+      post,
       user,
     });
 
@@ -35,7 +35,7 @@ export class CommentsService {
 
     // Gửi thông báo đến tác giả bài viết
     await this.notificationsService.sendNotification(
-      recipe.author.id,
+      post.author.id,
       `${user.username} đã bình luận về bài viết của bạn.`,
       comment.id,
       'comment',
@@ -56,13 +56,13 @@ export class CommentsService {
     return { message: 'Xóa bình luận thành công.' };
   }
 
-  async getComments(recipeId: number): Promise<any> {
-    const recipe = await this.recipesRepository.findOne({ where: { id: recipeId } });
-    if (!recipe) {
+  async getComments(postId: number): Promise<any> {
+    const post = await this.postsRepository.findOne({ where: { id: postId } });
+    if (!post) {
       throw new NotFoundException('Bài viết không tồn tại.');
     }
     const comments = await this.commentsRepository.find({
-      where: { recipe: { id: recipeId } },
+      where: { post: { id: postId } },
       relations: ['user'],
       order: { createdAt: 'DESC' },
     });

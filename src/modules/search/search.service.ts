@@ -1,19 +1,19 @@
 // src/modules/search/search.service.ts
 import { Injectable, BadRequestException } from '@nestjs/common';
-import { RecipesService } from '../recipes/recipes.service';
+import { PostsService } from '../posts/posts.service';
 import { getPagination, getPagingData } from '../../common/utils/pagination.util';
 
 @Injectable()
 export class SearchService {
-  constructor(private readonly recipesService: RecipesService) {}
+  constructor(private readonly postsService: PostsService) {}
 
-  async searchRecipes(queryParams: any): Promise<any> {
+  async searchPosts(queryParams: any): Promise<any> {
     const { query, cookTime, difficulty, rating, page, limit } = queryParams;
     if (!query) {
       throw new BadRequestException('Vui lòng cung cấp từ khóa tìm kiếm.');
     }
     const pagination = getPagination(queryParams);
-    const results = await this.recipesService.searchRecipes({
+    const results = await this.postsService.searchPosts({
       query,
       cookTime,
       difficulty,
@@ -27,7 +27,7 @@ export class SearchService {
     if (!query) {
       throw new BadRequestException('Vui lòng cung cấp từ khóa để nhận gợi ý.');
     }
-    const suggestions = await this.recipesService.getSearchSuggestions(query);
+    const suggestions = await this.postsService.getSearchSuggestions(query);
     return { suggestions };
   }
 }
