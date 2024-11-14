@@ -62,8 +62,7 @@ fun CookbookApp(
                     navigateBackAction = { navController.navigateUp() },
                     searchQuery = uiState.searchQuery
                 )
-            }
-            else {
+            } else {
                 CookbookAppBar(
                     showBackButton = uiState.canNavigateBack,
                     searchButtonAction = {
@@ -120,7 +119,14 @@ fun CookbookApp(
                 .padding(innerPadding),
         ) {
             composable(route = CookbookScreens.Login.name) {
-                LoginScreen()
+                LoginScreen(
+                    onSignIn = { username, password ->
+                        //TODO: Connect to database
+                    },
+                    onSignUp = { username, password ->
+                        //TODO: Connect to database
+                    },
+                )
             }
             composable(route = CookbookScreens.Category.name) {
                 CategoryScreen(categoryUiState = categoryViewModel.categoryUiState)
