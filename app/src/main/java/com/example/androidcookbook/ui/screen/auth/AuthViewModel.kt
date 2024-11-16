@@ -7,7 +7,7 @@ import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.example.androidcookbook.CookbookApplication
-import com.example.androidcookbook.data.AuthRepository
+import com.example.androidcookbook.data.repositories.AuthRepository
 import com.example.androidcookbook.model.auth.RegisterRequest
 import com.example.androidcookbook.model.auth.SignInRequest
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -15,7 +15,6 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 
 class AuthViewModel(private val authRepository: AuthRepository) : ViewModel() {
     private val _uiState = MutableStateFlow(AuthUiState())
@@ -46,7 +45,7 @@ class AuthViewModel(private val authRepository: AuthRepository) : ViewModel() {
     }
 
     fun SignUp(req: RegisterRequest) {
-        runBlocking {
+        viewModelScope.launch {
             val response = authRepository.register(req)
             ChangeOpenDialog(true)
             if (response.isSuccessful) {
@@ -61,23 +60,35 @@ class AuthViewModel(private val authRepository: AuthRepository) : ViewModel() {
         }
     }
 
-    fun SignIn(req: SignInRequest) {
-        runBlocking {
-            val response = authRepository.login(req)
+    fun signIn(req: SignInRequest) {
+        viewModelScope.launch {
+            try {
+                val response = authRepository.login(req)
 
-            ChangeOpenDialog(true)
-            if (response.isSuccessful) {
-                // Trường hợp đăng ký thành công
-                val signInResponse = response.body()
-                Log.d("Login", "Success: $signInResponse}")
-                SignInSuccess()
-                signInResponse?.message?.let { ChangeDialogMessage(it) }
-            } else if (response.code() == 404){
-                Log.e("Login", "Request timed out.")
-                ChangeDialogMessage("Cannot establish connection")
-            } else {
-                Log.e("Login", "Error: $response")
-                ChangeDialogMessage("Wrong username or password")
+                ChangeOpenDialog(true)
+                if (response.isSuccessful) {
+                    val signInResponse = response.body()
+                    Log.d("Login", "Success: $signInResponse}")
+                    SignInSuccess()
+                    signInResponse?.message?.let { ChangeDialogMessage(it) }
+                } else if (response.code() == 404) {
+                    Log.e("Login", "Request timed out.")
+                    ChangeDialogMessage("Cannot establish connection")
+                } else {
+                    Log.e("Login", "Error: $response")
+                    ChangeDialogMessage("Wrong username or password")
+                }
+            } catch (e: Exception) {
+                when (e) {
+                    is java.net.SocketTimeoutException -> {
+                        Log.e("Login", "Socket Timeout: ${e.message}")
+                        ChangeDialogMessage("Request timed out. Please try again.")
+                    }
+                    else -> {
+                        Log.e("Login", "Unexpected error: ${e.message}")
+                        ChangeDialogMessage("An unexpected error occurred. Please try again.")
+                    }
+                }
             }
         }
     }
