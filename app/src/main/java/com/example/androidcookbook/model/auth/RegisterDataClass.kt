@@ -1,4 +1,4 @@
-package com.example.androidcookbook.model.signup
+package com.example.androidcookbook.model.auth
 
 data class RegisterRequest(
     val username: String,
@@ -10,6 +10,6 @@ data class RegisterResponse(
     val statusCode: Int,
     val timestamp: String,
     val path: String,
-    val message: Any,
+    val message: String,
     val error: String
 )

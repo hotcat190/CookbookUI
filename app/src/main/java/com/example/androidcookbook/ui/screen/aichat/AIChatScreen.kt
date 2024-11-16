@@ -1,4 +1,4 @@
-package com.example.androidcookbook.ui.screen
+package com.example.androidcookbook.ui.screen.aichat
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier

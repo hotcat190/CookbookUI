@@ -1,4 +1,4 @@
-package com.example.androidcookbook.ui.screen
+package com.example.androidcookbook.ui.screen.category
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyListState
@@ -17,9 +18,9 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Card
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material.Text
+import androidx.compose.material.Text // Using material Text and Card
+import androidx.compose.material.Card // cuz cant be bothered changing colors
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -37,7 +38,6 @@ import coil.request.ImageRequest
 import com.example.androidcookbook.R
 import com.example.androidcookbook.model.Category
 import com.example.androidcookbook.ui.theme.Typography
-import com.example.androidcookbook.ui.uistate.CategoryUiState
 import kotlinx.coroutines.delay
 
 @Composable
@@ -77,7 +77,8 @@ fun RandomMeal(modifier: Modifier = Modifier, randomMeals: List<Category>) {
         items(items = randomMeals) { randomMeal ->
             Box(
                 modifier = Modifier
-                    .width(300.dp),
+                    .width(300.dp)
+                    .height(250.dp),
                 contentAlignment = Alignment.Center
             ) {
                 CategoryCard(
