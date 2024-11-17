@@ -1,6 +1,8 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
+    id("kotlin-kapt")
+    id("com.google.dagger.hilt.android")
 }
 
 android {
@@ -40,7 +42,7 @@ android {
         compose = true
     }
     composeOptions {
-        kotlinCompilerExtensionVersion = "1.5.1"
+        kotlinCompilerExtensionVersion = "1.5.10"
     }
     packaging {
         resources {
@@ -51,13 +53,12 @@ android {
 
 
 dependencies {
-    implementation("io.coil-kt:coil-compose:2.0.0")
-    implementation("com.squareup.retrofit2:retrofit:2.9.0")
-    implementation("com.squareup.retrofit2:converter-gson:2.9.0")
-    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.4.0")
-    implementation("androidx.activity:activity-compose:1.3.1")
-    implementation("androidx.navigation:navigation-compose:2.8.3")
-    implementation("androidx.compose.material:material:1.7.5")
+    implementation(libs.coil.compose)
+    implementation(libs.retrofit)
+    implementation(libs.converter.gson)
+    implementation(libs.androidx.lifecycle.viewmodel.compose)
+    implementation(libs.androidx.navigation.compose)
+    implementation(libs.androidx.material)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
@@ -70,10 +71,23 @@ dependencies {
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(platform(libs.androidx.compose.bom))
-    androidTestImplementation("androidx.test.espresso:espresso-intents:3.6.1")
+    androidTestImplementation(libs.androidx.espresso.intents)
     androidTestImplementation(libs.androidx.ui.test.junit4)
-    androidTestImplementation ("androidx.navigation:navigation-testing:2.8.3")
+    androidTestImplementation (libs.androidx.navigation.testing)
 
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
+
+    // Hilt
+    implementation(libs.hilt.android)
+    kapt(libs.hilt.compiler)
+    implementation(libs.androidx.hilt.navigation.compose)
+
+    // Reflect
+    implementation(kotlin("reflect"))
+}
+
+// Allow references to generated code
+kapt {
+    correctErrorTypes = true
 }

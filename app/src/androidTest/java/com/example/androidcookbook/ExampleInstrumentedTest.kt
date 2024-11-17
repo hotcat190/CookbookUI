@@ -5,14 +5,15 @@ import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTextInput
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
-import com.example.androidcookbook.model.auth.SignInRequest
-import com.example.androidcookbook.ui.screen.auth.AuthViewModel
-import com.example.androidcookbook.ui.screen.auth.LoginScreen
-import com.example.androidcookbook.ui.screen.auth.PASSWORD_TEXT_FIELD_TEST_TAG
-import com.example.androidcookbook.ui.screen.auth.USERNAME_TEXT_FIELD_TEST_TAG
+import com.example.androidcookbook.domain.model.auth.SignInRequest
+import com.example.androidcookbook.ui.features.auth.AuthViewModel
+import com.example.androidcookbook.ui.features.auth.LoginScreen
+import com.example.androidcookbook.ui.features.auth.PASSWORD_TEXT_FIELD_TEST_TAG
+import com.example.androidcookbook.ui.features.auth.USERNAME_TEXT_FIELD_TEST_TAG
 import com.example.androidcookbook.ui.theme.AndroidCookbookTheme
 import org.junit.Assert.*
 import org.junit.Rule
@@ -43,12 +44,14 @@ class ExampleInstrumentedTest {
 
         composeTestRule.setContent {
             AndroidCookbookTheme {
-                val authViewModel: AuthViewModel = viewModel(factory = AuthViewModel.Factory)
+                val authViewModel: AuthViewModel = hiltViewModel()
                 LoginScreen(
-                    authViewModel = authViewModel,
+                    isDialogOpen = false,
+                    dialogMessage = null,
+                    onDialogDismiss = {},
                     onNavigateToSignUp = {},
                     onForgotPasswordClick = {},
-                    onSignInClick = { username, password -> authViewModel.signIn(SignInRequest(username, password)) }
+                    onSignInClick = { username, password -> authViewModel.signIn(SignInRequest(username, password)) },
                 )
             }
         }
