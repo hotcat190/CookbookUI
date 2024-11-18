@@ -3,7 +3,7 @@ import { Injectable, NotFoundException, ForbiddenException, BadRequestException 
 import { InjectRepository } from '@nestjs/typeorm';
 import { Post } from './entities/post.entity';
 import { Repository } from 'typeorm';
-import { CreatePostDto, LiteReponsePostDto, ReponseUserDto } from './dtos/create-post.dto';
+import { CreatePostDto, FullReponseLikeDto, FullReponsePostDto, LiteReponsePostDto, ReponseUserDto } from './dtos/create-post.dto';
 import { UpdatePostDto } from './dtos/update-post.dto';
 import { User } from '../auth/entities/user.entity';
 import { MailerService } from '../mailer/mailer.service';
@@ -28,7 +28,7 @@ export class PostsService {
   }
 
   async updatePost(postId: number, updatePostDto: UpdatePostDto, userId: number): Promise<any> {
-    const post = await this.postsRepository.findOne({ where: { id: postId }, relations: ['author'] });
+    const post = await this.postsRepository.findOne({ where: { id: postId } });
     if (!post) {
       throw new NotFoundException('Bài viết không tồn tại.');
     }
@@ -37,7 +37,7 @@ export class PostsService {
     }
     Object.assign(post, updatePostDto);
     await this.postsRepository.save(post);
-    return { message: 'Cập nhật bài viết thành công.', post };
+    return { message: 'Chỉnh sửa bài viết thành công.', post: { ...post, authorName: post.author.name } };
   }
 
   async deletePost(postId: number, userId: number): Promise<any> {
@@ -60,11 +60,21 @@ export class PostsService {
       throw new NotFoundException('Bài viết không tồn tại.');
     }
     post.totalView += 1;
-    return post;
-  }
+    await this.postsRepository.save(post);
 
+    return new FullReponsePostDto(post);
+  }
+  async getLikeByPostId(postId: number, page: number): Promise<any> {
+    const post = await this.postsRepository.findOne({
+      where: { id: postId }
+    });
+    if (!post) {
+      throw new NotFoundException('Bài viết không tồn tại.');
+    }
+    return new FullReponseLikeDto(page, post);
+  }
   async likePost(postId: number, userId: number): Promise<any> {
-    const post = await this.postsRepository.findOne({ where: { id: postId }, relations: ['likes', 'author'] });
+    const post = await this.postsRepository.findOne({ where: { id: postId } });
     if (!post) {
       throw new NotFoundException('Bài viết không tồn tại.');
     }
@@ -82,7 +92,7 @@ export class PostsService {
   }
 
   async unlikePost(postId: number, userId: number): Promise<any> {
-    const post = await this.postsRepository.findOne({ where: { id: postId }, relations: ['likes', 'author'] });
+    const post = await this.postsRepository.findOne({ where: { id: postId } });
     if (!post) {
       throw new NotFoundException('Bài viết không tồn tại.');
     }
@@ -100,21 +110,17 @@ export class PostsService {
     return { message: 'Đã bỏ thích bài viết.', totalLike: post.totalLike };
   }
   
-  async getNewfeeds(userId: number): Promise<any> {
+  async getNewfeeds(userId: number, limit: number): Promise<any> {
     const currentTime = new Date();
-
-    // Lấy danh sách bài viết nổi bật
     const posts = await this.postsRepository.find();
-    // Tính điểm cho mỗi bài viết
     const scoredPosts = posts.map(post => {
-
       //const isFollow = this.followsService.isFollowing(userId, post.author.id) ? 1 : 0;
       //const isRead = this.usersService.hasReadPost(userId, post.id) ? 1 : 0;
       const isFollow = 0;
       const isRead = 0;
       const hoursAway = (currentTime.getTime() - post.createdAt.getTime()) / (1000 * 60 * 60);
 
-      const baseScore = (Math.sqrt(post.totalLike + post.totalComment + post.totalView / 5) *
+      const baseScore = (Math.sqrt(post.totalLike + post.totalComment + Math.sqrt(post.totalView)) *
         (1 + isFollow) *
         (1 - isRead * 0.9) +
         isFollow * 2) /
@@ -122,11 +128,10 @@ export class PostsService {
       console.log(post.title, baseScore);
       return { post, score: baseScore };
     });
-
     // Sắp xếp bài viết theo điểm giảm dần
     scoredPosts.sort((a, b) => b.score - a.score);
     
-    return scoredPosts.map(sp => new LiteReponsePostDto(sp.post));
+    return scoredPosts.slice(0, limit).map(sp => new LiteReponsePostDto(sp.post));
   } 
   
 }

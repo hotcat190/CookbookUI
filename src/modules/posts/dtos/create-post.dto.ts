@@ -6,7 +6,7 @@ import exp from 'constants';
 import { Post } from '../entities/post.entity';
 import { User } from 'src/modules/auth/entities/user.entity';
 
-class IngredientDto {
+export class IngredientDto {
   @IsString()
   @IsNotEmpty()
   @ApiProperty({ description: 'Tên nguyên liệu', example: 'Thịt heo' })
@@ -20,8 +20,10 @@ class IngredientDto {
 export class ReponseUserDto{
   constructor(user?: User) {
     if (user) {
-        const { id, username, name, avatar } = user;
-        Object.assign(this, { id, username, name, avatar });
+        this.id = user.id;
+        this.username = user.username;
+        this.name = user.name;
+        this.avatar = user.avatar;
     }
   }
   @IsNumber()
@@ -43,11 +45,20 @@ export class ReponseUserDto{
 export class LiteReponsePostDto{
   constructor(post?: Post) {
     if (post) {
-        const { author, title, description, cookTime, mainImage, totalView, totalComment, totalLike } = post;
-        const authorDto = new ReponseUserDto(author);
-        Object.assign(this, { author: authorDto, title, description, cookTime, mainImage, totalView, totalComment, totalLike });
+      this.id = post.id;
+      this.author = new ReponseUserDto(post.author);
+      this.title = post.title;
+      this.description = post.description;
+      this.cookTime = post.cookTime;
+      this.mainImage = post.mainImage;
+      this.totalView = post.totalView;
+      this.totalComment = post.totalComment;
+      this.totalLike = post.totalLike;
     }
   }
+  @IsNotEmpty()
+  id: number;
+
   @Type(() => ReponseUserDto)
   author: ReponseUserDto;
 
@@ -76,15 +87,42 @@ export class LiteReponsePostDto{
   totalComment?: number;
   totalLike?: number;
 }
+export class FullReponseLikeDto{
+  constructor(page: number, post?: Post) {
+    if (post) {
+      this.nextPage = false;  
+      const itemsPerPage = 10;
+      const startIndex = (page - 1) * itemsPerPage;
+      this.likes = post.likes.slice(startIndex, startIndex + itemsPerPage).map(sp => new ReponseUserDto(sp));
+      if (post.totalLike > itemsPerPage*page) {
+        this.nextPage = true;
+      }
+    }
+  }
+  likes: ReponseUserDto[];
+  nextPage: boolean;
+}
 export class FullReponsePostDto{
   constructor(post?: Post) {
     if (post) {
-        Object.assign(this, post);
+      this.id = post.id;
+      this.author = new ReponseUserDto(post.author);
+      this.title = post.title;
+      this.description = post.description;
+      this.cookTime = post.cookTime;
+      this.mainImage = post.mainImage;
+      this.totalView = post.totalView;
+      this.totalComment = post.totalComment;
+      this.totalLike = post.totalLike;
+      this.ingredient = post.ingredient;
+      this.steps = post.steps;
     }
-}
+  }
+  @IsNotEmpty()
+  id: number;
   @Type(() => ReponseUserDto)
   author: ReponseUserDto;
-
+  
   @IsString()
   @IsNotEmpty()
   @ApiProperty({ description: 'Tiêu đề bài viết', example: 'Sườn xào chua ngọt' })
@@ -121,6 +159,8 @@ export class FullReponsePostDto{
   totalFavorite?: number;
   totalComment?: number;
   totalLike?: number;
+
+  
 }
 export class CreatePostDto {
   @IsString()
@@ -154,4 +194,6 @@ export class CreatePostDto {
   @IsUrl()
   @ApiPropertyOptional({ description: 'Hình ảnh chính của món ăn', example: 'https://file.hstatic.net/200000610729/file/suon-3_022e54b9753f433ea8d5e2b7466b3484.jpg' })
   mainImage?: string;
+
+  
 }

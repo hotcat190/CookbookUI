@@ -65,16 +65,21 @@ import {
     getPostById(@Param('postId') postId: number) {
       return this.postsService.getPostById(postId);
     }
-
+    @Get('likes/:postId/:page')
+    @ApiOperation({ summary: 'Xem danh sách thích bài viết theo trang (mỗi trang 10, bắt đầu từ trang 1), more true là có trang tiếp theo' })
+    @ApiResponse({ status: 200, description: 'Danh sách người thích bài viết' })
+    @ApiResponse({ status: 404, description: 'Bài viết không tồn tại' })
+    getLikeByPostId(@Param('postId') postId: number, @Param('page') page: number) {
+      return this.postsService.getLikeByPostId(postId, page);
+    }
     @ApiBearerAuth()
     @UseGuards(JwtAuthGuard)
-    @Get('newfeeds')
-    @ApiOperation({ summary: 'Lấy newfeeds' })
+    @Get('newfeeds/:limit')
+    @ApiOperation({ summary: 'Lấy newfeeds theo limit' })
     @ApiResponse({ status: 200, description: 'Newfeed' })
     @ApiResponse({ status: 404, description: 'Error' })
-    getNewfeeds(@Request() req) {
-      console.log(req.user);
-      return this.postsService.getNewfeeds(req.user.id);
+    getNewfeeds(@Request() req, @Param('limit') limit: number) {
+      return this.postsService.getNewfeeds(req.user.id, limit);
     }
 
 
