@@ -29,6 +29,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -36,9 +37,11 @@ import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.example.androidcookbook.R
-import com.example.androidcookbook.domain.model.Category
+import com.example.androidcookbook.domain.model.category.Category
 import com.example.androidcookbook.ui.theme.Typography
 import kotlinx.coroutines.delay
+
+const val CATEGORY_SCREEN_TAG = "CategoryScreen"
 
 @Composable
 fun CategoryScreen(modifier: Modifier = Modifier, categoryUiState: CategoryUiState) {

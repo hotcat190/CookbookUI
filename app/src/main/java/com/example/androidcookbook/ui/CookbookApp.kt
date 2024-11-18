@@ -19,9 +19,9 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import com.example.androidcookbook.ui.components.appbars.CookbookAppBar
-import com.example.androidcookbook.ui.components.appbars.CookbookBottomNavigationBar
-import com.example.androidcookbook.ui.components.appbars.SearchBar
+import com.example.androidcookbook.ui.common.appbars.CookbookAppBar
+import com.example.androidcookbook.ui.common.appbars.CookbookBottomNavigationBar
+import com.example.androidcookbook.ui.common.appbars.SearchBar
 import com.example.androidcookbook.ui.nav.NavigationRoutes
 import com.example.androidcookbook.ui.nav.graphs.appScreens
 import com.example.androidcookbook.ui.nav.graphs.authScreens

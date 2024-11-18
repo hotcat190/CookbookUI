@@ -9,6 +9,7 @@ import com.example.androidcookbook.data.repositories.CategoriesRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import retrofit2.HttpException
 import java.io.IOException
 import javax.inject.Inject
@@ -26,7 +27,7 @@ class CategoryViewModel @Inject constructor(
     }
 
     fun getCategories() {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             categoryUiState = CategoryUiState.Loading
             categoryUiState = try {
                 CategoryUiState.Success(categoriesRepository.getCategories())

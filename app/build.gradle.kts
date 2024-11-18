@@ -16,7 +16,7 @@ android {
         versionCode = 1
         versionName = "1.0"
 
-        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunner = "com.example.androidcookbook.HiltTestRunner"
         vectorDrawables {
             useSupportLibrary = true
         }
@@ -51,7 +51,6 @@ android {
     }
 }
 
-
 dependencies {
     implementation(libs.coil.compose)
     implementation(libs.retrofit)
@@ -82,9 +81,16 @@ dependencies {
     implementation(libs.hilt.android)
     kapt(libs.hilt.compiler)
     implementation(libs.androidx.hilt.navigation.compose)
+    // Hilt instrumented tests.
+    androidTestImplementation(libs.hilt.android.testing)
+    kaptAndroidTest(libs.hilt.android.compiler)
 
     // Reflect
     implementation(kotlin("reflect"))
+
+    // Sandwich Adapter for Retrofit
+    implementation(libs.sandwich.retrofit) // For Retrofit (Android)
+
 }
 
 // Allow references to generated code

@@ -1,12 +1,14 @@
 package com.example.androidcookbook.ui.features.auth
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.androidcookbook.data.repositories.AuthRepository
 import com.example.androidcookbook.domain.model.auth.RegisterRequest
 import com.example.androidcookbook.domain.model.auth.SignInRequest
+import com.skydoves.sandwich.ApiResponse
+import com.skydoves.sandwich.message
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -22,7 +24,7 @@ class AuthViewModel @Inject constructor(
     private val _uiState = MutableStateFlow(AuthUiState())
     val uiState: StateFlow<AuthUiState> = _uiState.asStateFlow()
 
-    fun ChangeOpenDialog(open: Boolean) {
+    fun changeOpenDialog(open: Boolean) {
         _uiState.update {
             it.copy(
                 openDialog = open
@@ -30,7 +32,7 @@ class AuthViewModel @Inject constructor(
         }
     }
 
-    fun ChangeDialogMessage(message: String) {
+    fun changeDialogMessage(message: String) {
         _uiState.update {
             it.copy(
                 dialogMessage = message
@@ -38,7 +40,7 @@ class AuthViewModel @Inject constructor(
         }
     }
 
-    fun SignInSuccess() {
+    private fun signInSuccess() {
         _uiState.update {
             it.copy(
                 signInSuccess = true
@@ -46,52 +48,25 @@ class AuthViewModel @Inject constructor(
         }
     }
 
-    fun SignUp(req: RegisterRequest) {
-        viewModelScope.launch {
+    fun signUp(req: RegisterRequest) {
+        viewModelScope.launch(Dispatchers.IO) {
             val response = authRepository.register(req)
-            ChangeOpenDialog(true)
-            if (response.isSuccessful) {
-                // Trường hợp đăng ký thành công
-                val registerResponse = response.body()
-                Log.d("Register", "Success: ${registerResponse?.message}")
-                registerResponse?.message?.let { ChangeDialogMessage(it) }
-            } else {
-                Log.e("Register", "Error: ${response}")
-                ChangeDialogMessage(response.toString())
+            _uiState.value = when (response) {
+                is ApiResponse.Success -> _uiState.value.copy(openDialog = true, dialogMessage = response.data.message)
+                is ApiResponse.Failure.Error -> _uiState.value.copy(openDialog = true, dialogMessage = response.message())
+                is ApiResponse.Failure.Exception -> _uiState.value.copy(openDialog = true, dialogMessage = response.message())
             }
         }
     }
 
-    fun signIn(req: SignInRequest) {
+    fun signIn(username: String, password: String) {
         viewModelScope.launch {
-            try {
-                val response = authRepository.login(req)
-
-                if (response.isSuccessful) {
-                    val signInResponse = response.body()
-                    Log.d("Login", "Success: $signInResponse}")
-                    SignInSuccess()
-                    signInResponse?.message?.let { ChangeDialogMessage(it) }
-                } else if (response.code() == 404) {
-                    Log.e("Login", "Request timed out.")
-                    ChangeDialogMessage("Cannot establish connection")
-                } else {
-                    Log.e("Login", "Error: $response")
-                    ChangeDialogMessage("Wrong username or password")
-                }
-            } catch (e: Exception) {
-                when (e) {
-                    is java.net.SocketTimeoutException -> {
-                        Log.e("Login", "Socket Timeout: ${e}")
-                        ChangeDialogMessage("Request timed out. Please try again.")
-                    }
-                    else -> {
-                        Log.e("Login", "Unexpected error: ${e.message}")
-                        ChangeDialogMessage("An unexpected error occurred. Please try again.")
-                    }
-                }
+            val response = authRepository.login(SignInRequest(username, password))
+            _uiState.value = when (response) {
+                is ApiResponse.Success -> _uiState.value.copy(openDialog = true, dialogMessage = response.data.message, signInSuccess = true)
+                is ApiResponse.Failure.Error -> _uiState.value.copy(openDialog = true, dialogMessage = response.payload.toString())
+                is ApiResponse.Failure.Exception -> _uiState.value.copy(openDialog = true, dialogMessage = response.throwable.toString())
             }
-            ChangeOpenDialog(true)
         }
     }
 }
