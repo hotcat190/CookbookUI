@@ -66,6 +66,7 @@ import {
 
     @Column({ nullable: true })
     avatar: string;
+    likes: any;
 
 
   }

@@ -48,10 +48,10 @@ export class AuthService {
       });
 
       await this.usersRepository.save(user);
-
+      const url = `${baseUrl}/auth/verify-email?token=${user.verificationToken}`;
       await this.mailerService.sendVerificationEmail(user.username, user.email, user.verificationToken, baseUrl);
 
-      return { message: 'Đăng ký thành công. Vui lòng kiểm tra email để xác thực.' };
+      return { message: 'Đăng ký thành công. Vui lòng kiểm tra email để xác thực.', url: url };
     } 
     catch (error) {
       if (error instanceof BadRequestException) {

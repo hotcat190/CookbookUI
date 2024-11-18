@@ -1,11 +1,11 @@
 // src/modules/recipes/dtos/create-recipe.dto.ts
-import { IsString, IsNotEmpty, IsOptional, IsNumber, IsArray, ValidateNested, IsUrl, ArrayMinSize } from 'class-validator';
+import { IsString, IsNotEmpty, IsOptional, IsNumber, IsArray, ValidateNested, IsUrl, ArrayMinSize, IsDate, MaxLength } from 'class-validator';
 import { Type } from 'class-transformer';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import exp from 'constants';
 import { Post } from '../entities/post.entity';
 import { User } from 'src/modules/auth/entities/user.entity';
-
+import { Comment } from '../entities/comment.entity';
 export class IngredientDto {
   @IsString()
   @IsNotEmpty()
@@ -194,6 +194,46 @@ export class CreatePostDto {
   @IsUrl()
   @ApiPropertyOptional({ description: 'Hình ảnh chính của món ăn', example: 'https://file.hstatic.net/200000610729/file/suon-3_022e54b9753f433ea8d5e2b7466b3484.jpg' })
   mainImage?: string;
+}
 
-  
+
+
+export class CreateCommentDto {
+  @IsString()
+  @IsNotEmpty()
+  @MaxLength(500)
+  @ApiProperty({ description: 'Nội dung bình luận' })
+  content: string;
+}
+
+export class DeleteCommentDto {
+  @IsNumber()
+  @ApiProperty({ description: 'ID của bình luận cần xóa' })
+  commentId: number;
+}
+
+export class FullReponseCommentDto{
+  constructor(comment?: Comment) {
+    if (comment) {
+      this.id = comment.id;
+      this.content = comment.content;
+      this.user = new ReponseUserDto(comment.user);
+      this.createdAt = comment.createdAt;
+    }
+  }
+  nextPage: boolean;
+  @IsNotEmpty()
+  id: number;
+
+  @IsString()
+  @IsNotEmpty()
+  content: string;
+
+  @Type(() => ReponseUserDto)
+  user: ReponseUserDto;
+
+  @IsDate()
+  @IsNotEmpty()
+  createdAt: Date
+
 }

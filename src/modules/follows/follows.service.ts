@@ -15,30 +15,37 @@ export class FollowsService {
   ) {}
 
   async followUser(targetUserId: number, currentUserId: number): Promise<any> {
-    if (targetUserId === currentUserId) {
+    try {
+      if (targetUserId == currentUserId) {
       throw new BadRequestException('Bạn không thể theo dõi chính mình.');
-    }
+      }
 
-    const targetUser = await this.usersRepository.findOne({ where: { id: targetUserId } });
-    if (!targetUser) {
+      const targetUser = await this.usersRepository.findOne({ where: { id: targetUserId } });
+      if (!targetUser) {
       throw new NotFoundException('Người dùng không tồn tại.');
-    }
+      }
 
-    const existingFollow = await this.followsRepository.findOne({
+      const existingFollow = await this.followsRepository.findOne({
       where: { follower: { id: currentUserId }, following: { id: targetUserId } },
-    });
-    if (existingFollow) {
+      });
+      if (existingFollow) {
       throw new BadRequestException('Bạn đã theo dõi người dùng này trước đó.');
-    }
+      }
 
-    const follower = await this.usersRepository.findOne({ where: { id: currentUserId } });
-    const follow = this.followsRepository.create({ follower, following: targetUser });
-    await this.followsRepository.save(follow);
+      const follower = await this.usersRepository.findOne({ where: { id: currentUserId } });
+      const follow = this.followsRepository.create({ follower, following: targetUser });
+      await this.followsRepository.save(follow);
+      return { message: 'Đã theo dõi người dùng.'};
+
+    } catch (error) {
+      console.error('Failed to follow user:', error);
+      throw error;
+    }
 
     // Gửi thông báo đến người được theo dõi
-    await this.notificationsService.sendNotification(targetUserId, 'Bạn có người mới theo dõi.', follow.id, 'follow');
+    //await this.notificationsService.sendNotification(targetUserId, 'Bạn có người mới theo dõi.', follow.id, 'follow');
 
-    return { message: 'Đã theo dõi người dùng.', followersCount: targetUser.followers.length + 1 };
+    
   }
 
   async unfollowUser(targetUserId: number, currentUserId: number): Promise<any> {

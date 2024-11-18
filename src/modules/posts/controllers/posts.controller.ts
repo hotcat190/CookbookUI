@@ -12,7 +12,7 @@ import {
     Query,
   } from '@nestjs/common';
   import { PostsService } from '../posts.service';
-  import { CreatePostDto } from '../dtos/create-post.dto';
+  import { CreateCommentDto, CreatePostDto } from '../dtos/create-post.dto';
   import { UpdatePostDto } from '../dtos/update-post.dto';
   import { JwtAuthGuard } from '../../../common/guards/jwt-auth.guard';
   import { ApiTags, ApiBearerAuth, ApiOperation, ApiResponse } from '@nestjs/swagger';
@@ -22,6 +22,15 @@ import {
   export class PostsController {
     constructor(private readonly postsService: PostsService) {}
 
+    @ApiBearerAuth()
+    @UseGuards(JwtAuthGuard)
+    @Get('newfeeds/:limit')
+    @ApiOperation({ summary: 'Lấy newfeeds theo limit' })
+    @ApiResponse({ status: 200, description: 'Newfeed' })
+    @ApiResponse({ status: 404, description: 'Error' })
+    getNewfeeds(@Request() req, @Param('limit') limit: number) {
+      return this.postsService.getNewfeeds(req.user.id, limit);
+    }
     @ApiBearerAuth()
     @UseGuards(JwtAuthGuard)
     @Post('posts')
@@ -65,28 +74,27 @@ import {
     getPostById(@Param('postId') postId: number) {
       return this.postsService.getPostById(postId);
     }
-    @Get('likes/:postId/:page')
-    @ApiOperation({ summary: 'Xem danh sách thích bài viết theo trang (mỗi trang 10, bắt đầu từ trang 1), more true là có trang tiếp theo' })
+    @Get('profile/posts/:userId')
+    @ApiOperation({ summary: 'Xem tất cả bài viết của một người' })
+    @ApiResponse({ status: 200, description: 'Thông tin chi tiết của bài viết' })
+    @ApiResponse({ status: 404, description: 'Bài viết không tồn tại' })
+    getPostByUserId(@Param('userId') userId: number) {
+      return this.postsService.getPostByUserId(userId);
+    }
+    @Get('like/:postId/:page')
+    @ApiOperation({ summary: 'Xem danh sách thích bài viết theo trang (mỗi trang 10, bắt đầu từ trang 1), nextPage true là có trang tiếp theo' })
     @ApiResponse({ status: 200, description: 'Danh sách người thích bài viết' })
     @ApiResponse({ status: 404, description: 'Bài viết không tồn tại' })
     getLikeByPostId(@Param('postId') postId: number, @Param('page') page: number) {
       return this.postsService.getLikeByPostId(postId, page);
     }
-    @ApiBearerAuth()
-    @UseGuards(JwtAuthGuard)
-    @Get('newfeeds/:limit')
-    @ApiOperation({ summary: 'Lấy newfeeds theo limit' })
-    @ApiResponse({ status: 200, description: 'Newfeed' })
-    @ApiResponse({ status: 404, description: 'Error' })
-    getNewfeeds(@Request() req, @Param('limit') limit: number) {
-      return this.postsService.getNewfeeds(req.user.id, limit);
-    }
+    
 
 
 
     @ApiBearerAuth()
     @UseGuards(JwtAuthGuard)
-    @Post('posts/:postId/like')
+    @Post('like/:postId')
     @ApiOperation({ summary: 'Thích bài viết' })
     @ApiResponse({ status: 200, description: 'Đã thích bài viết' })
     @ApiResponse({ status: 400, description: 'Đã thích bài viết này trước đó' })
@@ -97,7 +105,7 @@ import {
 
     @ApiBearerAuth()
     @UseGuards(JwtAuthGuard)
-    @Delete('posts/:postId/like')
+    @Delete('like/:postId')
     @ApiOperation({ summary: 'Bỏ thích bài viết' })
     @ApiResponse({ status: 200, description: 'Đã bỏ thích bài viết' })
     @ApiResponse({ status: 400, description: 'Bạn chưa thích bài viết này' })
@@ -106,5 +114,39 @@ import {
       return this.postsService.unlikePost(postId, req.user.id);
     }
 
-  }
+    @ApiBearerAuth()
+    @UseGuards(JwtAuthGuard)
+    @Post('comment/:postId')
+    @ApiOperation({ summary: 'Thêm bình luận' })
+    @ApiResponse({ status: 201, description: 'Thêm bình luận thành công' })
+    @ApiResponse({ status: 400, description: 'Nội dung bình luận không hợp lệ' })
+    @ApiResponse({ status: 404, description: 'Bài viết không tồn tại' })
+    createComment(
+      @Param('postId') postId: number,
+      @Body() createCommentDto: CreateCommentDto,
+      @Request() req,
+    ) {
+      console.log(req.user);
+      return this.postsService.createComment(postId, createCommentDto, req.user.id);
+    }
+    
+    @ApiBearerAuth()
+    @UseGuards(JwtAuthGuard)
+    @Delete('comment/:commentId')
+    @ApiOperation({ summary: 'Xóa bình luận của mình' })
+    @ApiResponse({ status: 200, description: 'Xóa bình luận thành công' })
+    @ApiResponse({ status: 403, description: 'Không có quyền xóa' })
+    @ApiResponse({ status: 404, description: 'Bình luận không tồn tại' })
+    deleteComment(@Param('commentId') commentId: number, @Request() req) {
+      return this.postsService.deleteComment(commentId, req.user.id);
+    }
+
+    @Get('comment/:postId/:page')
+    @ApiOperation({ summary: 'Xem bình luận' })
+    @ApiResponse({ status: 200, description: 'Danh sách bình luận' })
+    @ApiResponse({ status: 404, description: 'Bài viết không tồn tại' })
+    getComments(@Param('postId') postId: number, @Param('page') page: number) {
+      return this.postsService.getComments(postId, page);
+    }
+}
   

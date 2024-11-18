@@ -9,6 +9,7 @@ import {
     JoinTable,
     CreateDateColumn,
     UpdateDateColumn,
+    RelationCount,
   } from 'typeorm';
   import { User } from '../../auth/entities/user.entity';
   import { Comment } from './comment.entity';
@@ -28,9 +29,11 @@ import {
     cookTime: string;
   
     @Column({default: 0})
+    @RelationCount((post: Post) => post.likes)
     totalLike: number;
 
     @Column({default: 0})
+    @RelationCount((post: Post) => post.comments)
     totalComment: number;
 
     @Column({default: 0})
@@ -57,10 +60,10 @@ import {
     @OneToMany(() => Comment, (comment) => comment.post, { cascade: true })
     comments: Comment[];
   
-    @ManyToMany(() => User, { eager: true })
+    @ManyToMany(() => User, user => user.likes)
     @JoinTable()
     likes: User[];
-  
+    
     @CreateDateColumn()
     createdAt: Date;
   

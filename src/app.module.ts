@@ -10,7 +10,6 @@ import { FavoritesModule } from './modules/favorites/favorites.module';
 import { SearchModule } from './modules/search/search.module';
 import { NotificationsModule } from './modules/notifications/notifications.module';
 import { FollowsModule } from './modules/follows/follows.module';
-import { CommentsModule } from './modules/comments/comments.module';
 import { MailerModule } from './modules/mailer/mailer.module';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
@@ -43,7 +42,6 @@ import { AppService } from './app.service';
     SearchModule,
     NotificationsModule,
     FollowsModule,
-    CommentsModule,
     MailerModule,
   ],
   controllers: [AppController],
