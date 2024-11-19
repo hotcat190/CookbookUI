@@ -5,7 +5,9 @@ import com.example.androidcookbook.domain.model.auth.RegisterRequest
 import com.example.androidcookbook.domain.model.auth.RegisterResponse
 import com.example.androidcookbook.domain.model.auth.SignInRequest
 import com.example.androidcookbook.domain.model.auth.SignInResponse
+import com.example.androidcookbook.domain.network.ErrorMessage
 import com.skydoves.sandwich.ApiResponse
+import com.skydoves.sandwich.retrofit.serialization.onErrorDeserialize
 import javax.inject.Inject
 
 class AuthRepository @Inject constructor(
@@ -16,7 +18,10 @@ class AuthRepository @Inject constructor(
     }
 
     suspend fun login(signInRequest: SignInRequest): ApiResponse<SignInResponse> {
-        return authService.login(signInRequest) // Same here
+        val response = authService.login(signInRequest)
+        return response.onErrorDeserialize<SignInResponse, ErrorMessage> { errorMessage: ErrorMessage ->
+            errorMessage.message
+        }
     }
 }
 
