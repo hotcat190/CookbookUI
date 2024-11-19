@@ -66,7 +66,5 @@ export class NotificationsService {
 
     await this.notificationsRepository.save(notification);
 
-    // Gửi thông báo email
-    await this.mailerService.sendNotificationEmail(user.email, message);
   }
 }

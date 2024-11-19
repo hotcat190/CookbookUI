@@ -12,11 +12,11 @@ import { UpdateProfileDto } from '../dtos/update-profile.dto';
 import { JwtAuthGuard } from 'src/common/guards/jwt-auth.guard';
 
 @ApiTags('auth')
-@Controller('auth')
+@Controller('')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
-  @Post('register')
+  @Post('auth/register')
   @ApiOperation({ summary: 'Đăng ký tài khoản mới' })
   @ApiResponse({ status: 201, description: 'Đăng ký thành công' })
   @ApiResponse({ status: 400, description: 'Dữ liệu không hợp lệ hoặc đã tồn tại' })
@@ -25,7 +25,7 @@ export class AuthController {
     return this.authService.register(registerDto, baseUrl);
   }
 
-  @Post('login')
+  @Post('auth/login')
   @ApiOperation({ summary: 'Đăng nhập' })
   @ApiResponse({ status: 200, description: 'Đăng nhập thành công' })
   @ApiResponse({ status: 401, description: 'Sai tên đăng nhập hoặc mật khẩu' })
@@ -33,7 +33,7 @@ export class AuthController {
     return this.authService.login(loginDto);
   }
 
-  @Get('verify-email')
+  @Get('auth/verify-email')
   @ApiOperation({ summary: 'Xác thực Email' })
   @ApiResponse({ status: 200, description: 'Xác thực thành công' })
   @ApiResponse({ status: 400, description: 'Token không hợp lệ hoặc đã hết hạn' })
@@ -41,7 +41,7 @@ export class AuthController {
     return this.authService.verifyEmail(token);
   }
 
-  @Post('forgot-password')
+  @Post('auth/forgot-password')
   @ApiOperation({ summary: 'Quên mật khẩu' })
   @ApiResponse({ status: 200, description: 'Liên kết đặt lại mật khẩu đã được gửi nếu email tồn tại' })
   @ApiResponse({ status: 400, description: 'Email không hợp lệ' })
@@ -50,7 +50,7 @@ export class AuthController {
     return this.authService.forgotPassword(forgotDto );
   }
 
-  @Post('reset-password')
+  @Post('auth/reset-password')
   @ApiOperation({ summary: 'Đặt lại mật khẩu' })
   @ApiResponse({ status: 200, description: 'Đặt lại mật khẩu thành công' })
   @ApiResponse({ status: 400, description: 'Token không hợp lệ hoặc đã hết hạn' })
