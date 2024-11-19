@@ -18,7 +18,7 @@ import {
   import { ApiTags, ApiBearerAuth, ApiOperation, ApiResponse } from '@nestjs/swagger';
   
   @ApiTags('posts')
-  @Controller('')
+  @Controller('posts')
   export class PostsController {
     constructor(private readonly postsService: PostsService) {}
 
@@ -126,7 +126,6 @@ import {
       @Body() createCommentDto: CreateCommentDto,
       @Request() req,
     ) {
-      console.log(req.user);
       return this.postsService.createComment(postId, createCommentDto, req.user.id);
     }
     

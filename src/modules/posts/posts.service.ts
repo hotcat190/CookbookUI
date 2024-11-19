@@ -79,7 +79,6 @@ export class PostsService {
       .select(['post.id', 'likes.id', 'likes.username', 'likes.avatar', 'likes.name'])
       .where('post.id = :id', { id: postId })
       .getOne();
-  
     if (!post) {
       throw new NotFoundException('Bài viết không tồn tại.');
     }
@@ -161,7 +160,6 @@ export class PostsService {
         (1 - isRead * 0.9) +
         isFollow * 2) /
         Math.sqrt(hoursAway / 2 + 1);
-      console.log(post.title, baseScore);
       return { post, score: baseScore };
     });
     // Sắp xếp bài viết theo điểm giảm dần

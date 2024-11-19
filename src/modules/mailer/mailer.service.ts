@@ -10,7 +10,6 @@ export class MailerService {
   async sendVerificationEmail(username: string, email: string, token: string, baseUrl: string): Promise<void> {
 
     const url = `${baseUrl}/auth/verify-email?token=${token}`;
-    console.log(url);
     try {
       await this.mailer.sendMail({
         to: email,

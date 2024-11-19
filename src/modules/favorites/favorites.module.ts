@@ -6,9 +6,10 @@ import { FavoritesService } from './favorites.service';
 import { Favorite } from './entities/favorite.entity';
 import { User } from '../auth/entities/user.entity';
 import { PostsModule } from '../posts/posts.module';
+import { Post } from '../posts/entities/post.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Favorite, User]), PostsModule],
+  imports: [TypeOrmModule.forFeature([Favorite, User, Post]), PostsModule],
   controllers: [FavoritesController],
   providers: [FavoritesService],
   exports: [FavoritesService],

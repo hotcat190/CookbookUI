@@ -17,7 +17,6 @@ export class FollowsController {
   @ApiResponse({ status: 400, description: 'Bạn đã theo dõi hoặc không thể theo dõi chính mình' })
   @ApiResponse({ status: 404, description: 'Người dùng không tồn tại' })
   followUser(@Param('userId') userId: number, @Request() req) {
-    console.log(req.user);
     return this.followsService.followUser(userId, req.user.id);
   }
 

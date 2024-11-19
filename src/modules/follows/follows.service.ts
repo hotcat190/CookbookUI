@@ -38,7 +38,6 @@ export class FollowsService {
       return { message: 'Đã theo dõi người dùng.'};
 
     } catch (error) {
-      console.error('Failed to follow user:', error);
       throw error;
     }
 
@@ -56,7 +55,7 @@ export class FollowsService {
       throw new BadRequestException('Bạn chưa theo dõi người dùng này.');
     }
     await this.followsRepository.remove(follow);
-    return { message: 'Đã hủy theo dõi người dùng.', followersCount: follow.following.followers.length - 1 };
+    return { message: 'Đã hủy theo dõi người dùng.'};
   }
 
   async getFollowers(userId: number): Promise<any> {
