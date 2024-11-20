@@ -60,7 +60,7 @@ import {
     @OneToMany(() => Comment, (comment) => comment.post, { cascade: true })
     comments: Comment[];
   
-    @ManyToMany(() => User, user => user.likes)
+    @ManyToMany(() => User)
     @JoinTable()
     likes: User[];
     

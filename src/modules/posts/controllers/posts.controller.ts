@@ -22,6 +22,13 @@ import {
   export class PostsController {
     constructor(private readonly postsService: PostsService) {}
 
+    @Get('profile/posts/:userId')
+    @ApiOperation({ summary: 'Xem tất cả bài viết của một người' })
+    @ApiResponse({ status: 200, description: 'Thông tin chi tiết của bài viết' })
+    @ApiResponse({ status: 404, description: 'Bài viết không tồn tại' })
+    getPostByUserId(@Param('userId') userId: number) {
+      return this.postsService.getPostByUserId(userId);
+    }
     @ApiBearerAuth()
     @UseGuards(JwtAuthGuard)
     @Get('newfeeds/:limit')
@@ -74,13 +81,7 @@ import {
     getPostById(@Param('postId') postId: number) {
       return this.postsService.getPostById(postId);
     }
-    @Get('profile/posts/:userId')
-    @ApiOperation({ summary: 'Xem tất cả bài viết của một người' })
-    @ApiResponse({ status: 200, description: 'Thông tin chi tiết của bài viết' })
-    @ApiResponse({ status: 404, description: 'Bài viết không tồn tại' })
-    getPostByUserId(@Param('userId') userId: number) {
-      return this.postsService.getPostByUserId(userId);
-    }
+    
     @Get('like/:postId/:page')
     @ApiOperation({ summary: 'Xem danh sách thích bài viết theo trang (mỗi trang 10, bắt đầu từ trang 1), nextPage true là có trang tiếp theo' })
     @ApiResponse({ status: 200, description: 'Danh sách người thích bài viết' })
@@ -113,7 +114,14 @@ import {
     unlikePost(@Param('postId') postId: number, @Request() req) {
       return this.postsService.unlikePost(postId, req.user.id);
     }
-
+    
+    @Get('comment/:postId/:page')
+    @ApiOperation({ summary: 'Xem bình luận' })
+    @ApiResponse({ status: 200, description: 'Danh sách bình luận' })
+    @ApiResponse({ status: 404, description: 'Bài viết không tồn tại' })
+    getComments(@Param('postId') postId: number, @Param('page') page: number) {
+      return this.postsService.getComments(postId, page);
+    }
     @ApiBearerAuth()
     @UseGuards(JwtAuthGuard)
     @Post('comment/:postId')
@@ -140,12 +148,6 @@ import {
       return this.postsService.deleteComment(commentId, req.user.id);
     }
 
-    @Get('comment/:postId/:page')
-    @ApiOperation({ summary: 'Xem bình luận' })
-    @ApiResponse({ status: 200, description: 'Danh sách bình luận' })
-    @ApiResponse({ status: 404, description: 'Bài viết không tồn tại' })
-    getComments(@Param('postId') postId: number, @Param('page') page: number) {
-      return this.postsService.getComments(postId, page);
-    }
+    
 }
   

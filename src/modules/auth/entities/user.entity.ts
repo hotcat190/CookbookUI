@@ -4,10 +4,11 @@ import {
     PrimaryGeneratedColumn,
     Column,
     OneToMany,
+    JoinTable,
+    ManyToMany,
   } from 'typeorm';
   import { Post } from '../../posts/entities/post.entity';
   import { Follow } from '../../follows/entities/follow.entity';
-  import { Favorite } from '../../favorites/entities/favorite.entity';
   import { Notification } from '../../notifications/entities/notification.entity';
   import { Exclude } from 'class-transformer';
   
@@ -37,7 +38,9 @@ import {
   
     @Column({ type: 'timestamp', nullable: true })
     resetPasswordExpires: Date;
-  
+    
+    @Column({ nullable: true })
+    resetPasswordCode: string;
     @Column('json', {
       nullable: true // Remove any default value here
     })
@@ -51,10 +54,12 @@ import {
   
     @OneToMany(() => Follow, (follow) => follow.following)
     followers: Follow[];
-  
-    @OneToMany(() => Favorite, (favorite) => favorite.user)
-    favorites: Favorite[];
-  
+
+
+    @ManyToMany(() => Post)
+    @JoinTable()
+    favorites: Post[];
+
     @OneToMany(() => Notification, (notification) => notification.user)
     notifications: Notification[];
     
@@ -66,7 +71,7 @@ import {
 
     @Column({ nullable: true })
     avatar: string;
-    likes: any;
+
 
 
   }

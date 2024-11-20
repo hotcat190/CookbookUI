@@ -87,21 +87,7 @@ export class LiteReponsePostDto{
   totalComment?: number;
   totalLike?: number;
 }
-export class FullReponseLikeDto{
-  constructor(page: number, post?: Post) {
-    if (post) {
-      this.nextPage = false;  
-      const itemsPerPage = 10;
-      const startIndex = (page - 1) * itemsPerPage;
-      this.likes = post.likes.slice(startIndex, startIndex + itemsPerPage).map(sp => new ReponseUserDto(sp));
-      if (post.totalLike > itemsPerPage*page) {
-        this.nextPage = true;
-      }
-    }
-  }
-  likes: ReponseUserDto[];
-  nextPage: boolean;
-}
+
 export class FullReponsePostDto{
   constructor(post?: Post) {
     if (post) {

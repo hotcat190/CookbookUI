@@ -1,5 +1,5 @@
 // src/modules/auth/controllers/auth.controller.ts
-import { Controller, Post, Body, Get, Query, Req, Put, Param, Request as Request1, UseGuards } from '@nestjs/common';
+import { Controller, Post, Body, Get, Query, Req, Put, Param, Request as Request1, UseGuards, Delete } from '@nestjs/common';
 
 import { AuthService } from '../auth.service';
 import { RegisterDto } from '../dtos/register.dto';
@@ -10,6 +10,7 @@ import { ForgotDto } from '../dtos/forgot.dto';
 import { Request as Request2 } from 'express';
 import { UpdateProfileDto } from '../dtos/update-profile.dto';
 import { JwtAuthGuard } from 'src/common/guards/jwt-auth.guard';
+import { ChangePasswordDto } from '../dtos/change-password.dto';
 
 @ApiTags('auth')
 @Controller('')
@@ -57,7 +58,45 @@ export class AuthController {
   resetPassword(@Body() resetPasswordDto: ResetPasswordDto) {
     return this.authService.resetPassword(resetPasswordDto);
   }
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
+  @Post('auth/change-password')
+  @ApiOperation({ summary: 'Đổi mật khẩu (khi đã đăng nhập)' })
+  @ApiResponse({ status: 200, description: 'Đổi mật khẩu thành công' })
+  changePassword(@Request1() req, @Body() changePasswordDto: ChangePasswordDto) {
+    return this.authService.changePassword(req.user.id, changePasswordDto);
+  }
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
+  @Get('favorite/:page')
+  @ApiOperation({ summary: 'Xem danh sách thích bài viết theo trang (mỗi trang 10, bắt đầu từ trang 1), nextPage true là có trang tiếp theo' })
+  @ApiResponse({ status: 200, description: 'Danh sách người thích bài viết' })
+  @ApiResponse({ status: 404, description: 'Bài viết không tồn tại' })
+  getLikeByPostId(@Param('page') page: number, @Request1() req) {
+    return this.authService.getFavorites(page, req.user.id);
+  }
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
+  @Post('favorite/:recipeId')
+  @ApiOperation({ summary: 'Thêm vào danh sách yêu thích' })
+  @ApiResponse({ status: 201, description: 'Đã thêm vào danh sách yêu thích' })
+  @ApiResponse({ status: 400, description: 'Bài viết đã được thêm trước đó' })
+  @ApiResponse({ status: 404, description: 'Bài viết không tồn tại' })
+  addToFavorites(@Param('recipeId') postId: number, @Request1() req) {
+    return this.authService.addToFavorites(postId, req.user.id);
+  }
 
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
+  @Delete('favorite/:recipeId')
+  @ApiOperation({ summary: 'Xóa khỏi danh sách yêu thích' })
+  @ApiResponse({ status: 200, description: 'Đã xóa khỏi danh sách yêu thích' })
+  @ApiResponse({ status: 404, description: 'Bài viết không nằm trong danh sách yêu thích' })
+  deleteFromFavorites(@Param('recipeId') postId: number, @Request1() req) {
+    return this.authService.deleteFromFavorites(postId, req.user.id);
+  }
+
+  
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
   @Put('profile/edit')

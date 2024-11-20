@@ -9,9 +9,9 @@ export class AppController {
   constructor(private readonly appService: AppService) {}
 
   @Get('/')
-  @ApiOperation({ summary: 'Kiểm tra tình trạng ứng dụng' })
-  @ApiResponse({ status: 200, description: 'Ứng dụng đang hoạt động' })
+  @ApiOperation({ summary: 'Giới thiệu về dự án' })
+  @ApiResponse({ status: 200, description: 'Trả OK' })
   getHealth() {
-    return this.appService.getHealth();
+    return this.appService.getProject();
   }
 }

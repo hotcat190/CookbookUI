@@ -4,7 +4,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Post } from './entities/post.entity';
 import { Comment } from './entities/comment.entity';
 import { Repository } from 'typeorm';
-import { CreateCommentDto, CreatePostDto, FullReponseCommentDto, FullReponseLikeDto, FullReponsePostDto, LiteReponsePostDto, ReponseUserDto } from './dtos/create-post.dto';
+import { CreateCommentDto, CreatePostDto, FullReponseCommentDto, FullReponsePostDto, LiteReponsePostDto, ReponseUserDto } from './dtos/create-post.dto';
 import { UpdatePostDto } from './dtos/update-post.dto';
 import { User } from '../auth/entities/user.entity';
 import { MailerService } from '../mailer/mailer.service';
@@ -82,7 +82,15 @@ export class PostsService {
     if (!post) {
       throw new NotFoundException('Bài viết không tồn tại.');
     }
-    return new FullReponseLikeDto(page, post);
+    const likes = post.likes;
+    const itemsPerPage = 10;
+    const startIndex = (page - 1) * itemsPerPage;
+    if (likes.length > itemsPerPage*page) {
+      return {nextPage: "true", likes: likes.slice(startIndex, startIndex + itemsPerPage).map(like => new ReponseUserDto(like))};
+    }
+    else{
+      return {nextPage: "false", likes: likes.slice(startIndex, startIndex + itemsPerPage).map(like => new ReponseUserDto(like))};
+    }
   }
   async getComments(postId: number, page: number): Promise<any> {
     const comments = await this.commentsRepository.find({
@@ -113,7 +121,6 @@ export class PostsService {
     if (post.likes.some((like) => like.id === userId)) {
       throw new BadRequestException('Bạn đã thích bài viết này trước đó.');
     }
-  
     post.likes.push({ id: userId } as User);
     post.totalLike = post.likes.length;
   
