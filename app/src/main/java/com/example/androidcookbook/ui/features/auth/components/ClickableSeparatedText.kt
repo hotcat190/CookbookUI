@@ -13,7 +13,8 @@ import androidx.compose.ui.tooling.preview.Preview
 fun ClickableSeparatedText(
     unclickableText: String,
     clickableText: String,
-    onClick: () -> Unit
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     Row {
         Text(
@@ -37,6 +38,7 @@ fun ClickableSeparatedText(
 fun TextPreview() {
     ClickableSeparatedText(
         unclickableText = "Doesn’t have account ?",
-        clickableText = "Sign Up"
-    ){}
+        clickableText = "Sign Up",
+        {}
+    )
 }

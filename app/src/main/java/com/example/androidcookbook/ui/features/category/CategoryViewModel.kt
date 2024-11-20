@@ -1,15 +1,14 @@
 package com.example.androidcookbook.ui.features.category
 
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.androidcookbook.data.repositories.CategoriesRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import retrofit2.HttpException
 import java.io.IOException
 import javax.inject.Inject
@@ -19,22 +18,24 @@ class CategoryViewModel @Inject constructor(
     private val categoriesRepository: CategoriesRepository
 ) : ViewModel() {
 
-    var categoryUiState: CategoryUiState by mutableStateOf(CategoryUiState.Loading)
-        private set
+    private var _categoryUiState: MutableStateFlow<CategoryUiState> = MutableStateFlow(CategoryUiState.Loading)
+    val categoryUiState: StateFlow<CategoryUiState> = _categoryUiState
 
     init {
         getCategories()
     }
 
-    fun getCategories() {
+    private fun getCategories() {
         viewModelScope.launch {
-            categoryUiState = CategoryUiState.Loading
-            categoryUiState = try {
-                CategoryUiState.Success(categoriesRepository.getCategories())
+            _categoryUiState.update { CategoryUiState.Loading }
+            try {
+                _categoryUiState.update{ CategoryUiState.Success(categoriesRepository.getCategories()) }
             } catch (e: IOException) {
-                CategoryUiState.Error
+                Log.e(CATEGORY_SCREEN_TAG, e.printStackTrace().toString())
+                _categoryUiState.update{ CategoryUiState.Error }
             } catch (e: HttpException) {
-                CategoryUiState.Error
+                Log.e(CATEGORY_SCREEN_TAG, e.printStackTrace().toString())
+                _categoryUiState.update{ CategoryUiState.Error }
             }
         }
     }

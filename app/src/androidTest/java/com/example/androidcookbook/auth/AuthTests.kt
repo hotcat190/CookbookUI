@@ -21,7 +21,7 @@ import com.example.androidcookbook.domain.model.auth.SignInResponse
 import com.example.androidcookbook.ui.features.auth.AuthViewModel
 import com.example.androidcookbook.ui.features.auth.components.PASSWORD_TEXT_FIELD_TEST_TAG
 import com.example.androidcookbook.ui.features.auth.components.USERNAME_TEXT_FIELD_TEST_TAG
-import com.example.androidcookbook.ui.features.auth.screens.LoginScreen
+import com.example.androidcookbook.ui.features.auth.login.LoginScreen
 import com.skydoves.sandwich.ApiResponse
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest

@@ -10,14 +10,6 @@ class CookbookViewModel : ViewModel() {
     private val _uiState = MutableStateFlow(CookbookUiState())
     val uiState: StateFlow<CookbookUiState> = _uiState.asStateFlow()
 
-    fun updateSearchQuery(updatedSearchQuery: String) {
-       _uiState.update { currentState ->
-           currentState.copy(
-               searchQuery = updatedSearchQuery
-           )
-       }
-    }
-
     fun updateCanNavigateBack(updatedCanNavigateBack: Boolean) {
         _uiState.update { currentState ->
             currentState.copy(

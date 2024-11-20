@@ -19,7 +19,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
@@ -65,7 +64,7 @@ private fun PasswordInputField(
         text = text,
         onChange = onChange,
         placeholderText = placeholderText,
-        modifier = modifier.testTag(PASSWORD_TEXT_FIELD_TEST_TAG),
+        modifier = modifier,
         visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
         trailingIcon = {
             val image = if (passwordVisible)
@@ -96,7 +95,7 @@ private fun DefaultInputField(
         text = text,
         onChange = onChange,
         placeholderText = placeholderText,
-        modifier = modifier.testTag(USERNAME_TEXT_FIELD_TEST_TAG),
+        modifier = modifier,
         visualTransformation = VisualTransformation.None,
         trailingIcon = null,
         keyboardType = type

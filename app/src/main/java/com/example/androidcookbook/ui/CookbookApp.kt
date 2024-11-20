@@ -1,6 +1,5 @@
 package com.example.androidcookbook.ui
 
-import android.util.Log
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -9,12 +8,11 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavDestination.Companion.hasRoute
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.currentBackStackEntryAsState
@@ -22,11 +20,16 @@ import androidx.navigation.compose.rememberNavController
 import com.example.androidcookbook.ui.common.appbars.CookbookAppBar
 import com.example.androidcookbook.ui.common.appbars.CookbookBottomNavigationBar
 import com.example.androidcookbook.ui.common.appbars.SearchBar
-import com.example.androidcookbook.ui.nav.NavigationRoutes
+import com.example.androidcookbook.ui.nav.graphs.AIChat
+import com.example.androidcookbook.ui.nav.graphs.AuthScreensGraph
+import com.example.androidcookbook.ui.nav.graphs.Category
+import com.example.androidcookbook.ui.nav.graphs.CreatePost
+import com.example.androidcookbook.ui.nav.graphs.Newsfeed
+import com.example.androidcookbook.ui.nav.graphs.Search
+import com.example.androidcookbook.ui.nav.graphs.UserProfile
 import com.example.androidcookbook.ui.nav.graphs.appScreens
 import com.example.androidcookbook.ui.nav.graphs.authScreens
 import com.example.androidcookbook.ui.nav.utils.navigateIfNotOn
-import com.example.androidcookbook.ui.features.category.CategoryViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -35,47 +38,33 @@ fun CookbookApp(
     navController: NavHostController = rememberNavController(),
 ) {
     val backStackEntry by navController.currentBackStackEntryAsState()
-    Log.d("BACK_STACK_ENTRY", backStackEntry.toString())
-
-    val currentRoute = backStackEntry?.destination?.route
-    // Memoize the result to avoid recomputing on each recomposition
-    val currentScreen = remember(currentRoute) {
-        NavigationRoutes.AppScreens::class.nestedClasses
-            .mapNotNull { it.objectInstance as? NavigationRoutes }
-            .find { it.route == currentRoute }
-    }
-
-    val showTopBar = currentScreen?.hasTopBar ?: false
-    val showBottomBar = currentScreen?.hasBottomBar ?: false
+    val currentDestination = backStackEntry?.destination
 
     val viewModel: CookbookViewModel = viewModel()
-    val categoryViewModel: CategoryViewModel = hiltViewModel<CategoryViewModel>()
-
     val uiState by viewModel.uiState.collectAsState()
+
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
 
     Scaffold(
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
         topBar = {
-            if (!showTopBar) {
+            if (!uiState.showTopBar) {
                 return@Scaffold
             }
-            if (currentScreen is NavigationRoutes.AppScreens.Search) {
+            if (currentDestination?.hasRoute(Search::class) == true) {
                 SearchBar(
-                    onValueChange = { updatedSearchQuery ->
-                        viewModel.updateSearchQuery(updatedSearchQuery)
-                    },
-                    navigateBackAction = { navController.navigateUp() },
-                    searchQuery = uiState.searchQuery
+                    onValueChange = {_->},
+                    navigateBackAction = {},
+                    searchQuery = "",
                 )
             } else {
                 CookbookAppBar(
                     showBackButton = uiState.canNavigateBack,
                     searchButtonAction = {
-                        navController.navigate(NavigationRoutes.AppScreens.Search.route)
+                        navController.navigate(Search)
                     },
                     onCreatePostClick = {
-                        navController.navigateIfNotOn(NavigationRoutes.AppScreens.CreatePost.route)
+                        navController.navigateIfNotOn(CreatePost)
                         viewModel.updateCanNavigateBack(true)
                     },
                     onMenuButtonClick = {
@@ -90,34 +79,34 @@ fun CookbookApp(
             }
         },
         bottomBar = {
-            if (!showBottomBar) {
+            if (!uiState.showTopBar) {
                 return@Scaffold
             }
             CookbookBottomNavigationBar(
                 onHomeClick = {
-                    navController.navigateIfNotOn(NavigationRoutes.AppScreens.Category.route)
+                    navController.navigateIfNotOn(Category)
                 },
                 onChatClick = {
-                    navController.navigateIfNotOn(NavigationRoutes.AppScreens.AIChat.route)
+                    navController.navigateIfNotOn(AIChat)
                 },
                 onNewsfeedClick = {
-                    navController.navigateIfNotOn(NavigationRoutes.AppScreens.Newsfeed.route)
+                    navController.navigateIfNotOn(Newsfeed)
                 },
                 onUserProfileClick = {
-                    navController.navigateIfNotOn(NavigationRoutes.AppScreens.UserProfile.route)
+                    navController.navigateIfNotOn(UserProfile)
                 }
             )
         }
     ) { innerPadding ->
         NavHost(
             navController = navController,
-            startDestination = NavigationRoutes.AuthScreens.NavigationRoute.route,
+            startDestination = AuthScreensGraph,
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding),
         ) {
             authScreens(navController = navController)
-            appScreens(navController = navController, viewModel = viewModel, categoryViewModel = categoryViewModel, uiState = uiState)
+            appScreens(navController = navController)
         }
     }
 }

@@ -6,66 +6,81 @@ import androidx.compose.runtime.getValue
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
+import androidx.navigation.compose.dialog
 import androidx.navigation.compose.navigation
-import com.example.androidcookbook.ui.nav.NavigationRoutes
-import com.example.androidcookbook.ui.nav.utils.authViewModel
+import com.example.androidcookbook.ui.common.dialog.MinimalDialog
+import com.example.androidcookbook.ui.features.auth.AuthUiState
 import com.example.androidcookbook.ui.features.auth.AuthViewModel
+import com.example.androidcookbook.ui.features.auth.login.LoginScreen
 import com.example.androidcookbook.ui.features.auth.screens.ForgotPasswordScreen
-import com.example.androidcookbook.ui.features.auth.screens.LoginScreen
 import com.example.androidcookbook.ui.features.auth.screens.RegisterScreen
+import com.example.androidcookbook.ui.nav.utils.authViewModel
+import kotlinx.serialization.Serializable
+
+@Serializable object AuthScreensGraph
+
+@Serializable object Login
+@Serializable object Register
+@Serializable object ForgotPassword
+@Serializable object MinimalDialog
 
 /**
  * Login, registration, forgot password screens nav graph builder
  * (Unauthenticated user)
  */
 fun NavGraphBuilder.authScreens(navController: NavController) {
-    navigation(
-        route = NavigationRoutes.AuthScreens.NavigationRoute.route,
-        startDestination = NavigationRoutes.AuthScreens.Login.route
+    navigation<AuthScreensGraph>(
+        startDestination = Login
     ) {
         // Scope the ViewModel to the navigation graph
-        composable(route = NavigationRoutes.AuthScreens.Login.route) { backStackEntry ->
-            val authViewModel = authViewModel(backStackEntry, navController)
-            val authUiState by authViewModel.uiState.collectAsState()
+        composable<Login> {
+            val authViewModel: AuthViewModel = authViewModel(it, navController)
+            val loginState: AuthUiState by authViewModel.uiState.collectAsState()
             LoginScreen(
                 onNavigateToSignUp = {
-                    navController.navigate(NavigationRoutes.AuthScreens.Register.route)
+                    navController.navigate(Register)
                 },
                 onForgotPasswordClick = {},
                 onSignInClick = { username, password ->
-                    authViewModel.signIn(username, password)
+                    authViewModel.signIn(username, password) { navController.navigate(MinimalDialog) }
                 },
-                isDialogOpen = authUiState.openDialog,
-                dialogMessage = authUiState.dialogMessage,
-                onDialogDismiss = {
-                    authViewModel.changeOpenDialog(false)
-                }
             )
             // Navigate to AppScreens graph when sign in is successful.
-            LaunchedEffect(authUiState.signInSuccess) {
-                if (authViewModel.uiState.value.signInSuccess) {
-                    navController.navigate(NavigationRoutes.AppScreens.NavigationRoute.route) {
+            LaunchedEffect(loginState.signInSuccess) {
+                if (loginState.signInSuccess) {
+                    navController.navigate(Category) {
                         // Clear authScreens from the backstack
-                        popUpTo(NavigationRoutes.AuthScreens.NavigationRoute.route) {
+                        popUpTo<AuthScreensGraph> {
                             inclusive = true
                         }
                     }
                 }
             }
         }
-        composable(route = NavigationRoutes.AuthScreens.Register.route) { backStackEntry ->
+        composable<Register> { backStackEntry ->
             val authViewModel: AuthViewModel = authViewModel(backStackEntry, navController)
             RegisterScreen(
                 authViewModel = authViewModel,
                 onNavigateToSignIn = {
-                    navController.navigate(NavigationRoutes.AuthScreens.Login.route)
-                }
+                    navController.navigate(Login)
+                },
+
             )
         }
-        composable(route = NavigationRoutes.AuthScreens.ForgotPassword.route) { backStackEntry ->
+        composable<ForgotPassword> { backStackEntry ->
             val authViewModel: AuthViewModel = authViewModel(backStackEntry, navController)
             ForgotPasswordScreen(
                 // TODO
+            )
+        }
+        dialog<MinimalDialog> { backStackEntry ->
+            val authViewModel: AuthViewModel = authViewModel(backStackEntry, navController)
+            val authUiState by authViewModel.uiState.collectAsState()
+            MinimalDialog(
+                dialogMessage = authUiState.dialogMessage,
+                onDismissRequest = {
+                    navController.popBackStack()
+                }
             )
         }
     }

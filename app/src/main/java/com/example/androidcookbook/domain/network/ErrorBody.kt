@@ -3,7 +3,7 @@ package com.example.androidcookbook.domain.network
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class ErrorMessage(
+data class ErrorBody(
     val statusCode: Int,
     val timestamp: String,
     val path: String,
