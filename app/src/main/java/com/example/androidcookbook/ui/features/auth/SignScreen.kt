@@ -25,6 +25,7 @@ import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.androidcookbook.domain.model.auth.RegisterRequest
 
 @Composable
@@ -47,8 +48,8 @@ fun LoginScreen(
         Canvas(modifier = Modifier.fillMaxSize()) {
             drawOval(
                 color = Color(0xFF4F3423),
-                topLeft = Offset(size.width * (-0.1f), size.height / (-14)),
-                size = Size(size.width * 1.2f, size.height / 4)
+                topLeft = Offset(-215f, -290f),
+                size = Size(1500f, 750f)
             )
         }
 
@@ -94,8 +95,8 @@ fun RegisterScreen(
         Canvas(modifier = Modifier.fillMaxSize()) {
             drawOval(
                 color = Color(0xFF4F3423),
-                topLeft = Offset(size.width * (-0.1f), size.height / (-14)),
-                size = Size(size.width * 1.2f, size.height / 4)
+                topLeft = Offset(-215f, -290f),
+                size = Size(1500f, 750f)
             )
         }
 
@@ -107,7 +108,7 @@ fun RegisterScreen(
                 .align(Alignment.TopCenter)
                 .offset(y = 70.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(50.dp)
+            verticalArrangement = Arrangement.spacedBy(15.dp)
         ) {
             AppLogo()
 
@@ -213,6 +214,7 @@ fun SignPreview() {
         {}, {}, {_,_ ->}, {}
     )
 }
+
 
 @Preview
 @Composable
