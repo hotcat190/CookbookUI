@@ -3,6 +3,9 @@ package com.example.androidcookbook.ui.features.search
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.androidcookbook.data.repositories.SearchRepository
+import com.example.androidcookbook.domain.model.recipe.RecipeList
+import com.skydoves.sandwich.ApiResponse
+import com.skydoves.sandwich.onFailure
 import com.skydoves.sandwich.onSuccess
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -22,11 +25,13 @@ class SearchViewModel @Inject constructor(
 
     fun search(searchQuery: String) {
         viewModelScope.launch {
-            val response = searchRepository.search(searchQuery)
+            val response: ApiResponse<RecipeList?> = searchRepository.search(searchQuery)
             response.onSuccess {
                 _uiState.update {
                     it.copy(result = data?.meals.toString())
                 }
+            }.onFailure {
+                _uiState.update { it.copy(result = "Failed to fetch data") }
             }
         }
     }
