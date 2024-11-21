@@ -1,4 +1,4 @@
-package com.example.androidcookbook.ui.components.appbars
+package com.example.androidcookbook.ui.common.appbars
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
@@ -10,6 +10,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconButtonDefaults
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
@@ -22,11 +23,10 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.androidcookbook.R
-import com.example.androidcookbook.ui.theme.Typography
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun CookbookAppBar(
+fun CookbookAppBarDefault(
     modifier: Modifier = Modifier,
     showBackButton: Boolean = false,
     onCreatePostClick: () -> Unit = {},
@@ -44,7 +44,7 @@ fun CookbookAppBar(
         title = {
             Text(
                 text = "Cookbook",
-                style = Typography.titleLarge
+                style = MaterialTheme.typography.titleLarge
             )
         },
         actions = {
@@ -116,5 +116,5 @@ fun CookbookAppBar(
 @Preview
 @Composable
 fun TopAppBarPreview() {
-    CookbookAppBar()
+    CookbookAppBarDefault()
 }

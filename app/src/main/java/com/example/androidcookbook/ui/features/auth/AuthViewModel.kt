@@ -1,17 +1,24 @@
 package com.example.androidcookbook.ui.features.auth
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.androidcookbook.data.repositories.AuthRepository
 import com.example.androidcookbook.domain.model.auth.RegisterRequest
 import com.example.androidcookbook.domain.model.auth.SignInRequest
+import com.example.androidcookbook.domain.model.auth.SignInResponse
+import com.example.androidcookbook.domain.network.ErrorBody
+import com.skydoves.sandwich.ApiResponse
+import com.skydoves.sandwich.message
+import com.skydoves.sandwich.onException
+import com.skydoves.sandwich.onSuccess
+import com.skydoves.sandwich.retrofit.serialization.onErrorDeserialize
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import java.net.SocketTimeoutException
 import javax.inject.Inject
 
 @HiltViewModel
@@ -19,10 +26,10 @@ class AuthViewModel @Inject constructor(
     private val authRepository: AuthRepository
 ) : ViewModel() {
 
-    private val _uiState = MutableStateFlow(AuthUiState())
+    private val _uiState: MutableStateFlow<AuthUiState> = MutableStateFlow(AuthUiState())
     val uiState: StateFlow<AuthUiState> = _uiState.asStateFlow()
 
-    fun ChangeOpenDialog(open: Boolean) {
+    fun changeOpenDialog(open: Boolean) {
         _uiState.update {
             it.copy(
                 openDialog = open
@@ -30,7 +37,7 @@ class AuthViewModel @Inject constructor(
         }
     }
 
-    fun ChangeDialogMessage(message: String) {
+    fun changeDialogMessage(message: String) {
         _uiState.update {
             it.copy(
                 dialogMessage = message
@@ -38,7 +45,7 @@ class AuthViewModel @Inject constructor(
         }
     }
 
-    fun SignInSuccess() {
+    private fun signInSuccess() {
         _uiState.update {
             it.copy(
                 signInSuccess = true
@@ -46,52 +53,31 @@ class AuthViewModel @Inject constructor(
         }
     }
 
-    fun SignUp(req: RegisterRequest) {
+    fun signUp(req: RegisterRequest) {
         viewModelScope.launch {
             val response = authRepository.register(req)
-            ChangeOpenDialog(true)
-            if (response.isSuccessful) {
-                // Trường hợp đăng ký thành công
-                val registerResponse = response.body()
-                Log.d("Register", "Success: ${registerResponse?.message}")
-                registerResponse?.message?.let { ChangeDialogMessage(it) }
-            } else {
-                Log.e("Register", "Error: ${response}")
-                ChangeDialogMessage(response.toString())
+            _uiState.value = when (response) {
+                is ApiResponse.Success -> _uiState.value.copy(dialogMessage = response.data.message)
+                is ApiResponse.Failure.Error -> _uiState.value.copy(dialogMessage = response.message())
+                is ApiResponse.Failure.Exception -> _uiState.value.copy(dialogMessage = response.message())
             }
         }
     }
 
-    fun signIn(req: SignInRequest) {
+    fun signIn(username: String, password: String, callback: () -> Unit) {
         viewModelScope.launch {
-            try {
-                val response = authRepository.login(req)
-
-                if (response.isSuccessful) {
-                    val signInResponse = response.body()
-                    Log.d("Login", "Success: $signInResponse}")
-                    SignInSuccess()
-                    signInResponse?.message?.let { ChangeDialogMessage(it) }
-                } else if (response.code() == 404) {
-                    Log.e("Login", "Request timed out.")
-                    ChangeDialogMessage("Cannot establish connection")
-                } else {
-                    Log.e("Login", "Error: $response")
-                    ChangeDialogMessage("Wrong username or password")
-                }
-            } catch (e: Exception) {
-                when (e) {
-                    is java.net.SocketTimeoutException -> {
-                        Log.e("Login", "Socket Timeout: ${e}")
-                        ChangeDialogMessage("Request timed out. Please try again.")
-                    }
-                    else -> {
-                        Log.e("Login", "Unexpected error: ${e.message}")
-                        ChangeDialogMessage("An unexpected error occurred. Please try again.")
-                    }
+            // Send request and receive the response
+            val response = authRepository.login(SignInRequest(username, password))
+            response.onSuccess {
+                _uiState.update { it.copy(openDialog = true, dialogMessage = data.message, signInSuccess = true) }
+            }.onErrorDeserialize<SignInResponse, ErrorBody> { errorBody ->
+                _uiState.update { it.copy(openDialog = true, dialogMessage = errorBody.message.joinToString("\n")) }
+            }.onException {
+                when (throwable) {
+                    is SocketTimeoutException -> _uiState.update { it.copy(openDialog = true, dialogMessage = "Request timed out.\n Please try again.") }
                 }
             }
-            ChangeOpenDialog(true)
+            callback()
         }
     }
 }

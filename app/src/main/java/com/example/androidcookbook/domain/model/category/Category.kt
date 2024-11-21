@@ -1,4 +1,4 @@
-package com.example.androidcookbook.domain.model
+package com.example.androidcookbook.domain.model.category
 
 data class CategoryResponse(
     val categories: List<Category>

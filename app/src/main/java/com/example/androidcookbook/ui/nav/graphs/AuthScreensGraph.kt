@@ -1,76 +1,89 @@
 package com.example.androidcookbook.ui.nav.graphs
 
 import android.util.Log
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
+import androidx.navigation.compose.dialog
 import androidx.navigation.compose.navigation
-import com.example.androidcookbook.domain.model.auth.SignInRequest
-import com.example.androidcookbook.ui.nav.NavigationRoutes
-import com.example.androidcookbook.ui.nav.utils.authViewModel
+import com.example.androidcookbook.ui.common.dialog.MinimalDialog
 import com.example.androidcookbook.ui.features.auth.AuthViewModel
-import com.example.androidcookbook.ui.features.auth.ForgotPasswordScreen
-import com.example.androidcookbook.ui.features.auth.LoginScreen
-import com.example.androidcookbook.ui.features.auth.RegisterScreen
+import com.example.androidcookbook.ui.features.auth.screens.ForgotPasswordScreen
+import com.example.androidcookbook.ui.features.auth.screens.LoginScreen
+import com.example.androidcookbook.ui.features.auth.screens.RegisterScreen
+import com.example.androidcookbook.ui.nav.Routes
+import com.example.androidcookbook.ui.nav.utils.getViewModel
 
 /**
  * Login, registration, forgot password screens nav graph builder
  * (Unauthenticated user)
  */
-fun NavGraphBuilder.authScreens(navController: NavController) {
-    navigation(
-        route = NavigationRoutes.AuthScreens.NavigationRoute.route,
-        startDestination = NavigationRoutes.AuthScreens.Login.route
+fun NavGraphBuilder.authScreens(navController: NavController, updateAppBar: () -> Unit) {
+    navigation<Routes.Auth>(
+        startDestination = Routes.Auth.Login
     ) {
         // Scope the ViewModel to the navigation graph
-        composable(route = NavigationRoutes.AuthScreens.Login.route) { backStackEntry ->
-            val authViewModel = authViewModel(backStackEntry, navController)
-            val authUiState by authViewModel.uiState.collectAsState()
+        composable<Routes.Auth.Login> {
+            updateAppBar()
+            val authViewModel: AuthViewModel = getViewModel(it, navController, Routes.Auth)
+            Log.d("Login", authViewModel.toString())
             LoginScreen(
-                isDialogOpen = authUiState.openDialog,
-                dialogMessage = authUiState.dialogMessage,
+                onForgotPasswordClick = {
+                    // TODO: navigate to ForgotPassword
+                },
                 onNavigateToSignUp = {
-                    navController.navigate(NavigationRoutes.AuthScreens.Register.route)
+                    navController.navigate(Routes.Auth.Register)
                 },
-                onForgotPasswordClick = {},
                 onSignInClick = { username, password ->
-                    authViewModel.signIn(SignInRequest(username, password))
+                    authViewModel.signIn(username, password) {
+                        navController.navigate(Routes.DialogDestination)
+                    }
                 },
-                onDialogDismiss = {
-                    authViewModel.ChangeOpenDialog(false)
+                onUseAsGuest = {
+                    navController.navigate(Routes.App)
                 }
             )
-            Log.d("Login", "after LoginScreen() before LaunchedEffect(): signInSuccess: ${authUiState.signInSuccess}")
-            // Navigate to AppScreens graph when sign in is successful.
-            LaunchedEffect(authUiState.signInSuccess) {
-                Log.d("Login", "in LaunchedEffect(): signInSuccess: ${authUiState.signInSuccess}")
-                if (authViewModel.uiState.value.signInSuccess) {
-                    Log.d("Login", "signInSuccess: ${authUiState.signInSuccess}")
-                    navController.navigate(NavigationRoutes.AppScreens.NavigationRoute.route) {
-                        // Clear authScreens from the backstack
-                        popUpTo(NavigationRoutes.AuthScreens.NavigationRoute.route) {
-                            inclusive = true
-                        }
-                    }
-                }
-            }
         }
-        composable(route = NavigationRoutes.AuthScreens.Register.route) { backStackEntry ->
-            val authViewModel: AuthViewModel = authViewModel(backStackEntry, navController)
+        composable<Routes.Auth.Register> {
+            updateAppBar()
+            val authViewModel: AuthViewModel = getViewModel(it, navController, Routes.Auth)
+            Log.d("Login", authViewModel.toString())
             RegisterScreen(
                 authViewModel = authViewModel,
                 onNavigateToSignIn = {
-                    navController.navigate(NavigationRoutes.AuthScreens.Login.route)
-                }
+                    navController.navigate(Routes.Auth.Login)
+                },
             )
         }
-        composable(route = NavigationRoutes.AuthScreens.ForgotPassword.route) { backStackEntry ->
-            val authViewModel: AuthViewModel = authViewModel(backStackEntry, navController)
+        composable<Routes.Auth.ForgotPassword> {
+            updateAppBar()
+            val authViewModel: AuthViewModel = getViewModel(it, navController, Routes.Auth)
+            Log.d("Login", authViewModel.toString())
             ForgotPasswordScreen(
                 // TODO
+            )
+        }
+        dialog<Routes.DialogDestination> {
+            val authViewModel: AuthViewModel = getViewModel(it, navController, Routes.Auth)
+            Log.d("Login", authViewModel.toString())
+            val authUiState by authViewModel.uiState.collectAsState()
+            MinimalDialog(
+                dialogMessage = authUiState.dialogMessage,
+                onDismissRequest = {
+                    authViewModel.changeOpenDialog(false)
+                    navController.popBackStack()
+
+                    if (authUiState.signInSuccess) {
+                        navController.navigate(Routes.App) {
+                            // Clear authScreens from the backstack
+                            popUpTo<Routes.Auth> {
+                                inclusive = true
+                            }
+                        }
+                    }
+                }
             )
         }
     }
