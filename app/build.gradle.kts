@@ -31,6 +31,7 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+            signingConfig = signingConfigs.getByName("debug")
         }
     }
     compileOptions {
@@ -102,7 +103,6 @@ dependencies {
 
     // Kotlin serialization
     implementation(libs.kotlinx.serialization.json)
-
 }
 
 // Allow references to generated code

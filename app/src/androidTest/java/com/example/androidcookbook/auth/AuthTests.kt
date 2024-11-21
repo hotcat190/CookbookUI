@@ -1,8 +1,5 @@
 package com.example.androidcookbook.auth
 
-import androidx.activity.compose.setContent
-import androidx.activity.viewModels
-import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.test.isDisplayed
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithTag
@@ -18,10 +15,8 @@ import com.example.androidcookbook.auth.AuthTestConst.USERNAME
 import com.example.androidcookbook.data.network.AuthService
 import com.example.androidcookbook.domain.model.auth.SignInRequest
 import com.example.androidcookbook.domain.model.auth.SignInResponse
-import com.example.androidcookbook.ui.features.auth.AuthViewModel
-import com.example.androidcookbook.ui.features.auth.components.PASSWORD_TEXT_FIELD_TEST_TAG
-import com.example.androidcookbook.ui.features.auth.components.USERNAME_TEXT_FIELD_TEST_TAG
-import com.example.androidcookbook.ui.features.auth.login.LoginScreen
+import com.example.androidcookbook.ui.features.auth.screens.PASSWORD_TEXT_FIELD_TEST_TAG
+import com.example.androidcookbook.ui.features.auth.screens.USERNAME_TEXT_FIELD_TEST_TAG
 import com.skydoves.sandwich.ApiResponse
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
@@ -51,18 +46,15 @@ class AuthTests {
     @Before
     fun setup() {
         hiltTestRule.inject()
-        composeTestRule.activity.setContent {
-            val authViewModel = composeTestRule.activity.viewModels<AuthViewModel>().value
-            val uiState = authViewModel.uiState.collectAsState()
-            LoginScreen(
-                onForgotPasswordClick = {},
-                onNavigateToSignUp = {},
-                onSignInClick = {username, password -> authViewModel.signIn(username, password)},
-                isDialogOpen = uiState.value.openDialog,
-                dialogMessage = uiState.value.dialogMessage,
-                onDialogDismiss = { authViewModel.changeOpenDialog(false) },
-            )
-        }
+//        composeTestRule.activity.setContent {
+//            val authViewModel = composeTestRule.activity.viewModels<AuthViewModel>().value
+//            val uiState by authViewModel.uiState.collectAsState()
+//            LoginScreen(
+//                onForgotPasswordClick = {},
+//                onNavigateToSignUp = {},
+//                onSignInClick = {username, password -> authViewModel.signIn(username, password) {} },
+//            )
+//        }
     }
 
     @Test

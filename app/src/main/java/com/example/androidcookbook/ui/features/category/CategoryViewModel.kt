@@ -1,6 +1,5 @@
 package com.example.androidcookbook.ui.features.category
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.androidcookbook.data.repositories.CategoriesRepository
@@ -31,10 +30,8 @@ class CategoryViewModel @Inject constructor(
             try {
                 _categoryUiState.update{ CategoryUiState.Success(categoriesRepository.getCategories()) }
             } catch (e: IOException) {
-                Log.e(CATEGORY_SCREEN_TAG, e.printStackTrace().toString())
                 _categoryUiState.update{ CategoryUiState.Error }
             } catch (e: HttpException) {
-                Log.e(CATEGORY_SCREEN_TAG, e.printStackTrace().toString())
                 _categoryUiState.update{ CategoryUiState.Error }
             }
         }

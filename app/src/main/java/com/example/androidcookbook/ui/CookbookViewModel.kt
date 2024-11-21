@@ -17,4 +17,12 @@ class CookbookViewModel : ViewModel() {
             )
         }
     }
+
+    fun updateTopBarState(topBarState: CookbookUiState.TopBarState) {
+        _uiState.update { it.copy(topBarState = topBarState) }
+    }
+
+    fun updateBottomBarState(bottomBarState: CookbookUiState.BottomBarState) {
+        _uiState.update { it.copy(bottomBarState = bottomBarState) }
+    }
 }

@@ -10,10 +10,14 @@ import androidx.navigation.NavHostController
  * currentDestination is not already on it.
  */
 fun <T : Any> NavHostController.navigateIfNotOn(route: T) {
-    if (currentDestination?.hasRoute(route::class) == false) {
-        navigate(route)
+    if (currentDestination?.hasRoute(route) == true) {
+        return
     }
+    navigate(route)
 }
+
+fun <T: Any> NavDestination.hasRoute(route: T) =
+    hasRoute(route::class)
 
 /*
  * Extension function to check whether the current destination's hierarchy contains the parent route

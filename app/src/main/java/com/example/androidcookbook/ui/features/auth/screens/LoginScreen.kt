@@ -1,4 +1,4 @@
-package com.example.androidcookbook.ui.features.auth.login
+package com.example.androidcookbook.ui.features.auth.screens
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -14,6 +14,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.androidcookbook.ui.features.auth.components.ClickableSeparatedText
+import com.example.androidcookbook.ui.features.auth.components.ClickableText
 import com.example.androidcookbook.ui.features.auth.components.InputField
 import com.example.androidcookbook.ui.features.auth.components.SignButton
 import com.example.androidcookbook.ui.features.auth.components.SignLayout
@@ -26,6 +27,7 @@ fun LoginScreen(
     onForgotPasswordClick: () -> Unit,
     onNavigateToSignUp: () -> Unit,
     onSignInClick: (String, String) -> Unit,
+    onUseAsGuest: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     SignLayout {
@@ -33,6 +35,10 @@ fun LoginScreen(
             onSignInClick = onSignInClick,
             onForgotPasswordClick = onForgotPasswordClick,
             onSignUpClick = onNavigateToSignUp,
+        )
+        ClickableText(
+            clickableText = "Use as guest",
+            onClick = onUseAsGuest,
         )
     }
 }
@@ -81,6 +87,6 @@ fun SignInComponent(
 @Composable
 fun LoginPreview() {
     LoginScreen(
-        {},{},{_,_->},
+        {}, {}, { _, _->},{},
     )
 }

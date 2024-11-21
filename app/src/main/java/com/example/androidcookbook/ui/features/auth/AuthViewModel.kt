@@ -14,6 +14,7 @@ import com.skydoves.sandwich.onSuccess
 import com.skydoves.sandwich.retrofit.serialization.onErrorDeserialize
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -25,8 +26,16 @@ class AuthViewModel @Inject constructor(
     private val authRepository: AuthRepository
 ) : ViewModel() {
 
-    private val _uiState = MutableStateFlow(AuthUiState())
-    val uiState = _uiState.asStateFlow()
+    private val _uiState: MutableStateFlow<AuthUiState> = MutableStateFlow(AuthUiState())
+    val uiState: StateFlow<AuthUiState> = _uiState.asStateFlow()
+
+    fun changeOpenDialog(open: Boolean) {
+        _uiState.update {
+            it.copy(
+                openDialog = open
+            )
+        }
+    }
 
     fun changeDialogMessage(message: String) {
         _uiState.update {
@@ -60,15 +69,15 @@ class AuthViewModel @Inject constructor(
             // Send request and receive the response
             val response = authRepository.login(SignInRequest(username, password))
             response.onSuccess {
-                _uiState.update { it.copy(dialogMessage = data.message, signInSuccess = true) }
+                _uiState.update { it.copy(openDialog = true, dialogMessage = data.message, signInSuccess = true) }
             }.onErrorDeserialize<SignInResponse, ErrorBody> { errorBody ->
-                _uiState.update { it.copy(dialogMessage = errorBody.message.joinToString("\n")) }
+                _uiState.update { it.copy(openDialog = true, dialogMessage = errorBody.message.joinToString("\n")) }
             }.onException {
                 when (throwable) {
-                    is SocketTimeoutException -> _uiState.update { it.copy(dialogMessage = "Request timed out.\n Please try again.") }
+                    is SocketTimeoutException -> _uiState.update { it.copy(openDialog = true, dialogMessage = "Request timed out.\n Please try again.") }
                 }
             }
+            callback()
         }
-        callback()
     }
 }
