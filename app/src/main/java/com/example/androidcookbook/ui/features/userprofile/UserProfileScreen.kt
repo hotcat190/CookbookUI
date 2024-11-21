@@ -1,7 +1,6 @@
 package com.example.androidcookbook.ui.features.userprofile
 
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -14,11 +13,9 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentHeight
-import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Text
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -32,7 +29,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.androidcookbook.R
 import com.example.androidcookbook.ui.features.newsfeed.NewsfeedCard
-import com.example.androidcookbook.ui.features.newsfeed.NewsfeedScreen
+import com.example.androidcookbook.ui.theme.AndroidCookbookTheme
 
 @Composable
 fun UserProfileScreen(
@@ -98,7 +95,6 @@ fun UserInfo() {
             style = TextStyle(
                 fontSize = 24.sp,
                 fontWeight = FontWeight(600),
-                color = Color(0xFF000000),
             )
         )
         Text(
@@ -106,7 +102,6 @@ fun UserInfo() {
             style = TextStyle(
                 fontSize = 12.sp,
                 fontWeight = FontWeight(400),
-                color = Color(0xFF000000),
             )
         )
         Row {
@@ -115,7 +110,6 @@ fun UserInfo() {
                 style = TextStyle(
                     fontSize = 14.sp,
                     fontWeight = FontWeight(700),
-                    color = Color(0xFF000000),
                 )
             )
             Text(
@@ -123,7 +117,6 @@ fun UserInfo() {
                 style = TextStyle(
                     fontSize = 14.sp,
                     fontWeight = FontWeight(400),
-                    color = Color(0xFF000000),
                 )
             )
         }
@@ -133,7 +126,11 @@ fun UserInfo() {
 @Preview
 @Composable
 fun ProfilePreview() {
-    UserProfileScreen()
+    AndroidCookbookTheme(darkTheme = true) {
+        UserProfileScreen(
+            userId = 0
+        )
+    }
 }
 
 @Preview
