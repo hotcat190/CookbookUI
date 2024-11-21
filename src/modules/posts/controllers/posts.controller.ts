@@ -35,9 +35,17 @@ import {
     @ApiOperation({ summary: 'Lấy newfeeds theo limit' })
     @ApiResponse({ status: 200, description: 'Newfeed' })
     @ApiResponse({ status: 404, description: 'Error' })
-    getNewfeeds(@Request() req, @Param('limit') limit: number) {
-      return this.postsService.getNewfeeds(req.user.id, limit);
+    async getNewfeeds(@Request() req, @Param('limit') limit: number) {
+      console.log(`UserID ${req.user.id} get newfeeds with limit ${limit}`);
+      console.time('getNewfeeds');
+      const result = await this.postsService.getNewfeeds(req.user.id, limit);
+      console.timeEnd('getNewfeeds');
+      return result;
     }
+
+
+
+
     @ApiBearerAuth()
     @UseGuards(JwtAuthGuard)
     @Post('posts')

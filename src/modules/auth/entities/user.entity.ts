@@ -63,7 +63,7 @@ import {
     @OneToMany(() => Notification, (notification) => notification.user)
     notifications: Notification[];
     
-    @Column({ nullable: true, length: 200 })
+    @Column({ nullable: true, length: 500 })
     bio: string;
 
     @Column({ default: 'Tôi dại dột', length: 30 })

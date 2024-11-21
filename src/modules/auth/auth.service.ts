@@ -43,6 +43,17 @@ export class AuthService {
         await this.usersRepository.delete(existingUser.id);
       }
       const hashedPassword = await bcrypt.hash(password, 10);
+      const test1 = await bcrypt.hash("Password123", 10);
+      const test2 = await bcrypt.hash("Password123", 10);
+      const test3 = await bcrypt.hash("Password123", 10);
+      const test4 = await bcrypt.hash("Password123", 10);
+      const test5 = await bcrypt.hash("Password123", 10);
+      console.log(test1);
+      console.log(test2);
+      console.log(test3);
+      console.log(test4);
+      console.log(test5);
+
       const user = this.usersRepository.create({
         username,
         email,
