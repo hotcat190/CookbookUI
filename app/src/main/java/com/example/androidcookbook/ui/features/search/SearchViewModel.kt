@@ -1,20 +1,33 @@
 package com.example.androidcookbook.ui.features.search
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.example.androidcookbook.data.repositories.SearchRepository
+import com.skydoves.sandwich.onSuccess
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class SearchViewModel : ViewModel() {
+@HiltViewModel
+class SearchViewModel @Inject constructor(
+    private val searchRepository: SearchRepository
+) : ViewModel() {
+
     private val _uiState = MutableStateFlow(SearchUiState())
     val uiState: StateFlow<SearchUiState> = _uiState.asStateFlow()
 
-    fun updateSearchQuery(updatedSearchQuery: String) {
-        _uiState.update { currentState ->
-            currentState.copy(
-                searchQuery = updatedSearchQuery
-            )
+    fun search(searchQuery: String) {
+        viewModelScope.launch {
+            val response = searchRepository.search(searchQuery)
+            response.onSuccess {
+                _uiState.update {
+                    it.copy(result = data?.meals.toString())
+                }
+            }
         }
     }
 }

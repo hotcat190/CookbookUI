@@ -13,6 +13,7 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -20,8 +21,8 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.androidcookbook.ui.common.appbars.CookbookAppBarDefault
 import com.example.androidcookbook.ui.common.appbars.CookbookBottomNavigationBar
-import com.example.androidcookbook.ui.common.appbars.SearchBar
 import com.example.androidcookbook.ui.features.post.CreatePostScreen
+import com.example.androidcookbook.ui.features.search.SearchBar
 import com.example.androidcookbook.ui.features.search.SearchScreen
 import com.example.androidcookbook.ui.features.search.SearchViewModel
 import com.example.androidcookbook.ui.nav.Routes
@@ -107,24 +108,21 @@ fun CookbookApp(
                 viewModel.updateBottomBarState(CookbookUiState.BottomBarState.Default)
             })
             composable<Routes.Search> { entry ->
-                val searchViewModel = hiltViewModel<SearchViewModel>(entry)
+                val searchViewModel = hiltViewModel<SearchViewModel>()
                 val searchUiState = searchViewModel.uiState.collectAsState().value
 
                 viewModel.updateTopBarState(CookbookUiState.TopBarState.Custom {
                     SearchBar(
-                        onValueChange = {
-                            searchViewModel.updateSearchQuery(it)
-                        },
+                        onSearch = { searchViewModel.search(it) },
                         navigateBackAction = {
                             navController.popBackStack()
                         },
-                        searchQuery = searchUiState.searchQuery
                     )
                 })
                 viewModel.updateBottomBarState(CookbookUiState.BottomBarState.NoBottomBar)
 
                 SearchScreen(
-                    result = searchUiState.searchQuery,
+                    result = searchUiState.result,
                     onBackButtonClick = {
                         navController.navigateUp()
                     }
@@ -145,8 +143,16 @@ fun CookbookApp(
     }
 }
 
+fun NavGraphBuilder.searchScreen(
+    navController: NavHostController,
+    updateAppBar: () -> Unit,
+) {
+
+}
+
 @Preview
 @Composable
 fun CookbookAppPreview() {
     CookbookApp()
 }
+

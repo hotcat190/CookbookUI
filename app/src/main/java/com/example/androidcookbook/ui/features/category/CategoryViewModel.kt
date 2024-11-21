@@ -36,4 +36,8 @@ class CategoryViewModel @Inject constructor(
             }
         }
     }
+
+    fun refresh() {
+        getCategories()
+    }
 }

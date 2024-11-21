@@ -1,12 +1,12 @@
 package com.example.androidcookbook.ui.features.category
 
+import android.util.Log
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
@@ -19,10 +19,11 @@ import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
-import androidx.compose.material3.Text
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -37,25 +38,36 @@ import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.example.androidcookbook.R
 import com.example.androidcookbook.domain.model.category.Category
+import com.example.androidcookbook.ui.common.containers.RefreshableScreen
 import com.example.androidcookbook.ui.theme.Typography
 import kotlinx.coroutines.delay
 
 const val CATEGORY_SCREEN_TAG = "CategoryScreen"
 
 @Composable
-fun CategoryScreen(modifier: Modifier = Modifier, categoryUiState: CategoryUiState) {
-    when (categoryUiState) {
+fun CategoryScreen(
+    categoryViewModel: CategoryViewModel,
+    modifier: Modifier = Modifier,
+) {
+    Log.d(CATEGORY_SCREEN_TAG, categoryViewModel.toString())
+
+    when (val categoryUiState = categoryViewModel.categoryUiState.collectAsState().value) {
         is CategoryUiState.Loading -> Text("Loading")
+
         is CategoryUiState.Success -> {
-            CategoryListScreen(
-                categories = categoryUiState.categories,
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(start = 8.dp, top = 16.dp, end = 8.dp)
-            )
+            RefreshableScreen(
+                onRefresh = { categoryViewModel.refresh() }
+            ) {
+                CategoryListScreen(
+                    categories = categoryUiState.categories,
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(start = 8.dp, top = 16.dp, end = 8.dp)
+                )
+            }
         }
 
-        else -> Text("Error")
+        is CategoryUiState.Error -> Text("Error")
     }
 }
 
@@ -109,7 +121,7 @@ fun CategoryCard(category: Category, modifier: Modifier = Modifier) {
                 textAlign = TextAlign.Start
             )
             AsyncImage(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier.fillMaxSize(),
                 model = ImageRequest.Builder(context = LocalContext.current)
                     .data(category.strCategoryThumb)
                     .crossfade(true)
@@ -129,8 +141,6 @@ private fun CategoryListScreen(
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(8.dp)
 ) {
-    // TODO: Nesting a LazyRow inside of a LazyVerticalGrid seems incorrect,
-    //  should find a different solution.
     LazyVerticalGrid(
         columns = GridCells.Fixed(2),
         modifier = modifier,

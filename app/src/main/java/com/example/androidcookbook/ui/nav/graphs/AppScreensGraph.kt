@@ -1,7 +1,5 @@
 package com.example.androidcookbook.ui.nav.graphs
 
-import androidx.compose.runtime.collectAsState
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
@@ -13,6 +11,7 @@ import com.example.androidcookbook.ui.features.category.CategoryViewModel
 import com.example.androidcookbook.ui.features.newsfeed.NewsfeedScreen
 import com.example.androidcookbook.ui.features.userprofile.UserProfileScreen
 import com.example.androidcookbook.ui.nav.Routes
+import com.example.androidcookbook.ui.nav.utils.getViewModel
 
 /**
  * App screens nav graph builder
@@ -23,9 +22,8 @@ fun NavGraphBuilder.appScreens(navController: NavHostController, updateAppBar: (
     ) {
         composable<Routes.App.Category> {
             updateAppBar()
-            val categoryViewModel = hiltViewModel<CategoryViewModel>()
-            val categoryUiState = categoryViewModel.categoryUiState.collectAsState().value
-            CategoryScreen(categoryUiState = categoryUiState)
+            val categoryViewModel: CategoryViewModel = getViewModel(it, navController, Routes.App)
+            CategoryScreen(categoryViewModel)
         }
         composable<Routes.App.AIChat> {
             updateAppBar()
