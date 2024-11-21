@@ -1,11 +1,16 @@
 // src/modules/auth/dtos/reset-password.dto.ts
-import { IsString, MinLength, MaxLength, Matches } from 'class-validator';
+import { IsString, MinLength, MaxLength, Matches, IsEmail } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class ResetPasswordDto {
+
+  @IsEmail()
+  @ApiProperty({ description: 'Tài khoản gắn với mail cần đặt lại mật khẩu' })
+  email: string;
+
   @IsString()
-  @ApiProperty({ description: 'Token đặt lại mật khẩu' })
-  token: string;
+  @ApiProperty({ description: 'Mã đặt lại mật khẩu' })
+  code: string;
 
   @IsString()
   @MinLength(6)
@@ -16,7 +21,4 @@ export class ResetPasswordDto {
   @ApiProperty({ description: 'Mật khẩu mới' })
   password: string;
 
-  @IsString()
-  @ApiProperty({ description: 'Xác nhận mật khẩu mới' })
-  confirmPassword: string;
 }

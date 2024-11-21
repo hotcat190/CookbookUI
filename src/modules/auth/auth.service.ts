@@ -174,22 +174,19 @@ export class AuthService {
   
 
   async resetPassword(resetPasswordDto: ResetPasswordDto): Promise<any> {
-    const { token, password, confirmPassword } = resetPasswordDto;
+    const { email, code, password } = resetPasswordDto;
 
-    if (password !== confirmPassword) {
-      throw new BadRequestException('Mật khẩu không khớp.');
+    const user = await this.usersRepository.findOne({ where: { email: email } });
+    if(user.resetPasswordCode === null){
+      throw new BadRequestException('Mã xác nhận đã hết hạn. Vui lòng yêu cầu đặt lại mật khẩu mới.');
     }
-
-    const user = await this.usersRepository.findOne({ where: { resetPasswordToken: token } });
-    if (!user || (user.resetPasswordExpires && user.resetPasswordExpires < new Date())) {
-      throw new BadRequestException('Phiên đăng nhập không hợp lệ hoặc đã hết hạn.');
+    if(user.resetPasswordCode !== code){
+      throw new BadRequestException('Mã xác nhận không đúng.');
     }
 
     user.password = await bcrypt.hash(password, 10);
-    user.resetPasswordToken = null;
-    user.resetPasswordExpires = null;
+    user.resetPasswordCode = null;
     await this.usersRepository.save(user);
-
     return { message: 'Đặt lại mật khẩu thành công.' };
   }
   
