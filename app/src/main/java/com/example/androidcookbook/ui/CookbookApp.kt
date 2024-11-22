@@ -54,6 +54,7 @@ fun CookbookApp(
                     showBackButton = uiState.canNavigateBack,
                     searchButtonAction = {
                         navController.navigate(Routes.Search)
+                        viewModel.updateCanNavigateBack(true)
                     },
                     onCreatePostClick = {
                         navController.navigateIfNotOn(Routes.CreatePost)
@@ -125,6 +126,7 @@ fun CookbookApp(
                     result = searchUiState.result,
                     onBackButtonClick = {
                         navController.navigateUp()
+                        viewModel.updateCanNavigateBack(false)
                     }
                 )
             }
@@ -136,6 +138,7 @@ fun CookbookApp(
                     },
                     onBackButtonClick = {
                         navController.navigateUp()
+                        viewModel.updateCanNavigateBack(false)
                     },
                 )
             }

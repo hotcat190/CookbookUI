@@ -3,6 +3,7 @@ package com.example.androidcookbook.ui.features.auth.screens
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -11,6 +12,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import com.example.androidcookbook.domain.model.auth.RegisterRequest
+import com.example.androidcookbook.ui.common.dialog.MinimalDialog
 import com.example.androidcookbook.ui.features.auth.AuthViewModel
 import com.example.androidcookbook.ui.features.auth.components.ClickableSeparatedText
 import com.example.androidcookbook.ui.features.auth.components.InputField
@@ -26,6 +28,15 @@ fun RegisterScreen(
         SignUpCompose(
             onSignInClick = onNavigateToSignIn,
             viewModel = authViewModel,
+        )
+    }
+    val authUiState = authViewModel.uiState.collectAsState().value
+    if (authUiState.openDialog) {
+        MinimalDialog(
+            dialogMessage = authUiState.dialogMessage,
+            onDismissRequest = {
+                authViewModel.changeOpenDialog(false)
+            }
         )
     }
 }
@@ -61,6 +72,7 @@ fun SignUpCompose(
                 viewModel.signUp(RegisterRequest(username, password, email))
             } else {
                 viewModel.changeDialogMessage("Retype password not correct")
+                viewModel.changeOpenDialog(true)
             }
         }
     )
