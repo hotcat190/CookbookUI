@@ -4,7 +4,7 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigation
-import com.example.androidcookbook.ui.features.aichat.AIChatScreen
+import com.example.androidcookbook.ui.features.aigen.AIGenScreen
 import com.example.androidcookbook.ui.features.category.CategoryScreen
 import com.example.androidcookbook.ui.features.post.CreatePostScreen
 import com.example.androidcookbook.ui.features.newsfeed.NewsfeedScreen
@@ -26,7 +26,9 @@ fun NavGraphBuilder.appScreens(
 ) {
     navigation(
         route = NavigationRoutes.AppScreens.NavigationRoute.route,
-        startDestination = NavigationRoutes.AppScreens.Category.route,
+//        startDestination = NavigationRoutes.AppScreens.Category.route,
+        startDestination = NavigationRoutes.AppScreens.AIGen.route,
+
     ) {
         composable(route = NavigationRoutes.AppScreens.Category.route) {
             CategoryScreen(categoryUiState = categoryViewModel.categoryUiState)
@@ -40,8 +42,8 @@ fun NavGraphBuilder.appScreens(
                 }
             )
         }
-        composable(route = NavigationRoutes.AppScreens.AIChat.route) {
-            AIChatScreen()
+        composable(route = NavigationRoutes.AppScreens.AIGen.route) {
+            AIGenScreen()
         }
         composable(route = NavigationRoutes.AppScreens.Newsfeed.route) {
             NewsfeedScreen()
