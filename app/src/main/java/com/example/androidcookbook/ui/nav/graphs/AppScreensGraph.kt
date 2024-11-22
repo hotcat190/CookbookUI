@@ -12,7 +12,7 @@ import com.example.androidcookbook.ui.features.category.CategoryViewModel
 import com.example.androidcookbook.ui.features.newsfeed.NewsfeedScreen
 import com.example.androidcookbook.ui.features.userprofile.UserProfileScreen
 import com.example.androidcookbook.ui.nav.Routes
-import com.example.androidcookbook.ui.nav.utils.getViewModel
+import com.example.androidcookbook.ui.nav.utils.sharedViewModel
 
 /**
  * App screens nav graph builder
@@ -25,7 +25,7 @@ fun NavGraphBuilder.appScreens(navController: NavHostController, updateAppBar: (
         composable<Routes.App.Category> {
             Log.d("Navigation", "Route.App.Category")
             updateAppBar()
-            val categoryViewModel: CategoryViewModel = getViewModel(it, navController, Routes.App)
+            val categoryViewModel: CategoryViewModel = sharedViewModel(it, navController, Routes.App)
             CategoryScreen(categoryViewModel)
         }
         composable<Routes.App.AIChat> {

@@ -14,7 +14,7 @@ import com.example.androidcookbook.ui.features.auth.screens.ForgotPasswordScreen
 import com.example.androidcookbook.ui.features.auth.screens.LoginScreen
 import com.example.androidcookbook.ui.features.auth.screens.RegisterScreen
 import com.example.androidcookbook.ui.nav.Routes
-import com.example.androidcookbook.ui.nav.utils.getViewModel
+import com.example.androidcookbook.ui.nav.utils.sharedViewModel
 
 /**
  * Login, registration, forgot password screens nav graph builder
@@ -27,7 +27,7 @@ fun NavGraphBuilder.authScreens(navController: NavController, updateAppBar: () -
         // Scope the ViewModel to the navigation graph
         composable<Routes.Auth.Login> {
             updateAppBar()
-            val authViewModel: AuthViewModel = getViewModel(it, navController, Routes.Auth)
+            val authViewModel: AuthViewModel = sharedViewModel(it, navController, Routes.Auth)
             Log.d("Login", authViewModel.toString())
             LoginScreen(
                 onForgotPasswordClick = {
@@ -50,7 +50,7 @@ fun NavGraphBuilder.authScreens(navController: NavController, updateAppBar: () -
         }
         composable<Routes.Auth.Register> {
             updateAppBar()
-            val authViewModel: AuthViewModel = getViewModel(it, navController, Routes.Auth)
+            val authViewModel: AuthViewModel = sharedViewModel(it, navController, Routes.Auth)
             Log.d("Login", authViewModel.toString())
             RegisterScreen(
                 authViewModel = authViewModel,
@@ -61,14 +61,14 @@ fun NavGraphBuilder.authScreens(navController: NavController, updateAppBar: () -
         }
         composable<Routes.Auth.ForgotPassword> {
             updateAppBar()
-            val authViewModel: AuthViewModel = getViewModel(it, navController, Routes.Auth)
+            val authViewModel: AuthViewModel = sharedViewModel(it, navController, Routes.Auth)
             Log.d("Login", authViewModel.toString())
             ForgotPasswordScreen(
                 // TODO
             )
         }
         dialog<Routes.DialogDestination> {
-            val authViewModel: AuthViewModel = getViewModel(it, navController, Routes.Auth)
+            val authViewModel: AuthViewModel = sharedViewModel(it, navController, Routes.Auth)
             Log.d("Login", authViewModel.toString())
             val authUiState by authViewModel.uiState.collectAsState()
             MinimalDialog(
