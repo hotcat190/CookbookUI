@@ -27,7 +27,8 @@ fun RefreshableScreen(
             isRefreshing = true
             onRefresh()
             isRefreshing = false
-        }
+        },
+        modifier = modifier,
     ) {
         content()
     }

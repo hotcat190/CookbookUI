@@ -1,6 +1,5 @@
 package com.example.androidcookbook.ui.features.category
 
-import android.util.Log
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -49,15 +48,12 @@ fun CategoryScreen(
     categoryViewModel: CategoryViewModel,
     modifier: Modifier = Modifier,
 ) {
-    Log.d(CATEGORY_SCREEN_TAG, categoryViewModel.toString())
-
-    when (val categoryUiState = categoryViewModel.categoryUiState.collectAsState().value) {
-        is CategoryUiState.Loading -> Text("Loading")
-
-        is CategoryUiState.Success -> {
-            RefreshableScreen(
-                onRefresh = { categoryViewModel.refresh() }
-            ) {
+    RefreshableScreen(
+        onRefresh = { categoryViewModel.refresh() }
+    ) {
+        when (val categoryUiState = categoryViewModel.categoryUiState.collectAsState().value) {
+            is CategoryUiState.Loading -> Text("Loading")
+            is CategoryUiState.Success -> {
                 CategoryListScreen(
                     categories = categoryUiState.categories,
                     modifier = Modifier
@@ -65,9 +61,8 @@ fun CategoryScreen(
                         .padding(start = 8.dp, top = 16.dp, end = 8.dp)
                 )
             }
+            is CategoryUiState.Error -> Text("Error")
         }
-
-        is CategoryUiState.Error -> Text("Error")
     }
 }
 

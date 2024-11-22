@@ -1,5 +1,6 @@
 package com.example.androidcookbook.ui.nav.graphs
 
+import android.util.Log
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
@@ -20,7 +21,9 @@ fun NavGraphBuilder.appScreens(navController: NavHostController, updateAppBar: (
     navigation<Routes.App> (
         startDestination = Routes.App.Category
     ) {
+        Log.d("Navigation", "Route.App")
         composable<Routes.App.Category> {
+            Log.d("Navigation", "Route.App.Category")
             updateAppBar()
             val categoryViewModel: CategoryViewModel = getViewModel(it, navController, Routes.App)
             CategoryScreen(categoryViewModel)

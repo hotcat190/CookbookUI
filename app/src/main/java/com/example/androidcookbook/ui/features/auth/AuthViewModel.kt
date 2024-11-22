@@ -4,11 +4,10 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.androidcookbook.data.repositories.AuthRepository
 import com.example.androidcookbook.domain.model.auth.RegisterRequest
+import com.example.androidcookbook.domain.model.auth.RegisterResponse
 import com.example.androidcookbook.domain.model.auth.SignInRequest
 import com.example.androidcookbook.domain.model.auth.SignInResponse
 import com.example.androidcookbook.domain.network.ErrorBody
-import com.skydoves.sandwich.ApiResponse
-import com.skydoves.sandwich.message
 import com.skydoves.sandwich.onException
 import com.skydoves.sandwich.onSuccess
 import com.skydoves.sandwich.retrofit.serialization.onErrorDeserialize
@@ -56,10 +55,19 @@ class AuthViewModel @Inject constructor(
     fun signUp(req: RegisterRequest) {
         viewModelScope.launch {
             val response = authRepository.register(req)
-            _uiState.value = when (response) {
-                is ApiResponse.Success -> _uiState.value.copy(dialogMessage = response.data.message)
-                is ApiResponse.Failure.Error -> _uiState.value.copy(dialogMessage = response.message())
-                is ApiResponse.Failure.Exception -> _uiState.value.copy(dialogMessage = response.message())
+            response.onSuccess {
+                _uiState.update {
+                    it.copy(
+                        openDialog = true,
+                        dialogMessage = data.message
+                    )
+                }
+            }.onErrorDeserialize<RegisterResponse, ErrorBody> { errorBody ->
+                _uiState.update { it.copy(openDialog = true, dialogMessage = errorBody.message.joinToString("\n")) }
+            }.onException {
+                when (throwable) {
+                    is SocketTimeoutException -> _uiState.update { it.copy(openDialog = true, dialogMessage = "Request timed out.\n Please try again.") }
+                }
             }
         }
     }

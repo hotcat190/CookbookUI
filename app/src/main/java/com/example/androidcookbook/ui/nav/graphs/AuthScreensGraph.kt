@@ -42,7 +42,9 @@ fun NavGraphBuilder.authScreens(navController: NavController, updateAppBar: () -
                     }
                 },
                 onUseAsGuest = {
-                    navController.navigate(Routes.App)
+                    navController.navigate(Routes.App) {
+                        popUpTo<Routes.Auth> { inclusive = true }
+                    }
                 }
             )
         }
