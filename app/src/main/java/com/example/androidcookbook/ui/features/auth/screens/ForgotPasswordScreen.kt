@@ -1,4 +1,4 @@
-package com.example.androidcookbook.ui.features.auth
+package com.example.androidcookbook.ui.features.auth.screens
 
 import androidx.compose.runtime.Composable
 

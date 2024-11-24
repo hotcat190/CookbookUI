@@ -2,6 +2,7 @@ package com.example.androidcookbook.data.modules
 
 import com.example.androidcookbook.data.network.AuthService
 import com.example.androidcookbook.data.repositories.AuthRepository
+import com.skydoves.sandwich.retrofit.adapters.ApiResponseCallAdapterFactory
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -27,6 +28,7 @@ object CookbookBEModule {
     fun provideCookBE(): Retrofit = Retrofit.Builder()
         .baseUrl(COOKBOOK_BE)
         .addConverterFactory(GsonConverterFactory.create())
+        .addCallAdapterFactory(ApiResponseCallAdapterFactory.create())
         .build()
 
     @Provides

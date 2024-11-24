@@ -1,7 +1,10 @@
 package com.example.androidcookbook.data.modules
 
 import com.example.androidcookbook.data.network.CategoriesService
+import com.example.androidcookbook.data.network.SearchService
 import com.example.androidcookbook.data.repositories.CategoriesRepository
+import com.example.androidcookbook.data.repositories.SearchRepository
+import com.skydoves.sandwich.retrofit.adapters.ApiResponseCallAdapterFactory
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -27,6 +30,7 @@ object TheMealDBModule {
     fun provideTheMealDB(): Retrofit = Retrofit.Builder()
         .baseUrl(THE_MEAL_DB)
         .addConverterFactory(GsonConverterFactory.create())
+        .addCallAdapterFactory(ApiResponseCallAdapterFactory.create())
         .build()
 
     @Provides
@@ -38,4 +42,14 @@ object TheMealDBModule {
     @Singleton
     fun provideCategoriesRepository(categoriesService: CategoriesService): CategoriesRepository =
         CategoriesRepository(categoriesService)
+
+    @Provides
+    @Singleton
+    fun provideSearchService(@TheMealDBRetrofit retrofit: Retrofit): SearchService =
+        retrofit.create(SearchService::class.java)
+
+    @Provides
+    @Singleton
+    fun provideSearchRepository(searchService: SearchService): SearchRepository =
+        SearchRepository(searchService)
 }

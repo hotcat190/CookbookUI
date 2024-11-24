@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
@@ -18,11 +17,12 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Card
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material.Text // Using material Text and Card
-import androidx.compose.material.Card // cuz cant be bothered changing colors
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -36,24 +36,33 @@ import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.example.androidcookbook.R
-import com.example.androidcookbook.domain.model.Category
+import com.example.androidcookbook.domain.model.category.Category
+import com.example.androidcookbook.ui.common.containers.RefreshableScreen
 import com.example.androidcookbook.ui.theme.Typography
 import kotlinx.coroutines.delay
 
-@Composable
-fun CategoryScreen(modifier: Modifier = Modifier, categoryUiState: CategoryUiState) {
-    when (categoryUiState) {
-        is CategoryUiState.Loading -> Text("Loading")
-        is CategoryUiState.Success -> {
-            CategoryListScreen(
-                categories = categoryUiState.categories,
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(start = 8.dp, top = 16.dp, end = 8.dp)
-            )
-        }
+const val CATEGORY_SCREEN_TAG = "CategoryScreen"
 
-        else -> Text("Error")
+@Composable
+fun CategoryScreen(
+    categoryViewModel: CategoryViewModel,
+    modifier: Modifier = Modifier,
+) {
+    RefreshableScreen(
+        onRefresh = { categoryViewModel.refresh() }
+    ) {
+        when (val categoryUiState = categoryViewModel.categoryUiState.collectAsState().value) {
+            is CategoryUiState.Loading -> Text("Loading")
+            is CategoryUiState.Success -> {
+                CategoryListScreen(
+                    categories = categoryUiState.categories,
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(start = 8.dp, top = 16.dp, end = 8.dp)
+                )
+            }
+            is CategoryUiState.Error -> Text("Error")
+        }
     }
 }
 
@@ -107,7 +116,7 @@ fun CategoryCard(category: Category, modifier: Modifier = Modifier) {
                 textAlign = TextAlign.Start
             )
             AsyncImage(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier.fillMaxSize(),
                 model = ImageRequest.Builder(context = LocalContext.current)
                     .data(category.strCategoryThumb)
                     .crossfade(true)
@@ -127,8 +136,6 @@ private fun CategoryListScreen(
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(8.dp)
 ) {
-    // TODO: Nesting a LazyRow inside of a LazyVerticalGrid seems incorrect,
-    //  should find a different solution.
     LazyVerticalGrid(
         columns = GridCells.Fixed(2),
         modifier = modifier,
