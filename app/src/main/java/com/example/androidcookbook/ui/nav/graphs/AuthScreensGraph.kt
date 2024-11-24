@@ -7,7 +7,6 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.dialog
 import androidx.navigation.compose.navigation
-import com.example.androidcookbook.domain.model.user.User
 import com.example.androidcookbook.ui.common.dialog.MinimalDialog
 import com.example.androidcookbook.ui.features.auth.AuthViewModel
 import com.example.androidcookbook.ui.features.auth.screens.ForgotPasswordScreen
@@ -20,7 +19,7 @@ import com.example.androidcookbook.ui.nav.utils.sharedViewModel
  * Login, registration, forgot password screens nav graph builder
  * (Unauthenticated user)
  */
-fun NavGraphBuilder.authScreens(navController: NavController, updateUser: (User) -> Unit) {
+fun NavGraphBuilder.authScreens(navController: NavController, updateUser: (Int) -> Unit) {
     navigation<Routes.Auth>(
         startDestination = Routes.Auth.Login
     ) {
@@ -35,8 +34,8 @@ fun NavGraphBuilder.authScreens(navController: NavController, updateUser: (User)
                     navController.navigate(Routes.Auth.Register)
                 },
                 onSignInClick = { username, password ->
-                    authViewModel.signIn(username, password) { user ->
-                        updateUser(user)
+                    authViewModel.signIn(username, password) { id ->
+                        updateUser(id)
                         navController.navigate(Routes.DialogDestination)
                     }
                 },

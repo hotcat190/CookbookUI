@@ -21,13 +21,18 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
+import coil.compose.AsyncImage
+import coil.request.ImageRequest
 import com.example.androidcookbook.R
+import com.example.androidcookbook.ui.common.containers.RefreshableScreen
 import com.example.androidcookbook.ui.features.newsfeed.NewsfeedCard
 import com.example.androidcookbook.ui.theme.AndroidCookbookTheme
 
@@ -36,23 +41,60 @@ fun UserProfileScreen(
     userId: Int,
     modifier: Modifier = Modifier
 ) {
-    LazyColumn(
-        modifier = Modifier.fillMaxSize()
+    val userProfileViewModel = hiltViewModel<UserProfileViewModel, UserProfileViewModel.UserProfileViewModelFactory> {
+        it.create(userId)
+    }
+    val userProfileUiState = userProfileViewModel.uiState
+    RefreshableScreen(
+        onRefresh = { userProfileViewModel.refresh() }
     ) {
-        item {
-            UserAvatar()
-            UserInfo()
-            Column(modifier = Modifier.wrapContentHeight()) {
-                NewsfeedCard()
-                NewsfeedCard()
-                NewsfeedCard()
+        when (userProfileUiState) {
+            is UserProfileUiState.Loading -> {
+                Text(
+                    "Loading"
+                )
+            }
+            is UserProfileUiState.Success -> {
+                val user = userProfileUiState.user
+                LazyColumn(
+                    modifier = Modifier.fillMaxSize()
+                ) {
+                    item {
+                        UserAvatar(avatarPath = user.avatar)
+                        UserInfo()
+                        Column(modifier = Modifier.wrapContentHeight()) {
+                            NewsfeedCard()
+                            NewsfeedCard()
+                            NewsfeedCard()
+                        }
+                    }
+                }
+            }
+
+            UserProfileUiState.Failure -> {
+                LazyColumn(
+                    modifier = Modifier.fillMaxSize()
+                ) {
+                    item {
+                        UserAvatar(avatarPath = null)
+                        UserInfo()
+                        Column(modifier = Modifier.wrapContentHeight()) {
+                            NewsfeedCard()
+                            NewsfeedCard()
+                            NewsfeedCard()
+                        }
+                    }
+                }
             }
         }
     }
 }
 
 @Composable
-fun UserAvatar() {
+fun UserAvatar(
+    modifier: Modifier = Modifier,
+    avatarPath: String? = null,
+) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -67,8 +109,12 @@ fun UserAvatar() {
                 .height(200.dp),
             contentScale = ContentScale.Crop
         )
-        Image(
-            painter = painterResource(id = R.drawable.image_3),
+        AsyncImage(
+//            painter = painterResource(id = R.drawable.default_avatar),
+            model = ImageRequest.Builder(LocalContext.current)
+                .data(avatarPath)
+                .crossfade(true)
+                .build(),
             contentDescription = null,
             modifier =
             Modifier
@@ -77,7 +123,9 @@ fun UserAvatar() {
                 .border(shape = CircleShape, width = 5.dp, color = Color.White)
                 .padding(5.dp)
                 .clip(CircleShape),
-            contentScale = ContentScale.Crop
+            contentScale = ContentScale.Crop,
+            placeholder = painterResource(R.drawable.default_avatar),
+            error = painterResource(R.drawable.default_avatar),
         )
     }
 }
@@ -91,14 +139,14 @@ fun UserInfo() {
         verticalArrangement = Arrangement.spacedBy(5.dp)
     ) {
         Text(
-            text = "Ly Duc",
+            text = "Guest",
             style = TextStyle(
                 fontSize = 24.sp,
                 fontWeight = FontWeight(600),
             )
         )
         Text(
-            text = "I love being traumatized",
+            text = "",
             style = TextStyle(
                 fontSize = 12.sp,
                 fontWeight = FontWeight(400),
@@ -106,7 +154,7 @@ fun UserInfo() {
         )
         Row {
             Text(
-                text = "200",
+                text = "0",
                 style = TextStyle(
                     fontSize = 14.sp,
                     fontWeight = FontWeight(700),

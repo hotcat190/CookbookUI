@@ -41,6 +41,8 @@ fun CookbookApp(
 
     val uiState by viewModel.uiState.collectAsState()
 
+    val userId by viewModel.userId.collectAsState()
+
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
 
     Scaffold(
@@ -81,7 +83,7 @@ fun CookbookApp(
                         navController.navigateIfNotOn(Routes.App.Newsfeed)
                     },
                     onUserProfileClick = {
-                        navController.navigateIfNotOn(Routes.App.UserProfile(0)) // TODO: UserId logic
+                        navController.navigateIfNotOn(Routes.App.UserProfile(userId))
                     },
                     currentDestination = currentDestination
                 )
@@ -95,8 +97,8 @@ fun CookbookApp(
                 .fillMaxSize()
                 .padding(innerPadding),
         ) {
-            authScreens(navController = navController, updateUser = { user ->
-                viewModel.updateUser(user)
+            authScreens(navController = navController, updateUser = { id ->
+                viewModel.updateUser(id)
             })
             appScreens(navController = navController, updateAppBar = {
                 viewModel.updateTopBarState(CookbookUiState.TopBarState.Default)

@@ -1,7 +1,9 @@
 package com.example.androidcookbook.data.modules
 
 import com.example.androidcookbook.data.network.AuthService
+import com.example.androidcookbook.data.network.UserService
 import com.example.androidcookbook.data.repositories.AuthRepository
+import com.example.androidcookbook.data.repositories.UserRepository
 import com.skydoves.sandwich.retrofit.adapters.ApiResponseCallAdapterFactory
 import dagger.Module
 import dagger.Provides
@@ -40,4 +42,14 @@ object CookbookBEModule {
     @Singleton
     fun provideAuthRepository(authService: AuthService): AuthRepository =
         AuthRepository(authService)
+
+    @Provides
+    @Singleton
+    fun provideUserService(@CookbookRetrofit retrofit: Retrofit): UserService =
+        retrofit.create(UserService::class.java)
+
+    @Provides
+    @Singleton
+    fun provideUserRepository(userService: UserService) =
+        UserRepository(userService)
 }

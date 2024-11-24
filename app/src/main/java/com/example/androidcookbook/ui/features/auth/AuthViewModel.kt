@@ -7,7 +7,6 @@ import com.example.androidcookbook.domain.model.auth.RegisterRequest
 import com.example.androidcookbook.domain.model.auth.RegisterResponse
 import com.example.androidcookbook.domain.model.auth.SignInRequest
 import com.example.androidcookbook.domain.model.auth.SignInResponse
-import com.example.androidcookbook.domain.model.user.User
 import com.example.androidcookbook.domain.network.ErrorBody
 import com.skydoves.sandwich.onException
 import com.skydoves.sandwich.onSuccess
@@ -73,13 +72,13 @@ class AuthViewModel @Inject constructor(
         }
     }
 
-    fun signIn(username: String, password: String, onSuccessUpdateUser: (User) -> Unit) {
+    fun signIn(username: String, password: String, onSuccessUpdateUserId: (Int) -> Unit) {
         viewModelScope.launch {
             // Send request and receive the response
             val response = authRepository.login(SignInRequest(username, password))
             response.onSuccess {
                 _uiState.update { it.copy(openDialog = true, dialogMessage = data.message, signInSuccess = true) }
-                onSuccessUpdateUser(data.user)
+                onSuccessUpdateUserId(data.userId)
             }.onErrorDeserialize<SignInResponse, ErrorBody> { errorBody ->
                 _uiState.update { it.copy(openDialog = true, dialogMessage = errorBody.message.joinToString("\n")) }
             }.onException {

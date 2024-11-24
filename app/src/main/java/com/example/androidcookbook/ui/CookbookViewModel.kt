@@ -1,7 +1,6 @@
 package com.example.androidcookbook.ui
 
 import androidx.lifecycle.ViewModel
-import com.example.androidcookbook.domain.model.user.User
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -11,8 +10,8 @@ class CookbookViewModel : ViewModel() {
     private val _uiState = MutableStateFlow(CookbookUiState())
     val uiState: StateFlow<CookbookUiState> = _uiState.asStateFlow()
 
-    private val _user = MutableStateFlow<User>(User(0, "Guest", "Guest", null))
-    val user = _user.asStateFlow()
+    private val _userId = MutableStateFlow<Int>(0)
+    val userId = _userId.asStateFlow()
 
     fun updateCanNavigateBack(updatedCanNavigateBack: Boolean) {
         _uiState.update { currentState ->
@@ -30,7 +29,7 @@ class CookbookViewModel : ViewModel() {
         _uiState.update { it.copy(bottomBarState = bottomBarState) }
     }
 
-    fun updateUser(user: User) {
-        _user.update { it.copy(id = user.id, username = user.username, name = user.name, avatar = user.avatar) }
+    fun updateUser(userId: Int) {
+        _userId.update { userId }
     }
 }
