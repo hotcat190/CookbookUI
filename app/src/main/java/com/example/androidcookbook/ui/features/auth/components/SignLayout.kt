@@ -48,7 +48,7 @@ fun SignLayout(
                 .align(Alignment.TopCenter)
                 .offset(y = 70.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(50.dp)
+            verticalArrangement = Arrangement.spacedBy(15.dp)
         ) {
             AppLogo()
 
