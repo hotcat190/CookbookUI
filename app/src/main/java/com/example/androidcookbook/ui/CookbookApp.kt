@@ -11,6 +11,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -19,8 +20,10 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.androidcookbook.ui.common.appbars.CookbookAppBarDefault
 import com.example.androidcookbook.ui.common.appbars.CookbookBottomNavigationBar
+import com.example.androidcookbook.ui.common.appbars.SearchBar
 import com.example.androidcookbook.ui.features.post.CreatePostScreen
 import com.example.androidcookbook.ui.features.search.SearchScreen
+import com.example.androidcookbook.ui.features.search.SearchViewModel
 import com.example.androidcookbook.ui.nav.Routes
 import com.example.androidcookbook.ui.nav.graphs.appScreens
 import com.example.androidcookbook.ui.nav.graphs.authScreens
@@ -50,18 +53,15 @@ fun CookbookApp(
                     showBackButton = uiState.canNavigateBack,
                     searchButtonAction = {
                         navController.navigateIfNotOn(Routes.Search)
-                        viewModel.updateCanNavigateBack(true)
                     },
                     onCreatePostClick = {
                         navController.navigateIfNotOn(Routes.CreatePost)
-                        viewModel.updateCanNavigateBack(true)
                     },
                     onMenuButtonClick = {
                         //TODO: Add menu button
                     },
                     onBackButtonClick = {
                         navController.navigateUp()
-                        viewModel.updateCanNavigateBack(false)
                     },
                     scrollBehavior = scrollBehavior
                 )
@@ -95,36 +95,47 @@ fun CookbookApp(
                 .fillMaxSize()
                 .padding(innerPadding),
         ) {
-            authScreens(navController = navController, updateAppBar = {
-                viewModel.updateTopBarState(CookbookUiState.TopBarState.NoTopBar)
-                viewModel.updateBottomBarState(CookbookUiState.BottomBarState.NoBottomBar)
+            authScreens(navController = navController, updateUser = { user ->
+                viewModel.updateUser(user)
             })
             appScreens(navController = navController, updateAppBar = {
                 viewModel.updateTopBarState(CookbookUiState.TopBarState.Default)
                 viewModel.updateBottomBarState(CookbookUiState.BottomBarState.Default)
+                viewModel.updateCanNavigateBack(false)
             })
-            composable<Routes.Search> { entry ->
+            composable<Routes.Search> {
                 viewModel.updateBottomBarState(CookbookUiState.BottomBarState.NoBottomBar)
+                viewModel.updateCanNavigateBack(true)
 
+                val searchViewModel = hiltViewModel<SearchViewModel>()
+                val searchUiState = searchViewModel.uiState.collectAsState().value
+
+                viewModel.updateTopBarState(CookbookUiState.TopBarState.Custom {
+                    SearchBar(
+                        onSearch = { searchViewModel.search(it) },
+                        navigateBackAction = {
+                            navController.navigateUp()
+                        },
+                    )
+                })
                 SearchScreen(
-                    providesCustomAppBar = {
-                        viewModel.updateTopBarState(CookbookUiState.TopBarState.Custom(it))
-                    },
+                    searchUiState = searchUiState,
                     onBackButtonClick = {
                         navController.navigateUp()
-                        viewModel.updateCanNavigateBack(false)
                     }
                 )
             }
             composable<Routes.CreatePost> {
                 viewModel.updateBottomBarState(CookbookUiState.BottomBarState.NoBottomBar)
+                viewModel.updateTopBarState(CookbookUiState.TopBarState.Default)
+                viewModel.updateCanNavigateBack(true)
+
                 CreatePostScreen(
                     onPostButtonClick = {
                         //TODO: Connect to database
                     },
                     onBackButtonClick = {
                         navController.navigateUp()
-                        viewModel.updateCanNavigateBack(false)
                     },
                 )
             }
