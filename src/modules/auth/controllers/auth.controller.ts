@@ -1,5 +1,5 @@
 // src/modules/auth/controllers/auth.controller.ts
-import { Controller, Post, Body, Get, Query, Req, Put, Param, Request as Request1, UseGuards, Delete } from '@nestjs/common';
+import { Controller, Post, Body, Get, Query, Req, Put, Param, Request as Request1, UseGuards, Delete, UseInterceptors, UploadedFile } from '@nestjs/common';
 
 import { AuthService } from '../auth.service';
 import { RegisterDto } from '../dtos/register.dto';
@@ -11,6 +11,8 @@ import { Request as Request2 } from 'express';
 import { UpdateProfileDto } from '../dtos/update-profile.dto';
 import { JwtAuthGuard } from 'src/common/guards/jwt-auth.guard';
 import { ChangePasswordDto } from '../dtos/change-password.dto';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { diskStorage } from 'multer';
 
 @ApiTags('auth')
 @Controller('')
@@ -116,5 +118,22 @@ export class AuthController {
   async getUserProfile(@Param('userId') userId: number) {
     return this.authService.getProfileByUserId(userId);
   }
-  
+  @Post('profile/uploadImage')
+  @UseInterceptors(
+    FileInterceptor('image', {
+      storage: diskStorage({
+        destination: './uploads',
+        filename: (req, file, cb) => {
+          const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
+          const ext = file.originalname.split('.').pop();
+          cb(null, `${file.fieldname}-${uniqueSuffix}.${ext}`);
+        },
+      }),
+    }),
+  )
+  @ApiOperation({ summary: 'Đăng ảnh' })
+  @ApiResponse({ status: 200, description: 'Đăng ảnh thành công' })
+  async uploadImage(@UploadedFile() file: Express.Multer.File) {
+    return this.authService.uploadImage(file);
+  }
 }

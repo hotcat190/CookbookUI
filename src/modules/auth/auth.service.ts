@@ -1,5 +1,5 @@
 // src/modules/auth/auth.service.ts
-import { Injectable, BadRequestException, UnauthorizedException, NotFoundException } from '@nestjs/common';
+import { Injectable, BadRequestException, UnauthorizedException, NotFoundException, InternalServerErrorException } from '@nestjs/common';
 import { RegisterDto } from './dtos/register.dto';
 import { LoginDto } from './dtos/login.dto';
 import { ForgotDto } from './dtos/forgot.dto';
@@ -13,8 +13,9 @@ import { MailerService } from '../mailer/mailer.service';
 import { v4 as uuidv4 } from 'uuid';
 import { UpdateProfileDto } from './dtos/update-profile.dto';
 import { Post } from '../posts/entities/post.entity';
-import { FullReponsePostDto, LiteReponsePostDto } from '../posts/dtos/create-post.dto';
+import { FullReponsePostDto, LiteReponsePostDto, ReponseUserDto } from '../posts/dtos/create-post.dto';
 import { ChangePasswordDto } from './dtos/change-password.dto';
+import { v2 as cloudinary } from 'cloudinary';
 
 @Injectable()
 export class AuthService {
@@ -24,7 +25,13 @@ export class AuthService {
     @InjectRepository(Post) private postsRepository: Repository<Post>,
     private jwtService: JwtService,
     private mailerService: MailerService,
-  ) {}
+  ) {
+    cloudinary.config({
+      cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+      api_key: process.env.CLOUDINARY_API_KEY,
+      api_secret: process.env.CLOUDINARY_API_SECRET,
+    })
+  }
   async getUserIdFromToKen(token: string): Promise<number> {
     const payload = this.jwtService.decode(token);
     return payload['sub'];
@@ -43,16 +50,7 @@ export class AuthService {
         await this.usersRepository.delete(existingUser.id);
       }
       const hashedPassword = await bcrypt.hash(password, 10);
-      const test1 = await bcrypt.hash("Password123", 10);
-      const test2 = await bcrypt.hash("Password123", 10);
-      const test3 = await bcrypt.hash("Password123", 10);
-      const test4 = await bcrypt.hash("Password123", 10);
-      const test5 = await bcrypt.hash("Password123", 10);
-      console.log(test1);
-      console.log(test2);
-      console.log(test3);
-      console.log(test4);
-      console.log(test5);
+
 
       const user = this.usersRepository.create({
         username,
@@ -96,7 +94,7 @@ export class AuthService {
     const payload = { sub: user.id, username: user.username, roles: user.roles };
     const token = this.jwtService.sign(payload);
 
-    return { access_token: token, message: 'Đăng nhập thành công' };
+    return { access_token: token, message: 'Đăng nhập thành công', user: new ReponseUserDto(user) };
   }
 
   async verifyEmail(token: string): Promise<string> {
@@ -293,6 +291,19 @@ export class AuthService {
     }
     else{
       return {nextPage: "false", favorites: favorites.slice(startIndex, startIndex + itemsPerPage).map(fav => new LiteReponsePostDto(fav))};
+    }
+  }
+
+  async uploadImage(file: Express.Multer.File): Promise<any> {
+    try {
+      if(!file) return {error: "No file uploaded"}
+      const result = await cloudinary.uploader.upload(file.path, {
+        folder: 'uploads',
+      });
+      return result.secure_url;
+    } catch (error) {
+      console.log(error);
+      throw new InternalServerErrorException('Failed to upload image');
     }
   }
 }
