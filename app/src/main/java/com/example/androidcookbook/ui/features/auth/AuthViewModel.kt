@@ -72,13 +72,13 @@ class AuthViewModel @Inject constructor(
         }
     }
 
-    fun signIn(username: String, password: String, onSuccessUpdateUserId: (Int) -> Unit) {
+    fun signIn(username: String, password: String, onSuccess: (SignInResponse) -> Unit) {
         viewModelScope.launch {
             // Send request and receive the response
             val response = authRepository.login(SignInRequest(username, password))
             response.onSuccess {
                 _uiState.update { it.copy(openDialog = true, dialogMessage = data.message, signInSuccess = true) }
-                onSuccessUpdateUserId(data.userId)
+                onSuccess(data)
             }.onErrorDeserialize<SignInResponse, ErrorBody> { errorBody ->
                 _uiState.update { it.copy(openDialog = true, dialogMessage = errorBody.message.joinToString("\n")) }
             }.onException {

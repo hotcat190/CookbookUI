@@ -1,22 +1,24 @@
 package com.example.androidcookbook.ui.features.userprofile
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
@@ -32,6 +34,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.example.androidcookbook.R
+import com.example.androidcookbook.domain.model.user.User
 import com.example.androidcookbook.ui.common.containers.RefreshableScreen
 import com.example.androidcookbook.ui.features.newsfeed.NewsfeedCard
 import com.example.androidcookbook.ui.theme.AndroidCookbookTheme
@@ -39,6 +42,7 @@ import com.example.androidcookbook.ui.theme.AndroidCookbookTheme
 @Composable
 fun UserProfileScreen(
     userId: Int,
+    onPostSeeDetailsClick: (Int) -> Unit,
     modifier: Modifier = Modifier
 ) {
     val userProfileViewModel = hiltViewModel<UserProfileViewModel, UserProfileViewModel.UserProfileViewModelFactory> {
@@ -60,13 +64,24 @@ fun UserProfileScreen(
                     modifier = Modifier.fillMaxSize()
                 ) {
                     item {
-                        UserAvatar(avatarPath = user.avatar)
-                        UserInfo()
-                        Column(modifier = Modifier.wrapContentHeight()) {
-                            NewsfeedCard()
-                            NewsfeedCard()
-                            NewsfeedCard()
+                        UserProfileHeader(avatarPath = user.avatar)
+                    }
+                    item {
+                        UserInfo(user)
+                    }
+                    when (userProfileViewModel.userPostState) {
+                        is UserPostState.Loading -> item { Text("Loading user posts") }
+                        is UserPostState.Success -> {
+                            items(
+                                (userProfileViewModel.userPostState as UserPostState.Success).userPosts
+                            ) { post ->
+                                NewsfeedCard(
+                                    post = post,
+                                    onSeeDetailsClick = onPostSeeDetailsClick
+                                )
+                            }
                         }
+                        is UserPostState.Failure -> item { Text("Failed to fetch user posts.") }
                     }
                 }
             }
@@ -76,12 +91,15 @@ fun UserProfileScreen(
                     modifier = Modifier.fillMaxSize()
                 ) {
                     item {
-                        UserAvatar(avatarPath = null)
-                        UserInfo()
-                        Column(modifier = Modifier.wrapContentHeight()) {
-                            NewsfeedCard()
-                            NewsfeedCard()
-                            NewsfeedCard()
+                        UserProfileHeader(avatarPath = null)
+                        UserInfo(User())
+                    }
+                    item {
+                        Column(
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            modifier = Modifier.fillMaxSize()
+                        ) {
+                            Text("Login to view your posts.")
                         }
                     }
                 }
@@ -91,70 +109,93 @@ fun UserProfileScreen(
 }
 
 @Composable
-fun UserAvatar(
+fun UserProfileHeader(
     modifier: Modifier = Modifier,
     avatarPath: String? = null,
+    bannerPath: String? = null,
 ) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
             .height(270.dp)
     ) {
-        Image(
-            painter = painterResource(id = R.drawable.image_5),
-            contentDescription = null,
-            modifier =
-            Modifier
-                .fillMaxWidth()
-                .height(200.dp),
-            contentScale = ContentScale.Crop
-        )
-        AsyncImage(
-//            painter = painterResource(id = R.drawable.default_avatar),
-            model = ImageRequest.Builder(LocalContext.current)
-                .data(avatarPath)
-                .crossfade(true)
-                .build(),
-            contentDescription = null,
-            modifier =
-            Modifier
-                .size(125.dp)
-                .offset(x = 20.dp, y = 140.dp)
-                .border(shape = CircleShape, width = 5.dp, color = Color.White)
-                .padding(5.dp)
-                .clip(CircleShape),
-            contentScale = ContentScale.Crop,
-            placeholder = painterResource(R.drawable.default_avatar),
-            error = painterResource(R.drawable.default_avatar),
-        )
+        UserBanner(bannerPath)
+        UserAvatar(avatarPath)
     }
 }
 
 @Composable
-fun UserInfo() {
+private fun UserBanner(
+    bannerPath: String?,
+) {
+    AsyncImage(
+//        painter = painterResource(id = R.drawable.image_5),
+        model = ImageRequest.Builder(LocalContext.current)
+            .data(bannerPath)
+            .crossfade(true)
+            .build(),
+        contentDescription = null,
+        modifier =
+        Modifier
+            .fillMaxWidth()
+            .height(200.dp),
+        contentScale = ContentScale.Crop,
+        error = painterResource(id = R.drawable.image_5),
+        placeholder = painterResource(id = R.drawable.image_5),
+    )
+}
+
+@Composable
+private fun UserAvatar(avatarPath: String?) {
+    AsyncImage(
+//            painter = painterResource(id = R.drawable.default_avatar),
+        model = ImageRequest.Builder(LocalContext.current)
+            .data(avatarPath)
+            .crossfade(true)
+            .build(),
+        contentDescription = null,
+        modifier =
+        Modifier
+            .size(125.dp)
+            .offset(x = 20.dp, y = 140.dp)
+            .border(shape = CircleShape, width = 5.dp, color = Color.White)
+            .padding(5.dp)
+            .clip(CircleShape),
+        contentScale = ContentScale.Crop,
+        placeholder = painterResource(R.drawable.default_avatar),
+        error = painterResource(R.drawable.default_avatar),
+    )
+}
+
+@Composable
+fun UserInfo(
+    user: User,
+) {
     Column(
         modifier = Modifier
-            .padding(horizontal = 30.dp)
-            .height(70.dp),
+            .padding(horizontal = 30.dp),
         verticalArrangement = Arrangement.spacedBy(5.dp)
     ) {
         Text(
-            text = "Guest",
+            text = user.name,
             style = TextStyle(
                 fontSize = 24.sp,
                 fontWeight = FontWeight(600),
             )
         )
         Text(
-            text = "",
+            text = user.bio,
             style = TextStyle(
                 fontSize = 12.sp,
                 fontWeight = FontWeight(400),
             )
         )
+        if (user.id == 0) {
+            return@Column
+        }
         Row {
             Text(
-                text = "0",
+                text = user.totalFollowers.toString(),
                 style = TextStyle(
                     fontSize = 14.sp,
                     fontWeight = FontWeight(700),
@@ -162,6 +203,21 @@ fun UserInfo() {
             )
             Text(
                 text = " followers",
+                style = TextStyle(
+                    fontSize = 14.sp,
+                    fontWeight = FontWeight(400),
+                )
+            )
+            Spacer(Modifier.width(8.dp))
+            Text(
+                text = user.totalFollowing.toString(),
+                style = TextStyle(
+                    fontSize = 14.sp,
+                    fontWeight = FontWeight(700),
+                )
+            )
+            Text(
+                text = " following",
                 style = TextStyle(
                     fontSize = 14.sp,
                     fontWeight = FontWeight(400),
@@ -176,7 +232,8 @@ fun UserInfo() {
 fun ProfilePreview() {
     AndroidCookbookTheme(darkTheme = true) {
         UserProfileScreen(
-            userId = 0
+            userId = 0,
+            {}
         )
     }
 }
@@ -184,5 +241,22 @@ fun ProfilePreview() {
 @Preview
 @Composable
 fun AvtPreview() {
-    UserAvatar()
+    AndroidCookbookTheme(darkTheme = true) {
+        UserProfileHeader()
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun UserInfoPreview() {
+    AndroidCookbookTheme(darkTheme = true) {
+        UserInfo(User(
+            1,
+            bio = "I like suffering",
+            "Ly Duc",
+            null,
+            0,
+            1)
+        )
+    }
 }

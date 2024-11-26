@@ -1,7 +1,9 @@
 package com.example.androidcookbook.domain.model.user
 
+import com.google.gson.annotations.SerializedName
+
 data class User(
-    val userId: Int = 0,
+    @SerializedName(value = "id", alternate = ["userId"]) val id: Int = 0,
     val bio: String = "",
     val name: String = "Guest",
     val avatar: String? = null,

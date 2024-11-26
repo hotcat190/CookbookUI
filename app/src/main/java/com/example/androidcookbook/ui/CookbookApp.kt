@@ -1,5 +1,6 @@
 package com.example.androidcookbook.ui
 
+import android.util.Log
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -22,6 +23,7 @@ import com.example.androidcookbook.ui.common.appbars.CookbookAppBarDefault
 import com.example.androidcookbook.ui.common.appbars.CookbookBottomNavigationBar
 import com.example.androidcookbook.ui.common.appbars.SearchBar
 import com.example.androidcookbook.ui.features.post.CreatePostScreen
+import com.example.androidcookbook.ui.features.post.CreatePostViewModel
 import com.example.androidcookbook.ui.features.search.SearchScreen
 import com.example.androidcookbook.ui.features.search.SearchViewModel
 import com.example.androidcookbook.ui.nav.Routes
@@ -41,7 +43,8 @@ fun CookbookApp(
 
     val uiState by viewModel.uiState.collectAsState()
 
-    val userId by viewModel.userId.collectAsState()
+    val user by viewModel.user.collectAsState()
+    Log.d("USERID", user.toString())
 
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
 
@@ -83,7 +86,7 @@ fun CookbookApp(
                         navController.navigateIfNotOn(Routes.App.Newsfeed)
                     },
                     onUserProfileClick = {
-                        navController.navigateIfNotOn(Routes.App.UserProfile(userId))
+                        navController.navigateIfNotOn(Routes.App.UserProfile(user.id))
                     },
                     currentDestination = currentDestination
                 )
@@ -97,8 +100,11 @@ fun CookbookApp(
                 .fillMaxSize()
                 .padding(innerPadding),
         ) {
-            authScreens(navController = navController, updateUser = { id ->
-                viewModel.updateUser(id)
+            authScreens(navController = navController, updateAppBar = {
+                viewModel.updateTopBarState(CookbookUiState.TopBarState.NoTopBar)
+                viewModel.updateBottomBarState(CookbookUiState.BottomBarState.NoBottomBar)
+            }, updateUser = { response ->
+                viewModel.updateUser(response)
             })
             appScreens(navController = navController, updateAppBar = {
                 viewModel.updateTopBarState(CookbookUiState.TopBarState.Default)
@@ -106,12 +112,11 @@ fun CookbookApp(
                 viewModel.updateCanNavigateBack(false)
             })
             composable<Routes.Search> {
-                viewModel.updateBottomBarState(CookbookUiState.BottomBarState.NoBottomBar)
-                viewModel.updateCanNavigateBack(true)
-
                 val searchViewModel = hiltViewModel<SearchViewModel>()
                 val searchUiState = searchViewModel.uiState.collectAsState().value
 
+                viewModel.updateBottomBarState(CookbookUiState.BottomBarState.NoBottomBar)
+                viewModel.updateCanNavigateBack(true)
                 viewModel.updateTopBarState(CookbookUiState.TopBarState.Custom {
                     SearchBar(
                         onSearch = { searchViewModel.search(it) },
@@ -128,13 +133,35 @@ fun CookbookApp(
                 )
             }
             composable<Routes.CreatePost> {
-                viewModel.updateBottomBarState(CookbookUiState.BottomBarState.NoBottomBar)
                 viewModel.updateTopBarState(CookbookUiState.TopBarState.Default)
+                viewModel.updateBottomBarState(CookbookUiState.BottomBarState.NoBottomBar)
                 viewModel.updateCanNavigateBack(true)
 
+                val accessToken = viewModel.accessToken.collectAsState().value
+
+                val createPostViewModel = hiltViewModel<CreatePostViewModel, CreatePostViewModel.CreatePostViewModelFactory> { factory ->
+                    factory.create(accessToken)
+                }
+
+                val postTitle by createPostViewModel.postTitle.collectAsState()
+                val postBody by createPostViewModel.postBody.collectAsState()
+                val postImageUri by createPostViewModel.postImageUri.collectAsState()
+
                 CreatePostScreen(
+                    postTitle = postTitle,
+                    updatePostTitle = {
+                        createPostViewModel.updatePostTitle(it)
+                    },
+                    postBody = postBody,
+                    updatePostBody = {
+                        createPostViewModel.updatePostBody(it)
+                    },
+                    postImageUri = postImageUri,
+                    updatePostImageUri = {
+                        createPostViewModel.updatePostImageUri(it)
+                    },
                     onPostButtonClick = {
-                        //TODO: Connect to database
+                        createPostViewModel.createPost()
                     },
                     onBackButtonClick = {
                         navController.navigateUp()

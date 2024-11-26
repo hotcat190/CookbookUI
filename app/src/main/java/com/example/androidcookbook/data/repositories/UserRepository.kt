@@ -7,4 +7,6 @@ class UserRepository @Inject constructor(
     private val userService: UserService
 ) {
     suspend fun getUserProfile(userId: Int) = userService.getUserProfile(userId)
+
+    suspend fun getUserPosts(userId: Int) = userService.getUserPosts(userId)
 }

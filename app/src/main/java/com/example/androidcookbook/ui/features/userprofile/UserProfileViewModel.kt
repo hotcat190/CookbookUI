@@ -26,7 +26,8 @@ class UserProfileViewModel @AssistedInject constructor(
     }
 
     init {
-        getUser(userId = userId)
+        getUser(userId)
+        getUserPosts(userId)
     }
 
     var isRefreshing: Boolean by mutableStateOf(false)
@@ -35,16 +36,26 @@ class UserProfileViewModel @AssistedInject constructor(
     var uiState: UserProfileUiState by mutableStateOf(UserProfileUiState.Loading)
         private set
 
+    var userPostState: UserPostState by mutableStateOf(UserPostState.Loading)
+        private set
+
     private fun getUser(userId: Int) {
         viewModelScope.launch {
-            userRepository
-                .getUserProfile(userId = userId)
+            userRepository.getUserProfile(userId = userId)
                 .onSuccess {
-                    uiState = UserProfileUiState.Success(data)
+                    uiState = UserProfileUiState.Success(user = data)
                 }
                 .onFailure {
                     uiState = UserProfileUiState.Failure
                 }
+        }
+    }
+
+    fun getUserPosts(userId: Int) {
+        viewModelScope.launch {
+            userRepository.getUserPosts(userId)
+                .onSuccess { userPostState = UserPostState.Success(data) }
+                .onFailure { userPostState = UserPostState.Failure }
         }
     }
 
