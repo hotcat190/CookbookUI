@@ -87,7 +87,7 @@ fun UserInfo() {
     Column(
         modifier = Modifier
             .padding(horizontal = 30.dp)
-            .height(70.dp),
+            .height(90.dp),
         verticalArrangement = Arrangement.spacedBy(5.dp)
     ) {
         Text(
@@ -114,6 +114,22 @@ fun UserInfo() {
             )
             Text(
                 text = " followers",
+                style = TextStyle(
+                    fontSize = 14.sp,
+                    fontWeight = FontWeight(400),
+                )
+            )
+        }
+        Row {
+            Text(
+                text = "200",
+                style = TextStyle(
+                    fontSize = 14.sp,
+                    fontWeight = FontWeight(700),
+                )
+            )
+            Text(
+                text = " following",
                 style = TextStyle(
                     fontSize = 14.sp,
                     fontWeight = FontWeight(400),
