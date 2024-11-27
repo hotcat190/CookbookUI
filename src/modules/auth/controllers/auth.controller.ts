@@ -1,5 +1,5 @@
 // src/modules/auth/controllers/auth.controller.ts
-import { Controller, Post, Body, Get, Query, Req, Put, Param, Request as Request1, UseGuards, Delete, UseInterceptors, UploadedFile } from '@nestjs/common';
+import { Controller, Post, Body, Get, Query, Req, Put, Param, Request as Request1, UseGuards, Delete, UseInterceptors, UploadedFile, BadRequestException } from '@nestjs/common';
 
 import { AuthService } from '../auth.service';
 import { RegisterDto } from '../dtos/register.dto';
@@ -12,7 +12,7 @@ import { UpdateProfileDto } from '../dtos/update-profile.dto';
 import { JwtAuthGuard } from 'src/common/guards/jwt-auth.guard';
 import { ChangePasswordDto } from '../dtos/change-password.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { diskStorage } from 'multer';
+import { diskStorage, memoryStorage } from 'multer';
 
 @ApiTags('auth')
 @Controller('')
@@ -118,6 +118,8 @@ export class AuthController {
   async getUserProfile(@Param('userId') userId: number) {
     return this.authService.getProfileByUserId(userId);
   }
+
+  /*
   @Post('profile/uploadImage')
   @UseInterceptors(
     FileInterceptor('image', {
@@ -136,4 +138,38 @@ export class AuthController {
   async uploadImage(@UploadedFile() file: Express.Multer.File) {
     return this.authService.uploadImage(file);
   }
+}
+*/
+@Post('uploadImage')
+  @UseInterceptors(
+    FileInterceptor('image', {
+      storage: memoryStorage(), 
+      limits: { fileSize: 5 * 1024 * 1024 }, 
+    }),
+  )
+  async uploadImage(@UploadedFile() file: Express.Multer.File) {
+    if (!file) {
+      throw new BadRequestException('No file provided');
+    }
+
+    return await this.authService.uploadImage(file.buffer);
+  }
+  
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
+  @Post('airecipe/uploadImage')
+  @UseInterceptors(
+    FileInterceptor('image', {
+      storage: memoryStorage(), 
+      limits: { fileSize: 5 * 1024 * 1024 }, 
+    }),
+  )
+  async sendImageToAI(@UploadedFile() file: Express.Multer.File) {
+    if (!file) {
+      throw new BadRequestException('No file provided');
+    }
+    console.log("ok");
+    return await this.authService.sendImageToAI(file.buffer);
+  }
+  
 }
