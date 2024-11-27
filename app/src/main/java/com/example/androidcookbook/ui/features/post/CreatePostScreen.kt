@@ -27,9 +27,11 @@ import coil.compose.AsyncImage
 import com.example.androidcookbook.domain.model.user.User
 import com.example.androidcookbook.ui.features.newsfeed.PostHeader
 import com.example.androidcookbook.ui.theme.AndroidCookbookTheme
+import java.time.LocalDate
 
 @Composable
 fun CreatePostScreen(
+    author: User,
     postTitle: String,
     updatePostTitle: (String) -> Unit,
     postBody: String,
@@ -54,8 +56,8 @@ fun CreatePostScreen(
             .verticalScroll(rememberScrollState())
     ) {
         PostHeader(
-            author = User(),
-            createdAt = "01/28/2024",
+            author = author,
+            createdAt = LocalDate.now().toString(),
             modifier = Modifier.padding(bottom = 8.dp)
         )
 
@@ -139,6 +141,7 @@ fun CreatePostScreen(
 fun CreatePostScreenPreview() {
     AndroidCookbookTheme(darkTheme = false) {
         CreatePostScreen(
+            User(),
             "", {},
             "", {},
             null, {},
@@ -154,6 +157,7 @@ fun CreatePostScreenPreview() {
 fun CreatePostScreenPreviewDarkTheme() {
     AndroidCookbookTheme(darkTheme = true) {
         CreatePostScreen(
+            User(),
             "", {},
             "", {},
             null, {},

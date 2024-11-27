@@ -43,8 +43,8 @@ fun CookbookApp(
 
     val uiState by viewModel.uiState.collectAsState()
 
-    val user by viewModel.user.collectAsState()
-    Log.d("USERID", user.toString())
+    val currentUser by viewModel.user.collectAsState()
+    Log.d("USERID", currentUser.toString())
 
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
 
@@ -86,7 +86,7 @@ fun CookbookApp(
                         navController.navigateIfNotOn(Routes.App.Newsfeed)
                     },
                     onUserProfileClick = {
-                        navController.navigateIfNotOn(Routes.App.UserProfile(user.id))
+                        navController.navigateIfNotOn(Routes.App.UserProfile(currentUser.id))
                     },
                     currentDestination = currentDestination
                 )
@@ -148,6 +148,7 @@ fun CookbookApp(
                 val postImageUri by createPostViewModel.postImageUri.collectAsState()
 
                 CreatePostScreen(
+                    author = currentUser,
                     postTitle = postTitle,
                     updatePostTitle = {
                         createPostViewModel.updatePostTitle(it)

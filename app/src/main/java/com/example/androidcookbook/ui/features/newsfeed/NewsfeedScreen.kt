@@ -126,7 +126,7 @@ fun PostHeader(
                 color = MaterialTheme.colorScheme.onSurface
             )
             Text(
-                text = createdAt?: "01/01/2024", // TODO remove nullable
+                text = createdAt?: "", // TODO remove nullable
                 fontSize = 12.sp,
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.4f)
