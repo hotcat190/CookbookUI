@@ -9,6 +9,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusDirection
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusProperties
+import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
@@ -54,19 +59,31 @@ fun SignInComponent(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(25.dp)
     ) {
+        val focusManager = LocalFocusManager.current
+        val changeFocus: () -> Unit = {
+            focusManager.moveFocus(FocusDirection.Next)
+        }
         var username by remember { mutableStateOf("") }
         var password by remember { mutableStateOf("") }
+        val (first, second) = remember { FocusRequester.createRefs() }
 
         InputField(username, { username = it },"Username", KeyboardType.Text,
             Modifier.testTag(USERNAME_TEXT_FIELD_TEST_TAG)
+                .focusRequester(first)
+                .focusProperties { next = second },
+            onDone = changeFocus
         )
 
         InputField(password, { password = it },"Password", KeyboardType.Password,
             Modifier.testTag(PASSWORD_TEXT_FIELD_TEST_TAG)
+                .focusRequester(second),
+            onDone = {
+                onSignInClick(username.trim(), password)
+            }
         )
 
         SignButton(
-            onClick = { onSignInClick(username, password) },
+            onClick = { onSignInClick(username.trim(), password) },
             actionText = "Sign In"
         )
     }

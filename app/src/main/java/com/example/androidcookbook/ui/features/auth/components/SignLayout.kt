@@ -35,8 +35,8 @@ fun SignLayout(
         Canvas(modifier = Modifier.fillMaxSize()) {
             drawOval(
                 color = Color(0xFF4F3423),
-                topLeft = Offset(size.width * (-0.1f), size.height / (-14)),
-                size = Size(size.width * 1.2f, size.height / 4)
+                topLeft = Offset(-215f, -290f),
+                size = Size(1500f, 750f)
             )
         }
 
@@ -48,7 +48,7 @@ fun SignLayout(
                 .align(Alignment.TopCenter)
                 .offset(y = 70.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(50.dp)
+            verticalArrangement = Arrangement.spacedBy(15.dp)
         ) {
             AppLogo()
 
