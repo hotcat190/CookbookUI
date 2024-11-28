@@ -3,6 +3,7 @@ package com.example.androidcookbook.ui.features.auth.components
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
@@ -18,8 +19,10 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
@@ -32,21 +35,24 @@ fun InputField(
     onChange: (String) -> Unit,
     placeholderText: String,
     type: KeyboardType,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onDone: () -> Unit
 ) {
     when (type) {
         KeyboardType.Password -> PasswordInputField(
             text = text,
             onChange = onChange,
             placeholderText = placeholderText,
-            modifier = modifier
+            modifier = modifier,
+            onDone = onDone
         )
         else -> DefaultInputField(
             text = text,
             onChange = onChange,
             placeholderText = placeholderText,
             type = type,
-            modifier = modifier
+            modifier = modifier,
+            onDone = onDone
         )
     }
 }
@@ -56,7 +62,8 @@ private fun PasswordInputField(
     text: String,
     onChange: (String) -> Unit,
     placeholderText: String,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onDone: () -> Unit
 ) {
     var passwordVisible by remember { mutableStateOf(false) }
 
@@ -79,7 +86,8 @@ private fun PasswordInputField(
                 Icon(imageVector = image, contentDescription = description)
             }
         },
-        keyboardType = KeyboardType.Password
+        keyboardType = KeyboardType.Password,
+        onDone = onDone
     )
 }
 
@@ -89,7 +97,8 @@ private fun DefaultInputField(
     onChange: (String) -> Unit,
     placeholderText: String,
     type: KeyboardType,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onDone: () -> Unit
 ) {
     BaseTextField(
         text = text,
@@ -98,7 +107,8 @@ private fun DefaultInputField(
         modifier = modifier,
         visualTransformation = VisualTransformation.None,
         trailingIcon = null,
-        keyboardType = type
+        keyboardType = type,
+        onDone = onDone
     )
 }
 
@@ -110,7 +120,8 @@ private fun BaseTextField(
     modifier: Modifier = Modifier,
     visualTransformation: VisualTransformation = VisualTransformation.None,
     trailingIcon: @Composable (() -> Unit)? = null,
-    keyboardType: KeyboardType
+    keyboardType: KeyboardType,
+    onDone: () -> Unit
 ) {
     TextField(
         modifier = modifier
@@ -130,8 +141,13 @@ private fun BaseTextField(
             disabledIndicatorColor = Color.Transparent
         ),
         visualTransformation = visualTransformation,
-        keyboardOptions = KeyboardOptions(keyboardType = keyboardType),
+        keyboardOptions = KeyboardOptions(keyboardType = keyboardType, imeAction = ImeAction.Done),
         trailingIcon = trailingIcon,
-        singleLine = true
+        singleLine = true,
+        keyboardActions = KeyboardActions(
+            onDone = {
+                onDone()
+            }
+        )
     )
 }

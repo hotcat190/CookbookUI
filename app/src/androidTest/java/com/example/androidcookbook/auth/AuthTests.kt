@@ -68,7 +68,7 @@ class AuthTests {
     fun testLoginSuccess() {
         // Mock behavior for a successful login
         coEvery { authService.login(SignInRequest(USERNAME, PASSWORD)) } returns
-                ApiResponse.Success(SignInResponse(TOKEN, SIGN_IN_SUCCESS))
+                ApiResponse.Success(SignInResponse(TOKEN, SIGN_IN_SUCCESS, 0))
 
         composeTestRule.waitForIdle()
 

@@ -1,5 +1,6 @@
 package com.example.androidcookbook.ui
 
+import android.util.Log
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -13,7 +14,6 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -21,8 +21,9 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.androidcookbook.ui.common.appbars.CookbookAppBarDefault
 import com.example.androidcookbook.ui.common.appbars.CookbookBottomNavigationBar
+import com.example.androidcookbook.ui.common.appbars.SearchBar
 import com.example.androidcookbook.ui.features.post.CreatePostScreen
-import com.example.androidcookbook.ui.features.search.SearchBar
+import com.example.androidcookbook.ui.features.post.CreatePostViewModel
 import com.example.androidcookbook.ui.features.search.SearchScreen
 import com.example.androidcookbook.ui.features.search.SearchViewModel
 import com.example.androidcookbook.ui.nav.Routes
@@ -35,12 +36,15 @@ import com.example.androidcookbook.ui.nav.utils.navigateIfNotOn
 fun CookbookApp(
     modifier: Modifier = Modifier,
     navController: NavHostController = rememberNavController(),
+    viewModel: CookbookViewModel = viewModel(),
 ) {
-    val backStackEntry by navController.currentBackStackEntryAsState()
-    val currentDestination = backStackEntry?.destination
+    val navBackStackEntry by navController.currentBackStackEntryAsState()
+    val currentDestination = navBackStackEntry?.destination
 
-    val viewModel: CookbookViewModel = viewModel()
     val uiState by viewModel.uiState.collectAsState()
+
+    val currentUser by viewModel.user.collectAsState()
+    Log.d("USERID", currentUser.toString())
 
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
 
@@ -49,27 +53,23 @@ fun CookbookApp(
         topBar = {
             when (uiState.topBarState) {
                 is CookbookUiState.TopBarState.NoTopBar -> {}
-                is CookbookUiState.TopBarState.Custom -> (uiState.topBarState as CookbookUiState.TopBarState.Custom).topAppBar()
+                is CookbookUiState.TopBarState.Custom -> (uiState.topBarState as CookbookUiState.TopBarState.Custom).topAppBar.invoke()
                 is CookbookUiState.TopBarState.Default -> CookbookAppBarDefault(
                     showBackButton = uiState.canNavigateBack,
                     searchButtonAction = {
-                        navController.navigate(Routes.Search)
-                        viewModel.updateCanNavigateBack(true)
+                        navController.navigateIfNotOn(Routes.Search)
                     },
                     onCreatePostClick = {
                         navController.navigateIfNotOn(Routes.CreatePost)
-                        viewModel.updateCanNavigateBack(true)
                     },
                     onMenuButtonClick = {
                         //TODO: Add menu button
                     },
                     onBackButtonClick = {
                         navController.navigateUp()
-                        viewModel.updateCanNavigateBack(false)
                     },
                     scrollBehavior = scrollBehavior
                 )
-
             }
         },
         bottomBar = {
@@ -86,7 +86,7 @@ fun CookbookApp(
                         navController.navigateIfNotOn(Routes.App.Newsfeed)
                     },
                     onUserProfileClick = {
-                        navController.navigateIfNotOn(Routes.App.UserProfile(0)) // TODO: UserId logic
+                        navController.navigateIfNotOn(Routes.App.UserProfile(currentUser.id))
                     },
                     currentDestination = currentDestination
                 )
@@ -103,54 +103,74 @@ fun CookbookApp(
             authScreens(navController = navController, updateAppBar = {
                 viewModel.updateTopBarState(CookbookUiState.TopBarState.NoTopBar)
                 viewModel.updateBottomBarState(CookbookUiState.BottomBarState.NoBottomBar)
+            }, updateUser = { response ->
+                viewModel.updateUser(response)
             })
             appScreens(navController = navController, updateAppBar = {
                 viewModel.updateTopBarState(CookbookUiState.TopBarState.Default)
                 viewModel.updateBottomBarState(CookbookUiState.BottomBarState.Default)
+                viewModel.updateCanNavigateBack(false)
             })
-            composable<Routes.Search> { entry ->
+            composable<Routes.Search> {
                 val searchViewModel = hiltViewModel<SearchViewModel>()
                 val searchUiState = searchViewModel.uiState.collectAsState().value
 
+                viewModel.updateBottomBarState(CookbookUiState.BottomBarState.NoBottomBar)
+                viewModel.updateCanNavigateBack(true)
                 viewModel.updateTopBarState(CookbookUiState.TopBarState.Custom {
                     SearchBar(
                         onSearch = { searchViewModel.search(it) },
                         navigateBackAction = {
-                            navController.popBackStack()
+                            navController.navigateUp()
                         },
                     )
                 })
-                viewModel.updateBottomBarState(CookbookUiState.BottomBarState.NoBottomBar)
-
                 SearchScreen(
-                    result = searchUiState.result,
+                    searchUiState = searchUiState,
                     onBackButtonClick = {
                         navController.navigateUp()
-                        viewModel.updateCanNavigateBack(false)
                     }
                 )
             }
             composable<Routes.CreatePost> {
+                viewModel.updateTopBarState(CookbookUiState.TopBarState.Default)
                 viewModel.updateBottomBarState(CookbookUiState.BottomBarState.NoBottomBar)
+                viewModel.updateCanNavigateBack(true)
+
+                val accessToken = viewModel.accessToken.collectAsState().value
+
+                val createPostViewModel = hiltViewModel<CreatePostViewModel, CreatePostViewModel.CreatePostViewModelFactory> { factory ->
+                    factory.create(accessToken)
+                }
+
+                val postTitle by createPostViewModel.postTitle.collectAsState()
+                val postBody by createPostViewModel.postBody.collectAsState()
+                val postImageUri by createPostViewModel.postImageUri.collectAsState()
+
                 CreatePostScreen(
+                    author = currentUser,
+                    postTitle = postTitle,
+                    updatePostTitle = {
+                        createPostViewModel.updatePostTitle(it)
+                    },
+                    postBody = postBody,
+                    updatePostBody = {
+                        createPostViewModel.updatePostBody(it)
+                    },
+                    postImageUri = postImageUri,
+                    updatePostImageUri = {
+                        createPostViewModel.updatePostImageUri(it)
+                    },
                     onPostButtonClick = {
-                        //TODO: Connect to database
+                        createPostViewModel.createPost()
                     },
                     onBackButtonClick = {
                         navController.navigateUp()
-                        viewModel.updateCanNavigateBack(false)
                     },
                 )
             }
         }
     }
-}
-
-fun NavGraphBuilder.searchScreen(
-    navController: NavHostController,
-    updateAppBar: () -> Unit,
-) {
-
 }
 
 @Preview

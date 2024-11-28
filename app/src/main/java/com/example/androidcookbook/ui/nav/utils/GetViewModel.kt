@@ -8,7 +8,7 @@ import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavController
 
 @Composable
-inline fun <reified VM : ViewModel> getViewModel(
+inline fun <reified VM : ViewModel> sharedViewModel(
     backStackEntry: NavBackStackEntry,
     navController: NavController,
     route: Any,

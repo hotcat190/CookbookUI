@@ -7,11 +7,11 @@ import androidx.compose.ui.Modifier
 
 @Composable
 fun SearchScreen(
-    result: String,
+    searchUiState: SearchUiState,
     onBackButtonClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     BackHandler { onBackButtonClick() }
-    Text(text = result)
+    Text(text = searchUiState.result)
 }
 

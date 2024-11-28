@@ -23,6 +23,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.androidcookbook.R
+import com.example.androidcookbook.ui.theme.AndroidCookbookTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -116,5 +117,7 @@ fun CookbookAppBarDefault(
 @Preview
 @Composable
 fun TopAppBarPreview() {
-    CookbookAppBarDefault()
+    AndroidCookbookTheme {
+        CookbookAppBarDefault()
+    }
 }

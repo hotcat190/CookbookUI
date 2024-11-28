@@ -9,6 +9,12 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusDirection
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusProperties
+import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import com.example.androidcookbook.domain.model.auth.RegisterRequest
@@ -50,6 +56,7 @@ fun SignUpCompose(
     var username by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var repassword by remember { mutableStateOf("") }
+    val (first, second, third, fourth) = remember { FocusRequester.createRefs() }
     SignUpComponents(
         email = email,
         onTypeEmail = {
@@ -69,12 +76,13 @@ fun SignUpCompose(
         },
         onSignUpClick = {
             if (password == repassword) {
-                viewModel.signUp(RegisterRequest(username, password, email))
+                viewModel.signUp(RegisterRequest(username.trim(), password, email))
             } else {
                 viewModel.changeDialogMessage("Retype password not correct")
                 viewModel.changeOpenDialog(true)
             }
-        }
+        },
+        first, second, third, fourth
     )
 
     ClickableSeparatedText(
@@ -94,20 +102,40 @@ fun SignUpComponents(
     onTypePassword: (String) -> Unit,
     repassword: String,
     onRetypePassword: (String) -> Unit,
-    onSignUpClick: () -> Unit
+    onSignUpClick: () -> Unit,
+    first: FocusRequester,
+    second: FocusRequester,
+    third: FocusRequester,
+    fourth: FocusRequester
 ) {
-
+    val focusManager = LocalFocusManager.current
+    val changeFocus: () -> Unit = {
+        focusManager.moveFocus(FocusDirection.Next)
+    }
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(25.dp)
     ) {
-        InputField(email, onTypeEmail, "Email", KeyboardType.Email)
+        InputField(email, onTypeEmail, "Email", KeyboardType.Email,
+            onDone = changeFocus,
+            modifier = Modifier.focusRequester(first)
+                .focusProperties { next = second }
+        )
 
-        InputField(username, onTypeUsername, "Username", KeyboardType.Text)
+        InputField(username, onTypeUsername, "Username", KeyboardType.Text,
+            onDone = changeFocus,
+            modifier = Modifier.focusRequester(second)
+                .focusProperties { next = third })
 
-        InputField(password, onTypePassword, "Password", KeyboardType.Password)
+        InputField(password, onTypePassword, "Password", KeyboardType.Password,
+            onDone = changeFocus,
+            modifier = Modifier.focusRequester(third)
+                .focusProperties { next = fourth })
 
-        InputField(repassword, onRetypePassword, "Repeat your password", KeyboardType.Password)
+        InputField(repassword, onRetypePassword, "Repeat your password", KeyboardType.Password,
+            onDone = onSignUpClick,
+            modifier = Modifier.focusRequester(fourth)
+        )
 
         SignButton(onClick = onSignUpClick, actionText = "Sign Up")
     }
