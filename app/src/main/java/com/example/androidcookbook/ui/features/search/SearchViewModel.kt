@@ -33,12 +33,21 @@ class SearchViewModel @Inject constructor(
                     _uiState.update {
                         it.copy(result = meals.toString(), resultList = meals, fail = false)
                     }
+                    ChangeScreenState(SearchScreenState.Food)
                 } else {
                     _uiState.update { it.copy(result = "No meals found", fail = true) }
                 }
             }.onFailure {
                 _uiState.update { it.copy(result = "Failed to fetch data", fail = true) }
             }
+        }
+    }
+
+    fun ChangeScreenState(screen: SearchScreenState) {
+        _uiState.update {
+            it.copy(
+                currentScreen = screen
+            )
         }
     }
 }

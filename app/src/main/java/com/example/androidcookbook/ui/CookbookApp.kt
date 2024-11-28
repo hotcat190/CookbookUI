@@ -126,6 +126,7 @@ fun CookbookApp(
                     )
                 })
                 SearchScreen(
+                    viewModel = searchViewModel,
                     searchUiState = searchUiState,
                     onBackButtonClick = {
                         navController.navigateUp()

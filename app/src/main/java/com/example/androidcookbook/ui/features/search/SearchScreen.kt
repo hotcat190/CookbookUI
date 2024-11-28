@@ -37,15 +37,29 @@ import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.example.androidcookbook.R
+import com.example.androidcookbook.domain.model.post.Post
 import com.example.androidcookbook.domain.model.recipe.Recipe
+import com.example.androidcookbook.domain.model.user.User
+import com.example.androidcookbook.ui.features.newsfeed.NewsfeedScreen
+import com.example.androidcookbook.ui.features.recipedetail.RecipeDetailScreen
+
+
 
 @Composable
 fun SearchScreen(
+    viewModel: SearchViewModel,
     searchUiState: SearchUiState,
     onBackButtonClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    BackHandler { onBackButtonClick() }
+
+    BackHandler {
+        when (searchUiState.currentScreen) {
+            SearchScreenState.Food -> onBackButtonClick()
+            SearchScreenState.Posts -> viewModel.ChangeScreenState(SearchScreenState.Food)
+            SearchScreenState.Detail -> viewModel.ChangeScreenState(SearchScreenState.Posts)
+        }
+    }
     if (searchUiState.fail) {
         Text(
             text = searchUiState.result,
@@ -57,23 +71,45 @@ fun SearchScreen(
             textAlign = TextAlign.Center
         )
     } else {
-        LazyColumn(
-            modifier = Modifier.padding(horizontal = 20.dp, vertical = 10.dp),
-            verticalArrangement = Arrangement.spacedBy(10.dp)
-        ) {
-            items(searchUiState.resultList) {
-                    item -> ResultCard(item)
+        when (searchUiState.currentScreen) {
+            SearchScreenState.Food -> {
+                LazyColumn(
+                    modifier = Modifier.padding(horizontal = 20.dp, vertical = 10.dp),
+                    verticalArrangement = Arrangement.spacedBy(10.dp)
+                ) {
+                    items(searchUiState.resultList) { item ->
+                        ResultCard(
+                            onClick = {
+                                viewModel.ChangeScreenState(SearchScreenState.Posts)
+                            },
+                            recipe = item
+                        )
+                    }
+                }
+            }
+            SearchScreenState.Posts -> {
+                NewsfeedScreen(
+                    posts = SamplePosts.posts,
+                    onSeeDetailsClick = {
+                        viewModel.ChangeScreenState(SearchScreenState.Detail)
+                    }
+                )
+            }
+            SearchScreenState.Detail -> {
+                RecipeDetailScreen()
             }
         }
+
     }
 }
 
 @Composable
 fun ResultCard(
+    onClick: () -> Unit,
     recipe: Recipe
 ) {
     Card(
-        onClick = {},
+        onClick = onClick,
         modifier = Modifier
             .fillMaxWidth()
             .wrapContentHeight(),
@@ -139,6 +175,7 @@ fun ResultCard(
 @Composable
 fun CardPreview() {
     ResultCard(
+        {},
         Recipe(
             0,
             "Summer Dish",
