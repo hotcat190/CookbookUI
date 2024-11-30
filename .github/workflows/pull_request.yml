@@ -41,10 +41,10 @@ jobs:
           ./gradlew clean testDebug
 
   ui-testing:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     strategy:
       matrix:
-        api-level: [31]
+        api-level: [34]
     steps:
       - name: Enable KVM group perms
         run: |
@@ -85,6 +85,23 @@ jobs:
         uses: reactivecircus/android-emulator-runner@v2
         with:
           api-level: ${{ matrix.api-level }}
-          script: ./gradlew connectedCheck --stacktrace
+          target: aosp_atd
+          arch: x86_64
+          profile: Galaxy Nexus
+          cores: 2
+          ram-size: 2048M
+          sdcard-path-or-size: 100M
+          avd-name: test
+          force-avd-creation: false
+          emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
+          disable-animations: true
+          channel: canary
+          pre-emulator-launch-script: |
+            echo "Running pre emulator launch script. Printing the working directory now:"
+            pwd
+          script: |
+            echo $GITHUB_REPOSITORY
+            adb devices
+            ./gradlew connectedDebugAndroidTest
 
 
