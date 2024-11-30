@@ -1,23 +1,3 @@
-<!-- Improved compatibility of back to top link: See: https://github.com/othneildrew/Best-README-Template/pull/73 -->
-<a id="readme-top"></a>
-<!--
-*** Thanks for checking out the Best-README-Template. If you have a suggestion
-*** that would make this better, please fork the repo and create a pull request
-*** or simply open an issue with the tag "enhancement".
-*** Don't forget to give the project a star!
-*** Thanks again! Now go create something AMAZING! :D
--->
-
-
-
-<!-- PROJECT SHIELDS -->
-<!--
-*** I'm using markdown "reference style" links for readability.
-*** Reference links are enclosed in brackets [ ] instead of parentheses ( ).
-*** See the bottom of this document for the declaration of the reference variables
-*** for contributors-url, forks-url, etc. This is an optional, concise syntax you may use.
-*** https://www.markdownguide.org/basic-syntax/#reference-style-links
--->
 [![Contributors][contributors-shield]][contributors-url]
 [![Forks][forks-shield]][forks-url]
 [![Stargazers][stars-shield]][stars-url]
@@ -30,7 +10,7 @@
 <br />
 <div align="center">
   <a href="https://github.com/hotcat190/HKI2425_MobDev20_Nhom01">
-    <img src="AndroidCookbook/app/src/main/res/drawable/cookbook_app_icon.png" alt="Logo" width="80" height="80">
+    <img src="app/src/main/res/drawable/cookbook_app_icon.png" alt="Logo" width="80" height="80">
   </a>
 
 <h3 align="center">Cookbook</h3>
@@ -68,7 +48,7 @@
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
-<!-- GETTING STARTED -->
+<!-- BUILDING -->
 ## Building
 
 ### Prerequisites
@@ -85,12 +65,14 @@
 
 3. Kết nối với một thiết bị Android hoặc tạo giả lập theo hướng dẫn [ở đây](https://developer.android.com/studio/run).
 
-4. Sử dụng default run configuration `app` và nhấn **Run** <img src="images/run.png" alt="" width="15" height="15">
+4. Sử dụng default run configuration `app` và nhấn **Run** <img src="../images/run.png" alt="" width="15" height="15">
 
 <!-- RELEASES -->
 ## Releases
 
 Tải về các bản apk release mới nhất [ở đây](https://github.com/hotcat190/HKI2425_MobDev20_Nhom01/tags).
+
+
 
 <!-- MARKDOWN LINKS & IMAGES -->
 <!-- https://www.markdownguide.org/basic-syntax/#reference-style-links -->
