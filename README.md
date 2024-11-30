@@ -22,6 +22,8 @@
 [![Forks][forks-shield]][forks-url]
 [![Stargazers][stars-shield]][stars-url]
 [![Issues][issues-shield]][issues-url]
+<br>
+![Run test](https://github.com/hotcat190/HKI2425_MobDev20_Nhom01/workflows/Run%20test/badge.svg) 
 
 
 <!-- PROJECT LOGO -->
@@ -84,6 +86,7 @@
 3. Kết nối với một thiết bị Android hoặc tạo giả lập theo hướng dẫn [ở đây](https://developer.android.com/studio/run).
 
 4. Sử dụng default run configuration `app` và nhấn **Run** <img src="images/run.png" alt="" width="15" height="15">
+
 
 
 <!-- MARKDOWN LINKS & IMAGES -->
