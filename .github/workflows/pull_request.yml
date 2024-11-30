@@ -41,7 +41,7 @@ jobs:
           ./gradlew clean testDebug
 
   ui-testing:
-    runs-on: macos-10.15
+    runs-on: macos-latest
     strategy:
       matrix:
         api-level: [26, 28, 31]
