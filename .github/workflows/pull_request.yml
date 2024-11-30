@@ -1,4 +1,4 @@
-name: Build
+name: Build Android
 
 on:
   pull_request:
@@ -12,7 +12,16 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          path: AndroidCookbook
+          sparse-checkout: 'AndroidCookbook'
+          sparse-checkout-cone-mode: false
+
+      - name: Move mobile app files to root
+        run: |
+          ls -lah
+          shopt -s dotglob
+          mv AndroidCookbook/* .
+          rm -rf AndroidCookbook
+          ls -lah
 
       - name: Setup JDK
         uses: actions/setup-java@v4

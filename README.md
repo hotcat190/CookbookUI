@@ -23,7 +23,7 @@
 [![Stargazers][stars-shield]][stars-url]
 [![Issues][issues-shield]][issues-url]
 <br>
-![Build](https://github.com/hotcat190/HKI2425_MobDev20_Nhom01/workflows/Build/badge.svg) 
+![Build](https://github.com/hotcat190/HKI2425_MobDev20_Nhom01/workflows/Build%20Android/badge.svg) 
 
 
 <!-- PROJECT LOGO -->
