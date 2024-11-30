@@ -23,7 +23,7 @@
 [![Stargazers][stars-shield]][stars-url]
 [![Issues][issues-shield]][issues-url]
 <br>
-![Android CI](https://github.com/hotcat190/HKI2425_MobDev20_Nhom01/workflows/Android%CI/badge.svg) 
+![Android CI](https://github.com/hotcat190/HKI2425_MobDev20_Nhom01/workflows/Android%20CI/badge.svg) 
 
 
 <!-- PROJECT LOGO -->
