@@ -66,8 +66,6 @@
 <p><b>Cookbook</b> là ứng dụng di động dành cho những người yêu thích nấu ăn và muốn tìm hiểu về những công thức mới hoặc chia sẻ những công thức mà họ đã biết.</p>
 <p>Ứng dụng còn tích hợp AI, cho phép người dùng tìm kiếm những món ăn có thể được chế biến từ những nguyên liệu mà họ có sẵn.</p>
 
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
-
 <!-- GETTING STARTED -->
 ## Building
 
