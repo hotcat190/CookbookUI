@@ -41,7 +41,7 @@ jobs:
           ./gradlew clean testDebug
 
   ui-testing:
-    runs-on: macos-latest
+    runs-on: ubuntu-latest
     strategy:
       matrix:
         api-level: [26, 28, 31]
@@ -75,7 +75,6 @@ jobs:
         with:
           api-level: ${{ matrix.api-level }}
           target: ${{ matrix.target }}
-          arch: x86_64
           script: ./gradlew connectedCheck --no-daemon --stacktrace
 
 
