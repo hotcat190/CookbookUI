@@ -15,6 +15,7 @@ import com.example.androidcookbook.auth.AuthTestConst.USERNAME
 import com.example.androidcookbook.data.network.AuthService
 import com.example.androidcookbook.domain.model.auth.SignInRequest
 import com.example.androidcookbook.domain.model.auth.SignInResponse
+import com.example.androidcookbook.domain.model.user.User
 import com.example.androidcookbook.ui.features.auth.screens.PASSWORD_TEXT_FIELD_TEST_TAG
 import com.example.androidcookbook.ui.features.auth.screens.USERNAME_TEXT_FIELD_TEST_TAG
 import com.skydoves.sandwich.ApiResponse
@@ -68,7 +69,7 @@ class AuthTests {
     fun testLoginSuccess() {
         // Mock behavior for a successful login
         coEvery { authService.login(SignInRequest(USERNAME, PASSWORD)) } returns
-                ApiResponse.Success(SignInResponse(TOKEN, SIGN_IN_SUCCESS, 0))
+                ApiResponse.Success(SignInResponse(TOKEN, SIGN_IN_SUCCESS, User()))
 
         composeTestRule.waitForIdle()
 
