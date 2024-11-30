@@ -41,10 +41,10 @@ jobs:
           ./gradlew clean testDebug
 
   ui-testing:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     strategy:
       matrix:
-        api-level: [26, 28, 31]
+        api-level: [26, 28, 31, 34]
     steps:
       - uses: actions/checkout@v4
         with:
