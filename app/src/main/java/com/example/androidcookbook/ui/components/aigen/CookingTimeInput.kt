@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.ExposedDropdownMenuBox
 import androidx.compose.material.ExposedDropdownMenuDefaults
@@ -25,6 +26,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -35,7 +37,9 @@ import com.example.androidcookbook.R
 fun CookingTimeInput(
     modifier: Modifier = Modifier,
     cookingTime: String,
-    onCookingTimeChange: (String) -> Unit
+    onCookingTimeChange: (String) -> Unit,
+    selectedOption: String,
+    onOptionsClick: (String) -> Unit
 ) {
 
     Column(modifier = modifier) {
@@ -53,7 +57,7 @@ fun CookingTimeInput(
 
             TextField(
                 modifier = Modifier
-                    .weight(0.5f)
+                    .weight(1.5f)
                     .height(48.dp),
                 value = cookingTime,
                 onValueChange = onCookingTimeChange,
@@ -77,18 +81,20 @@ fun CookingTimeInput(
                     backgroundColor = Color(0xFF4A4A4A)
                 ),
                 shape = RoundedCornerShape(4.dp),
-
+                keyboardOptions = KeyboardOptions.Default.copy(
+                    imeAction = ImeAction.Next
+                )
                 )
 
 
             var expanded by rememberSaveable { mutableStateOf(false) } // Controls menu visibility
-            var selectedOption by remember { mutableStateOf("Minute") } // Holds the selected value
+//            var selectedOption by remember { mutableStateOf("Minute") } // Holds the selected value
             val options = listOf("Minute", "Hour", "Day") // Dropdown options
             //kind of time to pick
             ExposedDropdownMenuBox(
                 expanded = expanded,
                 onExpandedChange = { expanded = !expanded }, // Toggles dropdown
-                modifier = Modifier.weight(1.5f)
+                modifier = Modifier.weight(4f)
             ) {
 
                 OutlinedTextField(
@@ -119,7 +125,7 @@ fun CookingTimeInput(
                         DropdownMenuItem(
                             text = { Text(text = option) },
                             onClick = {
-                                selectedOption = option // Update selected value
+                                onOptionsClick(option) // Update selected value
                                 expanded = false // Close dropdown
                             }
                         )

@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.Text
 import androidx.compose.material.TextField
 import androidx.compose.material.TextFieldDefaults
@@ -15,6 +16,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -44,7 +46,7 @@ fun PortionInput(
             onValueChange = onPortionChange,
             placeholder = {
                 Text(
-                    "Portion",
+                    "5",
                     textAlign = TextAlign.Center,
                     fontFamily = FontFamily(Font(R.font.nunito_regular)),
                     modifier = Modifier.fillMaxSize(),
@@ -62,7 +64,9 @@ fun PortionInput(
                 backgroundColor = Color(0xFF4A4A4A)
             ),
             shape = RoundedCornerShape(4.dp),
-
+            keyboardOptions = KeyboardOptions.Default.copy(
+                imeAction = ImeAction.Next
+            )
             )
     }
 }

@@ -27,8 +27,12 @@ import com.example.androidcookbook.R
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
-fun ServedAsInput(modifier: Modifier = Modifier) {
-    Column(modifier = Modifier.padding(bottom = 4.dp)) {
+fun ServedAsInput(
+    modifier: Modifier = Modifier,
+    selectedOption: String,
+    onServedAsClick: (String) -> Unit
+) {
+    Column(modifier = modifier.padding(bottom = 4.dp)) {
         AiGenInputLabel(
             imageResource = R.drawable.serve_icon,
             title = "Served as",
@@ -39,7 +43,6 @@ fun ServedAsInput(modifier: Modifier = Modifier) {
         Spacer(Modifier.size(1.dp))
 
         var expanded by rememberSaveable { mutableStateOf(false) } // Controls menu visibility
-        var selectedOption by remember { mutableStateOf("Main Dish") } // Holds the selected value
         val options = listOf("Starter", "Main dish", "Dessert") // Dropdown options
 
         Row() {
@@ -78,7 +81,7 @@ fun ServedAsInput(modifier: Modifier = Modifier) {
                         DropdownMenuItem(
                             text = { Text(text = option) },
                             onClick = {
-                                selectedOption = option // Update selected value
+                                onServedAsClick(option) // Update selected value
                                 expanded = false // Close dropdown
                             }
                         )
@@ -86,7 +89,6 @@ fun ServedAsInput(modifier: Modifier = Modifier) {
                 }
             }
 
-            Spacer(Modifier.weight(1f))
         }
 
     }
