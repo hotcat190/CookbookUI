@@ -1,16 +1,27 @@
-name: Run test
+name: Android CI
 
 on:
   pull_request:
     branches:
       - main
-      - 'develope'
+
 jobs:
   build:
     runs-on: ubuntu-latest
 
     steps:
       - uses: actions/checkout@v4
+        with:
+          sparse-checkout: 'AndroidCookbook'
+          sparse-checkout-cone-mode: false
+
+      - name: Move mobile app files to root
+        run: |
+          ls -lah
+          shopt -s dotglob
+          mv AndroidCookbook/* .
+          rm -rf AndroidCookbook
+          ls -lah
 
       - name: Setup JDK
         uses: actions/setup-java@v4
@@ -25,7 +36,72 @@ jobs:
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
 
-      - name: Run unit tests
+      - name: Build
         run: |
           ./gradlew clean testDebug
+
+  ui-testing:
+    runs-on: ubuntu-24.04
+    strategy:
+      matrix:
+        api-level: [34]
+    steps:
+      - name: Enable KVM group perms
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: 'AndroidCookbook'
+          sparse-checkout-cone-mode: false
+
+      - name: Move mobile app files to root
+        run: |
+          ls -lah
+          shopt -s dotglob
+          mv AndroidCookbook/* .
+          rm -rf AndroidCookbook
+          ls -lah
+
+      - name: Setup JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'zulu'
+          java-version: |
+            8
+            11
+            21
+          cache: 'gradle'          
+      
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+
+      - name: assemble tests
+        run: ./gradlew build assembleAndroidTest
+
+      - name: Run UI Tests
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: ${{ matrix.api-level }}
+          target: aosp_atd
+          arch: x86_64
+          profile: Galaxy Nexus
+          cores: 2
+          ram-size: 2048M
+          sdcard-path-or-size: 100M
+          avd-name: test
+          force-avd-creation: false
+          emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
+          disable-animations: true
+          channel: canary
+          pre-emulator-launch-script: |
+            echo "Running pre emulator launch script. Printing the working directory now:"
+            pwd
+          script: |
+            echo $GITHUB_REPOSITORY
+            adb devices
+            ./gradlew connectedDebugAndroidTest
+
 
