@@ -105,23 +105,23 @@
    
 4. Tạo file `.env` theo format sau
   ```env
-  PORT=<your_port>
+  PORT=<your_port_number>
 
   JWT_SECRET=<your_jwt_secret>
-  JWT_EXPIRES_IN=<seconds>
+  JWT_EXPIRES_IN=<time> (eg. 3600s)
 
   DB_HOST=<your_db_host_name>
-  DB_PORT=<your_db_port>
+  DB_PORT=<your_db_port_number>
   DB_USERNAME=<your_db_username>
   DB_PASSWORD=<your_db_password>
   DB_NAME=<your_db_schema_name>
 
-  MAIL_HOST=<your_mail_host> (eg. stmp.gmail.com)
-  MAIL_PORT=<your_mail_port>
-  MAIL_USER=<your_mail_user>
+  MAIL_HOST=<your_mail_host_name> (eg. stmp.gmail.com)
+  MAIL_PORT=<your_mail_port_number>
+  MAIL_USER=<your_mail_user_address> (eg. user@gmail.com)
   MAIL_PASS=<your_mail_password>
 
-  CLOUDINARY_CLOUD_NAME=<your_cloudinary_name>
+  CLOUDINARY_CLOUD_NAME=<your_cloudinary_cloud_name>
   CLOUDINARY_API_KEY=<your_cloudinary_api_key>
   CLOUDINARY_API_SECRET=<your_cloudinary_api_secret>
 
