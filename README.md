@@ -89,7 +89,7 @@
 4. Sử dụng default run configuration `app` và nhấn **Run** <img src="images/run.png" alt="" width="15" height="15">
 
 ## Deploying Backend
-Ứng dụng di động **Cookbook** sử dụng server backend được deploy bằng [Render](https://render.com) và database được deploy bằng [Aiven](https://aiven.io), để tự deploy server backend và database, hãy làm theo các bước sau
+Ứng dụng di động **Cookbook** sử dụng server backend được deploy bằng [Render](https://render.com) và database được deploy bằng [Aiven](https://aiven.io), để chạy server, hãy làm theo các bước sau
 
 1. Clone the repo (bỏ qua nếu đã làm ở trên)
    ```sh
