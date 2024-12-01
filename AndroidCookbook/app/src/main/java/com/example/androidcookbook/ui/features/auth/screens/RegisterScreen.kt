@@ -15,6 +15,7 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusProperties
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import com.example.androidcookbook.domain.model.auth.RegisterRequest
@@ -119,22 +120,28 @@ fun SignUpComponents(
         InputField(email, onTypeEmail, "Email", KeyboardType.Email,
             onDone = changeFocus,
             modifier = Modifier.focusRequester(first)
-                .focusProperties { next = second }
+                .focusProperties { next = second },
+            imeAction = ImeAction.Next
         )
 
         InputField(username, onTypeUsername, "Username", KeyboardType.Text,
             onDone = changeFocus,
             modifier = Modifier.focusRequester(second)
-                .focusProperties { next = third })
+                .focusProperties { next = third },
+            imeAction = ImeAction.Next
+        )
 
         InputField(password, onTypePassword, "Password", KeyboardType.Password,
             onDone = changeFocus,
             modifier = Modifier.focusRequester(third)
-                .focusProperties { next = fourth })
+                .focusProperties { next = fourth },
+            imeAction = ImeAction.Next
+        )
 
         InputField(repassword, onRetypePassword, "Repeat your password", KeyboardType.Password,
             onDone = onSignUpClick,
-            modifier = Modifier.focusRequester(fourth)
+            modifier = Modifier.focusRequester(fourth),
+            imeAction = ImeAction.Done
         )
 
         SignButton(onClick = onSignUpClick, actionText = "Sign Up")

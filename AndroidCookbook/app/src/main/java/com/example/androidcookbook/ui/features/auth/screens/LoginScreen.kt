@@ -15,6 +15,7 @@ import androidx.compose.ui.focus.focusProperties
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -68,18 +69,20 @@ fun SignInComponent(
         val (first, second) = remember { FocusRequester.createRefs() }
 
         InputField(username, { username = it },"Username", KeyboardType.Text,
-            Modifier.testTag(USERNAME_TEXT_FIELD_TEST_TAG)
+            modifier = Modifier.testTag(USERNAME_TEXT_FIELD_TEST_TAG)
                 .focusRequester(first)
                 .focusProperties { next = second },
-            onDone = changeFocus
+            onDone = changeFocus,
+            imeAction = ImeAction.Next
         )
 
         InputField(password, { password = it },"Password", KeyboardType.Password,
-            Modifier.testTag(PASSWORD_TEXT_FIELD_TEST_TAG)
+            modifier = Modifier.testTag(PASSWORD_TEXT_FIELD_TEST_TAG)
                 .focusRequester(second),
             onDone = {
                 onSignInClick(username.trim(), password)
-            }
+            },
+            imeAction = ImeAction.Done
         )
 
         SignButton(

@@ -8,6 +8,7 @@ import androidx.navigation.toRoute
 import com.example.androidcookbook.domain.model.post.Post
 import com.example.androidcookbook.domain.model.user.User
 import com.example.androidcookbook.ui.features.aigen.AIGenScreen
+import com.example.androidcookbook.ui.features.aigen.AiScreenTheme
 import com.example.androidcookbook.ui.features.category.CategoryScreen
 import com.example.androidcookbook.ui.features.category.CategoryViewModel
 import com.example.androidcookbook.ui.features.newsfeed.NewsfeedScreen
@@ -29,7 +30,9 @@ fun NavGraphBuilder.appScreens(navController: NavHostController, updateAppBar: (
         }
         composable<Routes.App.AIChat> {
             updateAppBar()
-            AIGenScreen()
+            AiScreenTheme {
+                AIGenScreen()
+            }
         }
         composable<Routes.App.Newsfeed> {
             updateAppBar()

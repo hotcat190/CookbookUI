@@ -21,28 +21,18 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Button
 import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.material.ExposedDropdownMenuBox
-import androidx.compose.material.ExposedDropdownMenuDefaults
 import androidx.compose.material.IconButton
-import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.Text
 import androidx.compose.material.TextField
 import androidx.compose.material.TextFieldDefaults
-import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -62,7 +52,6 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.rememberAsyncImagePainter
 import com.example.androidcookbook.R
 import com.example.androidcookbook.domain.model.aigen.AiRecipe
-import com.example.androidcookbook.ui.components.aigen.AiGenInputLabel
 import com.example.androidcookbook.ui.components.aigen.CookingTimeInput
 import com.example.androidcookbook.ui.components.aigen.IngredientsInput
 import com.example.androidcookbook.ui.components.aigen.MealTitleInput
@@ -161,8 +150,10 @@ fun TakingInputScreen(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .background(color = Color(0xFFF9F4F1))
-                .border(width = 1.dp, color = Color(0xFF7F5346))
+//                .background(color = Color(0xFFF9F4F1))
+                .background(color = MaterialTheme.colorScheme.surfaceContainer)
+//                .border(width = 1.dp, color = Color(0xFF7F5346))
+                .border(width = 1.dp, color = MaterialTheme.colorScheme.outline)
                 .padding(top = 24.dp, bottom = 12.dp, start = 24.dp, end = 24.dp),
         ) {
 
@@ -442,9 +433,21 @@ fun getFileFromUri(context: android.content.Context, uri: Uri?): File? {
 @Composable
 @Preview
 fun AIGenScreenPreview() {
-    AIGenScreen(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(color = Color.White)
-    )
+    AiScreenTheme {
+        AIGenScreen(
+            modifier = Modifier
+                .fillMaxSize()
+        )
+    }
+}
+
+@Composable
+@Preview
+fun AIGenScreenDarkPreview() {
+    AiScreenTheme(darkTheme = true) {
+        AIGenScreen(
+            modifier = Modifier
+                .fillMaxSize()
+        )
+    }
 }

@@ -19,7 +19,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.ImeAction
@@ -35,6 +34,7 @@ fun InputField(
     onChange: (String) -> Unit,
     placeholderText: String,
     type: KeyboardType,
+    imeAction: ImeAction,
     modifier: Modifier = Modifier,
     onDone: () -> Unit
 ) {
@@ -44,7 +44,8 @@ fun InputField(
             onChange = onChange,
             placeholderText = placeholderText,
             modifier = modifier,
-            onDone = onDone
+            onDone = onDone,
+            imeAction = imeAction,
         )
         else -> DefaultInputField(
             text = text,
@@ -62,6 +63,7 @@ private fun PasswordInputField(
     text: String,
     onChange: (String) -> Unit,
     placeholderText: String,
+    imeAction: ImeAction,
     modifier: Modifier = Modifier,
     onDone: () -> Unit
 ) {
@@ -87,7 +89,8 @@ private fun PasswordInputField(
             }
         },
         keyboardType = KeyboardType.Password,
-        onDone = onDone
+        onDone = onDone,
+        imeAction = imeAction
     )
 }
 
@@ -108,7 +111,8 @@ private fun DefaultInputField(
         visualTransformation = VisualTransformation.None,
         trailingIcon = null,
         keyboardType = type,
-        onDone = onDone
+        onDone = onDone,
+        imeAction = ImeAction.Next
     )
 }
 
@@ -121,6 +125,7 @@ private fun BaseTextField(
     visualTransformation: VisualTransformation = VisualTransformation.None,
     trailingIcon: @Composable (() -> Unit)? = null,
     keyboardType: KeyboardType,
+    imeAction: ImeAction,
     onDone: () -> Unit
 ) {
     TextField(
@@ -141,7 +146,7 @@ private fun BaseTextField(
             disabledIndicatorColor = Color.Transparent
         ),
         visualTransformation = visualTransformation,
-        keyboardOptions = KeyboardOptions(keyboardType = keyboardType, imeAction = ImeAction.Done),
+        keyboardOptions = KeyboardOptions(keyboardType = keyboardType, imeAction = imeAction),
         trailingIcon = trailingIcon,
         singleLine = true,
         keyboardActions = KeyboardActions(

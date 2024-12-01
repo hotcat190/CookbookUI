@@ -99,7 +99,7 @@ fun NewsfeedCard(
 @Composable
 fun PostHeader(
     author: User,
-    createdAt: String?, // TODO remove nullable
+    createdAt: String?,
     modifier: Modifier = Modifier
 ) {
     Row(modifier = modifier) {
@@ -126,7 +126,7 @@ fun PostHeader(
                 color = MaterialTheme.colorScheme.onSurface
             )
             Text(
-                text = createdAt?: "", // TODO remove nullable
+                text = createdAt?: "",
                 fontSize = 12.sp,
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.4f)

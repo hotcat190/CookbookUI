@@ -2,12 +2,10 @@ package com.example.androidcookbook.ui.features.search
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -17,32 +15,26 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.font.Font
-import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.example.androidcookbook.R
-import com.example.androidcookbook.domain.model.post.Post
 import com.example.androidcookbook.domain.model.recipe.Recipe
-import com.example.androidcookbook.domain.model.user.User
 import com.example.androidcookbook.ui.features.newsfeed.NewsfeedScreen
 import com.example.androidcookbook.ui.features.recipedetail.RecipeDetailScreen
-
 
 
 @Composable
@@ -77,14 +69,16 @@ fun SearchScreen(
                     modifier = Modifier.padding(horizontal = 20.dp, vertical = 10.dp),
                     verticalArrangement = Arrangement.spacedBy(10.dp)
                 ) {
-                    items(searchUiState.resultList) { item ->
-                        ResultCard(
-                            onClick = {
-                                viewModel.ChangeScreenState(SearchScreenState.Posts)
-                            },
-                            recipe = item
-                        )
-                    }
+items(searchUiState.resultList) { item ->
+    ResultCardTheme {
+        ResultCard(
+            onClick = {
+                viewModel.ChangeScreenState(SearchScreenState.Posts)
+            },
+            recipe = item
+        )
+    }
+}
                 }
             }
             SearchScreenState.Posts -> {
@@ -114,8 +108,8 @@ fun ResultCard(
             .fillMaxWidth()
             .wrapContentHeight(),
         shape = RoundedCornerShape(8.dp),
-        border = BorderStroke(2.dp, Color(0xFFFFD09B)),
-        colors = CardDefaults.cardColors(Color(0xFFFFF7D1))
+        border = BorderStroke(2.dp, MaterialTheme.colorScheme.outline),
+        colors = CardDefaults.cardColors(MaterialTheme.colorScheme.surfaceContainer)
     ) {
         Row(
             modifier = Modifier.height(120.dp)
@@ -174,14 +168,37 @@ fun ResultCard(
 @Preview
 @Composable
 fun CardPreview() {
-    ResultCard(
-        {},
-        Recipe(
-            0,
-            "Summer Dish",
-            "Side",
-            "Japanese",
-            "",
-            "")
-    )
+    ResultCardTheme {
+        ResultCard(
+            {},
+            Recipe(
+                0,
+                "Summer Dish",
+                "Side",
+                "Japanese",
+                "",
+                ""
+            )
+        )
+    }
 }
+
+@Preview
+@Composable
+fun CardPreviewDark() {
+    ResultCardTheme(darkTheme = true) {
+        ResultCard(
+            {},
+            Recipe(
+                0,
+                "Summer Dish",
+                "Side",
+                "Japanese",
+                "",
+                ""
+            )
+        )
+    }
+}
+
+

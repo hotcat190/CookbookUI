@@ -63,7 +63,7 @@ class AuthViewModel @Inject constructor(
                     )
                 }
             }.onErrorDeserialize<RegisterResponse, ErrorBody> { errorBody ->
-                _uiState.update { it.copy(openDialog = true, dialogMessage = errorBody.message.joinToString("\n")) }
+                _uiState.update { it.copy(openDialog = true, dialogMessage = errorBody.message.joinToString(".\n\n")) }
             }.onException {
                 when (throwable) {
                     is SocketTimeoutException -> _uiState.update { it.copy(openDialog = true, dialogMessage = "Request timed out.\n Please try again.") }
@@ -80,7 +80,7 @@ class AuthViewModel @Inject constructor(
                 _uiState.update { it.copy(openDialog = true, dialogMessage = data.message, signInSuccess = true) }
                 onSuccess(data)
             }.onErrorDeserialize<SignInResponse, ErrorBody> { errorBody ->
-                _uiState.update { it.copy(openDialog = true, dialogMessage = errorBody.message.joinToString("\n")) }
+                _uiState.update { it.copy(openDialog = true, dialogMessage = errorBody.message.joinToString(".\n\n")) }
             }.onException {
                 when (throwable) {
                     is SocketTimeoutException -> _uiState.update { it.copy(openDialog = true, dialogMessage = "Request timed out.\n Please try again.") }
