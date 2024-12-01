@@ -76,17 +76,66 @@
 
 **Cookbook** sử dụng hệ thống build Gradle và có thể được import trực tiếp vào Android Studio (tải phiên bản mới nhất hiện có [ở đây](https://developer.android.com/studio)). 
 
-### Installation
+### Installing the Android App
 
 1. Clone the repo
    ```sh
    git clone https://github.com/hotcat190/HKI2425_MobDev20_Nhom01.git
    ```
-2. Mở dự án ở **<local_folder>/HKI2425_MobDev20_Nhom01/AndroidCookbook** trong Android Studio
+2. Mở dự án ở `./HKI2425_MobDev20_Nhom01/AndroidCookbook` trong Android Studio
 
 3. Kết nối với một thiết bị Android hoặc tạo giả lập theo hướng dẫn [ở đây](https://developer.android.com/studio/run).
 
 4. Sử dụng default run configuration `app` và nhấn **Run** <img src="images/run.png" alt="" width="15" height="15">
+
+## Deploying Backend
+Ứng dụng di động **Cookbook** sử dụng server backend được deploy bằng [Render](https://render.com) và database được deploy bằng [Aiven](https://aiven.io), để tự deploy server backend và database, hãy làm theo các bước sau
+
+1. Clone the repo (bỏ qua nếu đã làm ở trên)
+   ```sh
+   git clone https://github.com/hotcat190/HKI2425_MobDev20_Nhom01.git
+   ```
+   
+2. cd vào `./HKI2425_MobDev20_Nhom01/CookbookBE`
+ 
+3. Cài đặt thư viện npm
+   ```sh
+   npm install
+   ```
+   
+4. Tạo file `.env` theo format sau
+  ```env
+  PORT=<your_port>
+
+  JWT_SECRET=<your_jwt_secret>
+  JWT_EXPIRES_IN=<seconds>
+
+  DB_HOST=<your_db_host_name>
+  DB_PORT=<your_db_port>
+  DB_USERNAME=<your_db_username>
+  DB_PASSWORD=<your_db_password>
+  DB_NAME=<your_db_schema_name>
+
+  MAIL_HOST=<your_mail_host> (eg. stmp.gmail.com)
+  MAIL_PORT=<your_mail_port>
+  MAIL_USER=<your_mail_user>
+  MAIL_PASS=<your_mail_password>
+
+  CLOUDINARY_CLOUD_NAME=<your_cloudinary_name>
+  CLOUDINARY_API_KEY=<your_cloudinary_api_key>
+  CLOUDINARY_API_SECRET=<your_cloudinary_api_secret>
+
+  GEMINI_API_KEY=<your_gemini_api_key>
+  GEMINI_PRO_MODEL=<your_gemini_model_name>
+  ```
+
+5. Chạy server
+   ```sh
+   npm run start
+   ```
+   
+6. Nếu server chạy thành công, trên console sẽ phản hồi `Application is running on: http://<ip_address>:<port>`
+
 
 <!-- RELEASES -->
 ## Releases
