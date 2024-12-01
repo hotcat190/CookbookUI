@@ -23,13 +23,13 @@
 [![Stargazers][stars-shield]][stars-url]
 [![Issues][issues-shield]][issues-url]
 <br>
-[![Android CI](https://github.com/hotcat190/HKI2425_MobDev20_Nhom01/workflows/Android%20CI/badge.svg)](https://github.com/hotcat190/HKI2425_MobDev20_Nhom01/actions/workflows/pull_request.yml)
+[![Android CI](https://github.com/hotcat190/HKI2425_MobDev7_Nhom01/workflows/Android%20CI/badge.svg)](https://github.com/hotcat190/HKI2425_MobDev7_Nhom01/actions/workflows/pull_request.yml)
 
 
 <!-- PROJECT LOGO -->
 <br />
 <div align="center">
-  <a href="https://github.com/hotcat190/HKI2425_MobDev20_Nhom01">
+  <a href="https://github.com/hotcat190/HKI2425_MobDev7_Nhom01">
     <img src="AndroidCookbook/app/src/main/res/drawable/cookbook_app_icon.png" alt="Logo" width="80" height="80">
   </a>
 
@@ -80,9 +80,9 @@
 
 1. Clone the repo
    ```sh
-   git clone https://github.com/hotcat190/HKI2425_MobDev20_Nhom01.git
+   git clone https://github.com/hotcat190/HKI2425_MobDev7_Nhom01.git
    ```
-2. Mở dự án ở `./HKI2425_MobDev20_Nhom01/AndroidCookbook` trong Android Studio
+2. Mở dự án ở `./HKI2425_MobDev7_Nhom01/AndroidCookbook` trong Android Studio
 
 3. Kết nối với một thiết bị Android hoặc tạo giả lập theo hướng dẫn [ở đây](https://developer.android.com/studio/run).
 
@@ -93,10 +93,10 @@
 
 1. Clone the repo (bỏ qua nếu đã làm ở trên)
    ```sh
-   git clone https://github.com/hotcat190/HKI2425_MobDev20_Nhom01.git
+   git clone https://github.com/hotcat190/HKI2425_MobDev7_Nhom01.git
    ```
    
-2. cd vào `./HKI2425_MobDev20_Nhom01/CookbookBE`
+2. cd vào `./HKI2425_MobDev7_Nhom01/CookbookBE`
  
 3. Cài đặt thư viện npm
    ```sh
@@ -140,16 +140,16 @@
 <!-- RELEASES -->
 ## Releases
 
-Tải về các bản apk release mới nhất [ở đây](https://github.com/hotcat190/HKI2425_MobDev20_Nhom01/tags).
+Tải về các bản apk release mới nhất [ở đây](https://github.com/hotcat190/HKI2425_MobDev7_Nhom01/tags).
 
 <!-- MARKDOWN LINKS & IMAGES -->
 <!-- https://www.markdownguide.org/basic-syntax/#reference-style-links -->
-[contributors-shield]: https://img.shields.io/github/contributors/hotcat190/HKI2425_MobDev20_Nhom01.svg?style=for-the-badge
-[contributors-url]: https://github.com/hotcat190/HKI2425_MobDev20_Nhom01/graphs/contributors
-[forks-shield]: https://img.shields.io/github/forks/hotcat190/HKI2425_MobDev20_Nhom01.svg?style=for-the-badge
-[forks-url]: https://github.com/hotcat190/HKI2425_MobDev20_Nhom01/network/members
-[stars-shield]: https://img.shields.io/github/stars/hotcat190/HKI2425_MobDev20_Nhom01.svg?style=for-the-badge
-[stars-url]: https://github.com/hotcat190/HKI2425_MobDev20_Nhom01/stargazers
-[issues-shield]: https://img.shields.io/github/issues/hotcat190/HKI2425_MobDev20_Nhom01.svg?style=for-the-badge
-[issues-url]: https://github.com/hotcat190/HKI2425_MobDev20_Nhom01/issues
+[contributors-shield]: https://img.shields.io/github/contributors/hotcat190/HKI2425_MobDev7_Nhom01.svg?style=for-the-badge
+[contributors-url]: https://github.com/hotcat190/HKI2425_MobDev7_Nhom01/graphs/contributors
+[forks-shield]: https://img.shields.io/github/forks/hotcat190/HKI2425_MobDev7_Nhom01.svg?style=for-the-badge
+[forks-url]: https://github.com/hotcat190/HKI2425_MobDev7_Nhom01/network/members
+[stars-shield]: https://img.shields.io/github/stars/hotcat190/HKI2425_MobDev7_Nhom01.svg?style=for-the-badge
+[stars-url]: https://github.com/hotcat190/HKI2425_MobDev7_Nhom01/stargazers
+[issues-shield]: https://img.shields.io/github/issues/hotcat190/HKI2425_MobDev7_Nhom01.svg?style=for-the-badge
+[issues-url]: https://github.com/hotcat190/HKI2425_MobDev7_Nhom01/issues
 [product-screenshot]: images/screenshot.png
