@@ -4,20 +4,21 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 
 @Composable
-fun ForgotPasswordScreen(
-    email: String,
-    onEmailChanged: (String) -> Unit,
+fun OtpCodeScreen(
+    otpCode: String,
+    onOtpCodeChange: (String) -> Unit,
     onSubmit: () -> Unit,
     onNavigateToSignIn: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    //TODO: Email input field
+    //TODO: Otp 6 digits field
 
 
     //TODO: Submit button
 
 
-    //TODO: Back to Sign In clickable
+    //TODO: ClickableText("Input the wrong email? Go back")
 
 
+    //TODO: ClickableText("Return to Sign In")
 }

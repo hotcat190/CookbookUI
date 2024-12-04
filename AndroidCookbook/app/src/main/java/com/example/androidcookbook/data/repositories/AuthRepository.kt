@@ -1,6 +1,7 @@
 package com.example.androidcookbook.data.repositories
 
 import com.example.androidcookbook.data.network.AuthService
+import com.example.androidcookbook.domain.model.auth.ForgotPasswordRequest
 import com.example.androidcookbook.domain.model.auth.RegisterRequest
 import com.example.androidcookbook.domain.model.auth.RegisterResponse
 import com.example.androidcookbook.domain.model.auth.SignInRequest
@@ -19,5 +20,10 @@ class AuthRepository @Inject constructor(
         val response = authService.login(signInRequest)
         return response
     }
+
+    suspend fun sendForgotPasswordRequest(forgotPasswordRequest: ForgotPasswordRequest)
+        = authService.sendForgotPasswordRequest(forgotPasswordRequest)
+
+
 }
 

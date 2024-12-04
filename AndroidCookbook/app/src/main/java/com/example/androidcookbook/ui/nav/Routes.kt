@@ -14,7 +14,11 @@ object Routes {
         data object Register
 
         @Serializable
-        data object ForgotPassword
+        data object ForgotPassword {
+            data object Screen
+            data object Otp
+            data object Reset
+        }
     }
 
     @Serializable
