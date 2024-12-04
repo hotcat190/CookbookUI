@@ -48,6 +48,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.rememberAsyncImagePainter
 import com.example.androidcookbook.R
@@ -70,7 +71,7 @@ fun AIGenScreen(modifier: Modifier = Modifier) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
 
-    val aiGenViewModel: AiGenViewModel = viewModel()
+    val aiGenViewModel: AiGenViewModel = hiltViewModel()
     val uiState by aiGenViewModel.aiGenUiState.collectAsState()
     val selectedImageUri by aiGenViewModel.selectedImageUri.collectAsState()
     var testJson = ""

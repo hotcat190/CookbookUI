@@ -2,15 +2,14 @@ package com.example.androidcookbook.ui.features.aigen
 
 import android.net.Uri
 import android.util.Log
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.androidcookbook.data.network.AiGenService
+import com.example.androidcookbook.data.repositories.AiGenRepository
 import com.example.androidcookbook.domain.model.aigen.AiRecipe
 import com.example.androidcookbook.domain.model.aigen.Ingredient
 import com.google.gson.GsonBuilder
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -20,15 +19,16 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import okhttp3.MultipartBody
 import retrofit2.Response
+import javax.inject.Inject
 
-
-class AiGenViewModel  : ViewModel() {
+@HiltViewModel
+class AiGenViewModel @Inject constructor(
+    private val aiGenRepository: AiGenRepository
+) : ViewModel() {
 
     private var _aiGenUiState = MutableStateFlow(AIGenUiState())
 
     val aiGenUiState: StateFlow<AIGenUiState> = _aiGenUiState.asStateFlow()
-
-    private val apiService: ApiService = RetrofitInstance.api
 
     private val _selectedImageUri = MutableStateFlow<Uri?>(null)
     val selectedImageUri: StateFlow<Uri?> get() = _selectedImageUri
@@ -173,7 +173,7 @@ class AiGenViewModel  : ViewModel() {
     fun uploadImage(imagePart: MultipartBody.Part) {
         viewModelScope.launch {
             try {
-                val response: Response<AiRecipe> = apiService.uploadImage(
+                val response: Response<AiRecipe> = aiGenRepository.uploadImage(
                     image = imagePart
                 )
                 _uploadResponse.value = response.body()
