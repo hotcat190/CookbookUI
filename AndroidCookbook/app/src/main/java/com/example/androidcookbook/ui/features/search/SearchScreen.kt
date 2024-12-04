@@ -34,7 +34,7 @@ import coil.request.ImageRequest
 import com.example.androidcookbook.R
 import com.example.androidcookbook.domain.model.recipe.Recipe
 import com.example.androidcookbook.ui.features.newsfeed.NewsfeedScreen
-import com.example.androidcookbook.ui.features.recipedetail.RecipeDetailScreen
+import com.example.androidcookbook.ui.features.recipedetail.PostDetailsScreen
 
 
 @Composable
@@ -90,7 +90,7 @@ items(searchUiState.resultList) { item ->
                 )
             }
             SearchScreenState.Detail -> {
-                RecipeDetailScreen()
+                PostDetailsScreen(0) //TODO
             }
         }
 

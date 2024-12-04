@@ -56,7 +56,9 @@ enum class DetailState {
 }
 
 @Composable
-fun RecipeDetailScreen() {
+fun PostDetailsScreen(
+    id: Int,
+) {
     var state by remember { mutableStateOf(DetailState.Description) }
     var checkedStates = remember { mutableStateListOf(false, false, false) }
     LazyColumn(
@@ -213,5 +215,5 @@ fun LobsterTextButton(
 @Preview(showBackground = true)
 @Composable
 fun RecipePreview() {
-    RecipeDetailScreen()
+    PostDetailsScreen(0)
 }

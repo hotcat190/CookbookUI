@@ -13,17 +13,17 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-@HiltViewModel(assistedFactory = CreatePostViewModel.CreatePostViewModelFactory::class)
-class CreatePostViewModel @AssistedInject constructor(
+@HiltViewModel
+class CreatePostViewModel @Inject constructor(
     private val postRepository: PostRepository,
-    @Assisted private val accessToken: String,
 ) : ViewModel() {
 
-    @AssistedFactory
-    interface CreatePostViewModelFactory {
-        fun create(accessToken: String): CreatePostViewModel
-    }
+//    @AssistedFactory
+//    interface CreatePostViewModelFactory {
+//        fun create(accessToken: String): CreatePostViewModel
+//    }
 
     val postImageUri = MutableStateFlow<Uri?>(null)
     var postTitle = MutableStateFlow("")

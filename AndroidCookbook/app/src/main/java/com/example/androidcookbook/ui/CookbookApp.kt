@@ -36,7 +36,7 @@ import com.example.androidcookbook.ui.nav.utils.navigateIfNotOn
 fun CookbookApp(
     modifier: Modifier = Modifier,
     navController: NavHostController = rememberNavController(),
-    viewModel: CookbookViewModel = viewModel(),
+    viewModel: CookbookViewModel = hiltViewModel<CookbookViewModel>(),
 ) {
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentDestination = navBackStackEntry?.destination
@@ -138,11 +138,13 @@ fun CookbookApp(
                 viewModel.updateBottomBarState(CookbookUiState.BottomBarState.NoBottomBar)
                 viewModel.updateCanNavigateBack(true)
 
-                val accessToken = viewModel.accessToken.collectAsState().value
+//                val accessToken = viewModel.accessToken.collectAsState().value
 
-                val createPostViewModel = hiltViewModel<CreatePostViewModel, CreatePostViewModel.CreatePostViewModelFactory> { factory ->
-                    factory.create(accessToken)
-                }
+//                val createPostViewModel = hiltViewModel<CreatePostViewModel, CreatePostViewModel.CreatePostViewModelFactory> { factory ->
+//                    factory.create(accessToken)
+//                }
+
+                val createPostViewModel = hiltViewModel<CreatePostViewModel>()
 
                 val postTitle by createPostViewModel.postTitle.collectAsState()
                 val postBody by createPostViewModel.postBody.collectAsState()

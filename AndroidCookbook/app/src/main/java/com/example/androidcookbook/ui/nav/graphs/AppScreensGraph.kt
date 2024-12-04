@@ -1,5 +1,7 @@
 package com.example.androidcookbook.ui.nav.graphs
 
+import androidx.compose.runtime.collectAsState
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
@@ -12,6 +14,8 @@ import com.example.androidcookbook.ui.features.aigen.AiScreenTheme
 import com.example.androidcookbook.ui.features.category.CategoryScreen
 import com.example.androidcookbook.ui.features.category.CategoryViewModel
 import com.example.androidcookbook.ui.features.newsfeed.NewsfeedScreen
+import com.example.androidcookbook.ui.features.newsfeed.NewsfeedViewModel
+import com.example.androidcookbook.ui.features.recipedetail.PostDetailsScreen
 import com.example.androidcookbook.ui.features.userprofile.UserProfileScreen
 import com.example.androidcookbook.ui.nav.Routes
 import com.example.androidcookbook.ui.nav.utils.sharedViewModel
@@ -36,31 +40,28 @@ fun NavGraphBuilder.appScreens(navController: NavHostController, updateAppBar: (
         }
         composable<Routes.App.Newsfeed> {
             updateAppBar()
+
+            val newsfeedViewModel = hiltViewModel<NewsfeedViewModel>()
+            val posts = newsfeedViewModel.posts.collectAsState().value
+
             NewsfeedScreen(
-                // TODO
-                posts = listOf(
-                    Post(
-                        id = 0,
-                        author = User(),
-                        title = "Shrimp salad cooking :)",
-                        description = "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard.",
-                        cookTime = null,
-                        mainImage = null,
-                        createdAt = "01/28/2024",
-                        totalView = 0,
-                        totalLike = 0,
-                        totalComment = 0,
-                        ingredient = null,
-                        steps = null,
-                    )
-                ),
-                {},
+                posts = posts,
+                onSeeDetailsClick = {
+                    navController.navigate(Routes.App.PostDetails)
+                }
             )
         }
+        composable<Routes.App.PostDetails> {
+            updateAppBar()
+            val postRoute = it.toRoute<Routes.App.PostDetails>()
+            PostDetailsScreen(postRoute.id)
+
+        }
+
         composable<Routes.App.UserProfile> {
             updateAppBar()
-            val user = it.toRoute<Routes.App.UserProfile>()
-            UserProfileScreen(user.userId, {})
+            val userRoute = it.toRoute<Routes.App.UserProfile>()
+            UserProfileScreen(userRoute.id, {})
         }
     }
 }
