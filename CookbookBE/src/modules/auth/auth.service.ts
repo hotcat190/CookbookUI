@@ -3,7 +3,7 @@ import { Injectable, BadRequestException, UnauthorizedException, NotFoundExcepti
 import { RegisterDto } from './dtos/register.dto';
 import { LoginDto } from './dtos/login.dto';
 import { ForgotDto } from './dtos/forgot.dto';
-import { ResetPasswordDto } from './dtos/reset-password.dto';
+import { ResetPassword1Dto, ResetPassword2Dto } from './dtos/reset-password.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './entities/user.entity';
 import { Repository } from 'typeorm';
@@ -184,8 +184,8 @@ export class AuthService {
   }
   
 
-  async resetPassword(resetPasswordDto: ResetPasswordDto): Promise<any> {
-    const { email, code, password } = resetPasswordDto;
+  async resetPasswordCode(resetPassword1Dto: ResetPassword1Dto): Promise<any> {
+    const { email, code } = resetPassword1Dto;
 
     const user = await this.usersRepository.findOne({ where: { email: email } });
     if(user.resetPasswordCode === null){
@@ -195,12 +195,27 @@ export class AuthService {
       throw new BadRequestException('Mã xác nhận không đúng.');
     }
 
-    user.password = await bcrypt.hash(password, 10);
+    user.verificationToken = uuidv4();
     user.resetPasswordCode = null;
+    await this.usersRepository.save(user);
+    return { token: user.verificationToken, message: 'Mã xác nhận đúng. Bạn có thể đặt lại mật khẩu.' };
+  }
+  async resetPassword(resetPassword2Dto: ResetPassword2Dto): Promise<any> {
+    const { email, token, password } = resetPassword2Dto;
+
+    const user = await this.usersRepository.findOne({ where: { email: email } });
+    if(user.verificationToken === null){
+      throw new BadRequestException('Mã xác nhận đã hết hạn. Vui lòng yêu cầu đặt lại mật khẩu mới.');
+    }
+    if(user.verificationToken !== token){
+      throw new BadRequestException('Mã xác nhận không đúng.');
+    }
+
+    user.password = await bcrypt.hash(password, 10);
+    user.verificationToken = null;
     await this.usersRepository.save(user);
     return { message: 'Đặt lại mật khẩu thành công.' };
   }
-  
   async updateProfile(userId: number, updateProfileDto: UpdateProfileDto): Promise<any> {
     let profile = await this.usersRepository.findOne({ where: { id: userId } });
     if (!profile) {
