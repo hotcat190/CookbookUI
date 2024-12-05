@@ -1,6 +1,7 @@
 package com.example.androidcookbook.ui.nav.graphs
 
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.remember
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
@@ -41,27 +42,25 @@ fun NavGraphBuilder.appScreens(navController: NavHostController, updateAppBar: (
         composable<Routes.App.Newsfeed> {
             updateAppBar()
 
-            val newsfeedViewModel = hiltViewModel<NewsfeedViewModel>()
+            val newsfeedViewModel = sharedViewModel<NewsfeedViewModel>(it, navController, Routes.App)
             val posts = newsfeedViewModel.posts.collectAsState().value
 
             NewsfeedScreen(
                 posts = posts,
-                onSeeDetailsClick = {
-                    navController.navigate(Routes.App.PostDetails)
+                onSeeDetailsClick = { postId ->
+                    navController.navigate(Routes.App.PostDetails(postId))
                 }
             )
-        }
-        composable<Routes.App.PostDetails> {
-            updateAppBar()
-            val postRoute = it.toRoute<Routes.App.PostDetails>()
-            PostDetailsScreen(postRoute.id)
-
         }
 
         composable<Routes.App.UserProfile> {
             updateAppBar()
             val userRoute = it.toRoute<Routes.App.UserProfile>()
-            UserProfileScreen(userRoute.id, {})
+            UserProfileScreen(
+                userId = userRoute.id,
+                onPostSeeDetailsClick = { postId ->
+                    navController.navigate(Routes.App.PostDetails(postId))
+                })
         }
     }
 }

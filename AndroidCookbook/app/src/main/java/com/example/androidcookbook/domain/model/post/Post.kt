@@ -7,7 +7,7 @@ data class Post(
     val author: User,
     val title: String,
     val description: String,
-    val cookTime: Int?,
+    val cookTime: String?,
     val mainImage: String?,
     val totalView: Int,
     val totalComment: Int,

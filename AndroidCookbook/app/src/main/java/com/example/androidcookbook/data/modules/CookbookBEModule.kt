@@ -27,7 +27,7 @@ import javax.inject.Singleton
 @InstallIn(SingletonComponent::class)
 object CookbookBEModule {
 
-    private const val COOKBOOK_BE = "https://cookbookbe.onrender.com/"
+    private const val COOKBOOK_BE = "https://cookbookbe-tk91.onrender.com/"
 
     private val loggingInterceptor = HttpLoggingInterceptor().apply {
         level = HttpLoggingInterceptor.Level.BODY
@@ -36,12 +36,6 @@ object CookbookBEModule {
     @Qualifier
     @Retention(AnnotationRetention.BINARY)
     annotation class CookbookRetrofit
-
-    @Qualifier
-    @Retention(AnnotationRetention.BINARY)
-    annotation class CookbookAccessToken
-
-//    private val accessToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjMxLCJ1c2VybmFtZSI6ImhvYXByaTEyMyIsInJvbGVzIjpudWxsLCJpYXQiOjE3MzI5MjM3MTUsImV4cCI6MTczMjkyNzMxNX0.-49F7heQjEnZRKL14sViM_ETE0A67YhPI2Z8vEz0FQg"
 
     @Provides
     @Singleton

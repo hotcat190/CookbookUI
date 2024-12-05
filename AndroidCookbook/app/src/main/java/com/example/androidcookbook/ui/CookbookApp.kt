@@ -19,11 +19,13 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.toRoute
 import com.example.androidcookbook.ui.common.appbars.CookbookAppBarDefault
 import com.example.androidcookbook.ui.common.appbars.CookbookBottomNavigationBar
 import com.example.androidcookbook.ui.common.appbars.SearchBar
 import com.example.androidcookbook.ui.features.post.CreatePostScreen
 import com.example.androidcookbook.ui.features.post.CreatePostViewModel
+import com.example.androidcookbook.ui.features.recipedetail.PostDetailsScreen
 import com.example.androidcookbook.ui.features.search.SearchScreen
 import com.example.androidcookbook.ui.features.search.SearchViewModel
 import com.example.androidcookbook.ui.nav.Routes
@@ -171,6 +173,16 @@ fun CookbookApp(
                         navController.navigateUp()
                     },
                 )
+            }
+
+            composable<Routes.App.PostDetails> {
+                viewModel.updateTopBarState(CookbookUiState.TopBarState.Default)
+                viewModel.updateBottomBarState(CookbookUiState.BottomBarState.NoBottomBar)
+                viewModel.updateCanNavigateBack(true)
+
+                val postRoute = it.toRoute<Routes.App.PostDetails>()
+                PostDetailsScreen(postRoute.id)
+
             }
         }
     }
