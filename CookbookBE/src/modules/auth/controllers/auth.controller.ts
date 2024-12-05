@@ -4,7 +4,7 @@ import { Controller, Post, Body, Get, Query, Req, Put, Param, Request as Request
 import { AuthService } from '../auth.service';
 import { RegisterDto } from '../dtos/register.dto';
 import { LoginDto } from '../dtos/login.dto';
-import { ResetPasswordDto } from '../dtos/reset-password.dto';
+import { ResetPassword1Dto, ResetPassword2Dto } from '../dtos/reset-password.dto';
 import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
 import { ForgotDto } from '../dtos/forgot.dto';
 import { Request as Request2 } from 'express';
@@ -46,19 +46,25 @@ export class AuthController {
 
   @Post('auth/forgot-password')
   @ApiOperation({ summary: 'Quên mật khẩu' })
-  @ApiResponse({ status: 200, description: 'Liên kết đặt lại mật khẩu đã được gửi nếu email tồn tại' })
+  @ApiResponse({ status: 200, description: 'Gửi code đến mail' })
   @ApiResponse({ status: 400, description: 'Email không hợp lệ' })
-  forgotPassword(@Body() forgotDto: ForgotDto, @Req() req: Request2) {
-    
+  forgotPassword(@Body() forgotDto: ForgotDto) {
     return this.authService.forgotPassword(forgotDto );
   }
 
+  @Post('auth/reset-password-code')
+  @ApiOperation({ summary: 'Đặt lại mật khẩu' })
+  @ApiResponse({ status: 200, description: 'Đặt lại mật khẩu thành công' })
+  @ApiResponse({ status: 400, description: 'Token không hợp lệ hoặc đã hết hạn' })
+  resetPasswordCode(@Body() resetPassword1Dto: ResetPassword1Dto) {
+    return this.authService.resetPasswordCode(resetPassword1Dto);
+  }
   @Post('auth/reset-password')
   @ApiOperation({ summary: 'Đặt lại mật khẩu' })
   @ApiResponse({ status: 200, description: 'Đặt lại mật khẩu thành công' })
   @ApiResponse({ status: 400, description: 'Token không hợp lệ hoặc đã hết hạn' })
-  resetPassword(@Body() resetPasswordDto: ResetPasswordDto) {
-    return this.authService.resetPassword(resetPasswordDto);
+  resetPassword(@Body() resetPassword2Dto: ResetPassword2Dto) {
+    return this.authService.resetPassword(resetPassword2Dto);
   }
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)

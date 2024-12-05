@@ -31,15 +31,13 @@ import {
     }
     @ApiBearerAuth()
     @UseGuards(JwtAuthGuard)
-    @Get('newfeeds/:limit')
-    @ApiOperation({ summary: 'Lấy newfeeds theo limit' })
-    @ApiResponse({ status: 200, description: 'Newfeed' })
+    @Get('newsfeed/:limit')
+    @ApiOperation({ summary: 'Lấy newsfeed theo limit' })
+    @ApiResponse({ status: 200, description: 'Newsfeed' })
     @ApiResponse({ status: 404, description: 'Error' })
-    async getNewfeeds(@Request() req, @Param('limit') limit: number) {
-      console.log(`UserID ${req.user.id} get newfeeds with limit ${limit}`);
-      console.time('getNewfeeds');
-      const result = await this.postsService.getNewfeeds(req.user.id, limit);
-      console.timeEnd('getNewfeeds');
+    async getNewsfeed(@Request() req, @Param('limit') limit: number) {
+      console.log(`UserID ${req.user.id} get newsfeed with limit ${limit}`);
+      const result = await this.postsService.getNewsfeed(req.user.id, limit);
       return result;
     }
 

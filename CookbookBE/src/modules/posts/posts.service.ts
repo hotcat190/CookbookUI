@@ -152,7 +152,7 @@ export class PostsService {
     return { message: 'Đã bỏ thích bài viết.', totalLike: post.totalLike };
   }
   
-  async getNewfeeds(userId: number, limit: number): Promise<any> {
+  async getNewsfeed(userId: number, limit: number): Promise<any> {
     const currentTime = new Date();
     const posts = await this.postsRepository.find();
     const scoredPosts = posts.map(post => {
