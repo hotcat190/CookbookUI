@@ -92,7 +92,7 @@ fun NavGraphBuilder.authScreens(navController: NavController, updateAppBar: () -
                         onDismissRequest = {
                             forgotPasswordViewModel.updateOpenDialog(false)
                             if (success) {
-                                navController.navigate(Routes.Auth.ForgotPassword.Reset)
+                                navController.navigate(Routes.Auth.ForgotPassword.Otp)
                                 forgotPasswordViewModel.updateSuccessSubmit(false)
                             }
                         }
@@ -112,6 +112,10 @@ fun NavGraphBuilder.authScreens(navController: NavController, updateAppBar: () -
                     },
                     onSubmit = {
                         forgotPasswordViewModel.submitOtpRequest()
+                        navController.navigate(Routes.Auth.ForgotPassword.Reset)
+                    },
+                    onNavigateToEmail = {
+                        navController.navigate(Routes.Auth.ForgotPassword.Screen)
                     },
                     onNavigateToSignIn = {
                         navController.navigate(Routes.Auth.Login)
