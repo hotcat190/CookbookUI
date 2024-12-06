@@ -73,6 +73,9 @@ class AuthViewModel @Inject constructor(
     }
 
     fun signIn(username: String, password: String, onSuccess: (SignInResponse) -> Unit) {
+        _uiState.update {
+            it.copy(dialogMessage = "Loading...")
+        }
         viewModelScope.launch {
             // Send request and receive the response
             val response = authRepository.login(SignInRequest(username, password))

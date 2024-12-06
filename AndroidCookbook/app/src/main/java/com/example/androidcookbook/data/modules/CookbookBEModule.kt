@@ -1,9 +1,14 @@
 package com.example.androidcookbook.data.modules
 
+import com.example.androidcookbook.data.network.AiGenService
 import com.example.androidcookbook.data.network.AuthService
+import com.example.androidcookbook.data.network.NewsfeedService
 import com.example.androidcookbook.data.network.PostService
 import com.example.androidcookbook.data.network.UserService
+import com.example.androidcookbook.data.providers.AccessTokenProvider
+import com.example.androidcookbook.data.repositories.AiGenRepository
 import com.example.androidcookbook.data.repositories.AuthRepository
+import com.example.androidcookbook.data.repositories.NewsfeedRepository
 import com.example.androidcookbook.data.repositories.PostRepository
 import com.example.androidcookbook.data.repositories.UserRepository
 import com.skydoves.sandwich.retrofit.adapters.ApiResponseCallAdapterFactory
@@ -11,6 +16,8 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
+import okhttp3.OkHttpClient
+import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import javax.inject.Qualifier
@@ -20,17 +27,39 @@ import javax.inject.Singleton
 @InstallIn(SingletonComponent::class)
 object CookbookBEModule {
 
-    private const val COOKBOOK_BE = "https://cookbookbe.onrender.com/"
+    private const val COOKBOOK_BE = "https://cookbook-f98z.onrender.com/"
+
+    private val loggingInterceptor = HttpLoggingInterceptor().apply {
+        level = HttpLoggingInterceptor.Level.BODY
+    }
 
     @Qualifier
     @Retention(AnnotationRetention.BINARY)
     annotation class CookbookRetrofit
 
+    @Provides
+    @Singleton
+    fun provideOkHttpClient(accessTokenProvider: AccessTokenProvider) = OkHttpClient.Builder()
+        .addInterceptor{ chain ->
+            val token = accessTokenProvider.accessToken.value
+            val request = chain.request().newBuilder()
+                .apply {
+                    if (token.isNotEmpty()) {
+                        addHeader("Authorization", "Bearer $token") // Attach token
+                    }
+                }
+                .build()
+            chain.proceed(request)
+        }
+        .addInterceptor(loggingInterceptor)
+        .build()
+
     @CookbookRetrofit
     @Provides
     @Singleton
-    fun provideCookBE(): Retrofit = Retrofit.Builder()
+    fun provideCookBE(client: OkHttpClient): Retrofit = Retrofit.Builder()
         .baseUrl(COOKBOOK_BE)
+        .client(client)
         .addConverterFactory(GsonConverterFactory.create())
         .addCallAdapterFactory(ApiResponseCallAdapterFactory.create())
         .build()
@@ -64,4 +93,24 @@ object CookbookBEModule {
     @Singleton
     fun providePostRepository(postService: PostService) =
         PostRepository(postService)
+
+    @Provides
+    @Singleton
+    fun provideAiGenService(@CookbookRetrofit retrofit: Retrofit): AiGenService =
+        retrofit.create(AiGenService::class.java)
+
+    @Provides
+    @Singleton
+    fun provideAiGenRepository(aiGenService: AiGenService): AiGenRepository =
+        AiGenRepository(aiGenService)
+
+    @Provides
+    @Singleton
+    fun provideNewsfeedService(@CookbookRetrofit retrofit: Retrofit): NewsfeedService =
+        retrofit.create(NewsfeedService::class.java)
+
+    @Provides
+    @Singleton
+    fun provideNewsfeedRepository(newsfeedService: NewsfeedService): NewsfeedRepository =
+        NewsfeedRepository(newsfeedService)
 }

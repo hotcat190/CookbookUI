@@ -50,7 +50,7 @@ fun SearchBar(
     }
 
     TopAppBar(
-        colors = TopAppBarDefaults.topAppBarColors(containerColor = Color(0xFF7F5346)),
+        colors = TopAppBarDefaults.topAppBarColors(containerColor = MaterialTheme.colorScheme.primary),
         title = {
             Box(modifier = Modifier.height(48.dp)) {
                 TextField(
@@ -59,17 +59,17 @@ fun SearchBar(
                         .focusRequester(focusRequester),
                     value = searchQuery,
                     onValueChange = {searchQuery = it},
-                    placeholder = { Text("Search..", style = MaterialTheme.typography.labelMedium) },
+                    placeholder = { Text("Search..", style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.secondary) },
                     shape = RoundedCornerShape(16.dp),
                     textStyle = MaterialTheme.typography.labelMedium,
                     colors = TextFieldDefaults.colors().copy(
                         focusedIndicatorColor = Color.Transparent,
                         unfocusedIndicatorColor = Color.Transparent,
-                        cursorColor = Color.White,
-                        focusedTextColor = Color.White,
-                        unfocusedTextColor = Color.White,
-                        focusedPlaceholderColor = Color.White,
-                        unfocusedPlaceholderColor = Color.White,
+                        cursorColor = MaterialTheme.colorScheme.secondary,
+                        focusedTextColor = MaterialTheme.colorScheme.secondary,
+                        unfocusedTextColor = MaterialTheme.colorScheme.secondary,
+                        focusedPlaceholderColor = MaterialTheme.colorScheme.secondary,
+                        unfocusedPlaceholderColor = MaterialTheme.colorScheme.secondary,
                         focusedContainerColor = Color.Transparent.copy(alpha = .15f),
                         unfocusedContainerColor = Color.Transparent.copy(alpha = .15f),
                     ),
@@ -88,7 +88,7 @@ fun SearchBar(
                 Icon(
                     imageVector = Icons.AutoMirrored.Default.ArrowBack,
                     contentDescription = "Back Button",
-                    tint = Color.White
+                    tint = MaterialTheme.colorScheme.secondary
                 )
             }
         },

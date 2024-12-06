@@ -8,4 +8,6 @@ class PostRepository @Inject constructor(
     private val postService: PostService
 ) {
     suspend fun createPost(post: PostCreateRequest) = postService.createPost(post)
+
+    suspend fun getPost(postId: Int) = postService.getPost(postId)
 }

@@ -10,9 +10,13 @@ import androidx.navigation.compose.navigation
 import com.example.androidcookbook.domain.model.auth.SignInResponse
 import com.example.androidcookbook.ui.common.dialog.MinimalDialog
 import com.example.androidcookbook.ui.features.auth.AuthViewModel
+import com.example.androidcookbook.ui.features.auth.ForgotPasswordViewModel
+import com.example.androidcookbook.ui.features.auth.components.SignTheme
 import com.example.androidcookbook.ui.features.auth.screens.ForgotPasswordScreen
 import com.example.androidcookbook.ui.features.auth.screens.LoginScreen
 import com.example.androidcookbook.ui.features.auth.screens.RegisterScreen
+import com.example.androidcookbook.ui.features.auth.screens.OtpCodeScreen
+import com.example.androidcookbook.ui.features.auth.screens.ResetPasswordScreen
 import com.example.androidcookbook.ui.nav.Routes
 import com.example.androidcookbook.ui.nav.utils.sharedViewModel
 
@@ -26,27 +30,29 @@ fun NavGraphBuilder.authScreens(navController: NavController, updateAppBar: () -
     ) {
         // Scope the ViewModel to the navigation graph
         composable<Routes.Auth.Login> {
-            updateAppBar()
-            val authViewModel: AuthViewModel = sharedViewModel(it, navController, Routes.Auth)
-            LoginScreen(
-                onForgotPasswordClick = {
-                    // TODO: navigate to ForgotPassword
-                },
-                onNavigateToSignUp = {
-                    navController.navigate(Routes.Auth.Register)
-                },
-                onSignInClick = { username, password ->
-                    authViewModel.signIn(username, password) { response ->
-                        updateUser(response)
+            SignTheme {
+                updateAppBar()
+                val authViewModel: AuthViewModel = sharedViewModel(it, navController, Routes.Auth)
+                LoginScreen(
+                    onForgotPasswordClick = {
+                        navController.navigate(Routes.Auth.ForgotPassword)
+                    },
+                    onNavigateToSignUp = {
+                        navController.navigate(Routes.Auth.Register)
+                    },
+                    onSignInClick = { username, password ->
+                        authViewModel.signIn(username, password) { response ->
+                            updateUser(response)
+                        }
+                        navController.navigate(Routes.DialogDestination)
+                    },
+                    onUseAsGuest = {
+                        navController.navigate(Routes.App) {
+                            popUpTo<Routes.Auth> { inclusive = true }
+                        }
                     }
-                    navController.navigate(Routes.DialogDestination)
-                },
-                onUseAsGuest = {
-                    navController.navigate(Routes.App) {
-                        popUpTo<Routes.Auth> { inclusive = true }
-                    }
-                }
-            )
+                )
+            }
         }
         composable<Routes.Auth.Register> {
             updateAppBar()
@@ -58,12 +64,106 @@ fun NavGraphBuilder.authScreens(navController: NavController, updateAppBar: () -
                 },
             )
         }
-        composable<Routes.Auth.ForgotPassword> {
-            updateAppBar()
-            val authViewModel: AuthViewModel = sharedViewModel(it, navController, Routes.Auth)
-            ForgotPasswordScreen(
-                // TODO
-            )
+        navigation<Routes.Auth.ForgotPassword>(
+            startDestination = Routes.Auth.ForgotPassword.Screen
+        ) {
+            composable<Routes.Auth.ForgotPassword.Screen> {
+                updateAppBar()
+
+                val forgotPasswordViewModel: ForgotPasswordViewModel = sharedViewModel(it, navController, Routes.Auth.ForgotPassword)
+                val email = forgotPasswordViewModel.email.collectAsState().value
+
+                ForgotPasswordScreen(
+                    email = email,
+                    onEmailChanged = { newEmail ->
+                        forgotPasswordViewModel.updateEmail(newEmail)
+                    },
+                    onSubmit = {
+                        forgotPasswordViewModel.submitEmail()
+                        //navController.navigate(Routes.Auth.ForgotPassword.Reset)
+                    },
+                    onNavigateToSignIn = {
+                        navController.navigate(Routes.Auth.Login)
+                    }
+                )
+                val openDialog = forgotPasswordViewModel.openDialog.collectAsState().value
+                val dialogMessage = forgotPasswordViewModel.dialogMessage.collectAsState().value
+                val success = forgotPasswordViewModel.successSubmit.collectAsState().value
+                if (openDialog) {
+                    MinimalDialog(
+                        dialogMessage = dialogMessage,
+                        onDismissRequest = {
+                            forgotPasswordViewModel.updateOpenDialog(false)
+                            if (success) {
+                                navController.navigate(Routes.Auth.ForgotPassword.Reset)
+                                forgotPasswordViewModel.updateSuccessSubmit(false)
+                            }
+                        }
+                    )
+                }
+            }
+            composable<Routes.Auth.ForgotPassword.Otp> {
+                updateAppBar()
+
+                val forgotPasswordViewModel: ForgotPasswordViewModel = sharedViewModel(it, navController, Routes.Auth.ForgotPassword)
+                val otpCode = forgotPasswordViewModel.otpCode.collectAsState().value
+
+                OtpCodeScreen(
+                    otpCode = otpCode,
+                    onOtpCodeChange = { newOtpCode ->
+                        forgotPasswordViewModel.updateOtpCode(newOtpCode)
+                    },
+                    onSubmit = {
+                        forgotPasswordViewModel.submitOtpRequest()
+                    },
+                    onNavigateToSignIn = {
+                        navController.navigate(Routes.Auth.Login)
+                    },
+                    onGoBack = {
+                        navController.navigateUp()
+                    }
+                )
+            }
+            composable<Routes.Auth.ForgotPassword.Reset> {
+                updateAppBar()
+
+                val forgotPasswordViewModel: ForgotPasswordViewModel = sharedViewModel(it, navController, Routes.Auth.ForgotPassword)
+                val password = forgotPasswordViewModel.password.collectAsState().value
+                val retypePassword = forgotPasswordViewModel.retypePassword.collectAsState().value
+
+                ResetPasswordScreen(
+                    password = password,
+                    onPasswordChange = { newPassword ->
+                        forgotPasswordViewModel.updatePassword(newPassword)
+                    },
+                    retypePassword = retypePassword,
+                    onRetypePasswordChange = { newRetypePassword ->
+                        forgotPasswordViewModel.updateRetypePassword(newRetypePassword)
+                    },
+                    onSubmit = {
+                        forgotPasswordViewModel.submitPasswordResetRequest()
+                    },
+                    onNavigateToSignIn = {
+                        navController.navigate(Routes.Auth.Login)
+                    }
+                )
+
+                val openDialog = forgotPasswordViewModel.openDialog.collectAsState().value
+                val dialogMessage = forgotPasswordViewModel.dialogMessage.collectAsState().value
+                val success = forgotPasswordViewModel.successSubmit.collectAsState().value
+                if (openDialog) {
+                    MinimalDialog(
+                        dialogMessage = dialogMessage,
+                        onDismissRequest = {
+                            forgotPasswordViewModel.updateOpenDialog(false)
+                            if (success) {
+                                navController.navigate(Routes.Auth.Login)
+                                forgotPasswordViewModel.updateSuccessSubmit(false)
+                            }
+                        }
+                    )
+                }
+            }
         }
         dialog<Routes.DialogDestination> {
             val authViewModel: AuthViewModel = sharedViewModel(it, navController, Routes.Auth)

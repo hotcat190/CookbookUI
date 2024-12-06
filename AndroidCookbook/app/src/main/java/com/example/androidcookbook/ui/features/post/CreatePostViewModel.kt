@@ -5,25 +5,20 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.androidcookbook.data.repositories.PostRepository
+import com.example.androidcookbook.domain.model.post.Post
 import com.example.androidcookbook.domain.model.post.PostCreateRequest
-import dagger.assisted.Assisted
-import dagger.assisted.AssistedFactory
-import dagger.assisted.AssistedInject
+import com.skydoves.sandwich.onFailure
+import com.skydoves.sandwich.onSuccess
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-@HiltViewModel(assistedFactory = CreatePostViewModel.CreatePostViewModelFactory::class)
-class CreatePostViewModel @AssistedInject constructor(
+@HiltViewModel
+class CreatePostViewModel @Inject constructor(
     private val postRepository: PostRepository,
-    @Assisted private val accessToken: String,
 ) : ViewModel() {
-
-    @AssistedFactory
-    interface CreatePostViewModelFactory {
-        fun create(accessToken: String): CreatePostViewModel
-    }
 
     val postImageUri = MutableStateFlow<Uri?>(null)
     var postTitle = MutableStateFlow("")
@@ -41,12 +36,12 @@ class CreatePostViewModel @AssistedInject constructor(
         postImageUri.update { uri }
     }
 
-    fun createPost() {
+    fun createPost(onSuccessNavigate: (Post) -> Unit) {
         viewModelScope.launch {
 //            val mainImage = imageRepository.uploadImage(postImage.value)
 
             try {
-                postRepository.createPost(
+                val response = postRepository.createPost(
                     PostCreateRequest(
                         title = postTitle.value,
                         description = postBody.value,
@@ -56,6 +51,11 @@ class CreatePostViewModel @AssistedInject constructor(
                         steps = null,
                     )
                 )
+                response.onSuccess {
+                    onSuccessNavigate(data.post)
+                }.onFailure {
+                    //TODO
+                }
             } catch (e: Exception) {
                 Log.e("CreatePost", e.stackTraceToString())
             }
