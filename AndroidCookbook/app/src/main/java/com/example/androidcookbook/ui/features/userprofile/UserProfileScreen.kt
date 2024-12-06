@@ -1,5 +1,7 @@
 package com.example.androidcookbook.ui.features.userprofile
 
+import android.util.Log
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -27,6 +29,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -34,6 +37,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.example.androidcookbook.R
+import com.example.androidcookbook.domain.model.post.Post
 import com.example.androidcookbook.domain.model.user.User
 import com.example.androidcookbook.ui.common.containers.RefreshableScreen
 import com.example.androidcookbook.ui.features.newsfeed.NewsfeedCard
@@ -61,13 +65,18 @@ fun UserProfileScreen(
             is UserProfileUiState.Success -> {
                 val user = userProfileUiState.user
                 LazyColumn(
-                    modifier = Modifier.fillMaxSize()
+                    modifier = Modifier.fillMaxSize(),
+                    verticalArrangement = Arrangement.spacedBy(10.dp)
                 ) {
                     item {
-                        UserProfileHeader(avatarPath = user.avatar)
-                    }
-                    item {
-                        UserInfo(user)
+                        Column (
+                            Modifier
+                                .background(color = Color.White)
+                                .padding(bottom = 10.dp)
+                        ) {
+                            UserProfileHeader(avatarPath = user.avatar)
+                            UserInfo(user)
+                        }
                     }
                     when (userProfileViewModel.userPostState) {
                         is UserPostState.Loading -> item { Text("Loading user posts") }
@@ -77,8 +86,18 @@ fun UserProfileScreen(
                             ) { post ->
                                 NewsfeedCard(
                                     post = post,
-                                    onSeeDetailsClick = onPostSeeDetailsClick
+                                    onSeeDetailsClick = onPostSeeDetailsClick,
+                                    modifier = Modifier.background(color = Color.White)
                                 )
+                            }
+                            if ((userProfileViewModel.userPostState as UserPostState.Success).userPosts.isEmpty()) {
+                                item {
+                                    Text(
+                                        text = "No posts at the moment.",
+                                        textAlign = TextAlign.Center,
+                                        modifier = Modifier.fillMaxWidth()
+                                    )
+                                }
                             }
                         }
                         is UserPostState.Failure -> item { Text("Failed to fetch user posts.") }
@@ -184,7 +203,7 @@ fun UserInfo(
             )
         )
         Text(
-            text = user.bio,
+            text = user?.bio?:"Món ngon nóng hổi, vừa thổi vừa ăn",
             style = TextStyle(
                 fontSize = 12.sp,
                 fontWeight = FontWeight(400),
@@ -217,7 +236,7 @@ fun UserInfo(
                 )
             )
             Text(
-                text = " following",
+                text = " followings",
                 style = TextStyle(
                     fontSize = 14.sp,
                     fontWeight = FontWeight(400),

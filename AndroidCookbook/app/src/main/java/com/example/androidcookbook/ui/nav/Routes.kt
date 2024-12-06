@@ -8,38 +8,38 @@ object Routes {
     @Serializable
     object Auth {
         @Serializable
-        data object Login
+        object Login
 
         @Serializable
-        data object Register
+        object Register
 
         @Serializable
-        data object ForgotPassword {
-            data object Screen
-            data object Otp
-            data object Reset
+        object ForgotPassword {
+            @Serializable
+            object Screen
+            @Serializable
+            object Otp
+            @Serializable
+            object Reset
         }
     }
 
     @Serializable
     object App {
         @Serializable
-        data object Category
-
+        object Category
         @Serializable
-        data object AIChat
-
+        object AIChat
         @Serializable
-        data object Newsfeed
-
+        object Newsfeed
         @Serializable
         data class UserProfile(val userId: Int)
     }
 
     @Serializable
-    data object Search
+    object Search
     @Serializable
-    data object CreatePost
+    object CreatePost
 
     @Serializable
     object DialogDestination

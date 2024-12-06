@@ -77,12 +77,27 @@ fun NavGraphBuilder.authScreens(navController: NavController, updateAppBar: () -
                     },
                     onSubmit = {
                         forgotPasswordViewModel.submitEmail()
-                        navController.navigate(Routes.Auth.ForgotPassword.Reset)
+                        //navController.navigate(Routes.Auth.ForgotPassword.Reset)
                     },
                     onNavigateToSignIn = {
                         navController.navigate(Routes.Auth.Login)
                     }
                 )
+                val openDialog = forgotPasswordViewModel.openDialog.collectAsState().value
+                val dialogMessage = forgotPasswordViewModel.dialogMessage.collectAsState().value
+                val success = forgotPasswordViewModel.successSubmit.collectAsState().value
+                if (openDialog) {
+                    MinimalDialog(
+                        dialogMessage = dialogMessage,
+                        onDismissRequest = {
+                            forgotPasswordViewModel.updateOpenDialog(false)
+                            if (success) {
+                                navController.navigate(Routes.Auth.ForgotPassword.Reset)
+                                forgotPasswordViewModel.updateSuccessSubmit(false)
+                            }
+                        }
+                    )
+                }
             }
             composable<Routes.Auth.ForgotPassword.Otp> {
                 updateAppBar()
@@ -126,6 +141,22 @@ fun NavGraphBuilder.authScreens(navController: NavController, updateAppBar: () -
                         navController.navigate(Routes.Auth.Login)
                     }
                 )
+
+                val openDialog = forgotPasswordViewModel.openDialog.collectAsState().value
+                val dialogMessage = forgotPasswordViewModel.dialogMessage.collectAsState().value
+                val success = forgotPasswordViewModel.successSubmit.collectAsState().value
+                if (openDialog) {
+                    MinimalDialog(
+                        dialogMessage = dialogMessage,
+                        onDismissRequest = {
+                            forgotPasswordViewModel.updateOpenDialog(false)
+                            if (success) {
+                                navController.navigate(Routes.Auth.Login)
+                                forgotPasswordViewModel.updateSuccessSubmit(false)
+                            }
+                        }
+                    )
+                }
             }
         }
         dialog<Routes.DialogDestination> {

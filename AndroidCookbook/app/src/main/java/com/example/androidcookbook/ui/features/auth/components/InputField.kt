@@ -53,7 +53,8 @@ fun InputField(
             placeholderText = placeholderText,
             type = type,
             modifier = modifier,
-            onDone = onDone
+            onDone = onDone,
+            imeAction = imeAction
         )
     }
 }
@@ -101,6 +102,7 @@ private fun DefaultInputField(
     placeholderText: String,
     type: KeyboardType,
     modifier: Modifier = Modifier,
+    imeAction: ImeAction,
     onDone: () -> Unit
 ) {
     BaseTextField(
@@ -112,7 +114,7 @@ private fun DefaultInputField(
         trailingIcon = null,
         keyboardType = type,
         onDone = onDone,
-        imeAction = ImeAction.Next
+        imeAction = imeAction
     )
 }
 

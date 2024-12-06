@@ -1,6 +1,6 @@
 [versions]
 activityCompose = "1.9.3"
-agp = "8.6.1"
+agp = "8.7.2"
 coilCompose = "2.0.0"
 converterGson = "2.9.0"
 espressoIntents = "3.6.1"
