@@ -6,6 +6,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -39,13 +42,14 @@ fun CookbookAppBarDefault(
     TopAppBar(
         modifier = modifier,
         colors = TopAppBarDefaults.topAppBarColors(
-            containerColor = Color(0xFF7F5346),
-            scrolledContainerColor = Color(0xFF7F5346)
+            containerColor = MaterialTheme.colorScheme.primary,
+            scrolledContainerColor = MaterialTheme.colorScheme.primary
         ),
         title = {
             Text(
                 text = "Cookbook",
-                style = MaterialTheme.typography.titleLarge
+                style = MaterialTheme.typography.titleLarge,
+                color = MaterialTheme.colorScheme.secondary
             )
         },
         actions = {
@@ -54,15 +58,20 @@ fun CookbookAppBarDefault(
                     onClick = onCreatePostClick,
                     modifier = Modifier.size(30.dp),
                     colors = IconButtonDefaults.iconButtonColors(
-                        containerColor = Color(0xFFE8E8E8)
+                        containerColor = MaterialTheme.colorScheme.primary
                     )
                 ) {
-                    Image(
-                        modifier = Modifier.size(20.dp),
-                        painter = painterResource(R.drawable.plus),
+//                    Image(
+//                        modifier = Modifier.size(20.dp),
+//                        painter = painterResource(R.drawable.plus),
+//                        contentDescription = "Create Post",
+//                        contentScale = ContentScale.Crop
+//
+//                    )
+                    Icon(
+                        imageVector = Icons.Default.Add,
                         contentDescription = "Create Post",
-                        contentScale = ContentScale.Crop
-
+                        tint = MaterialTheme.colorScheme.secondary
                     )
                 }
             }
@@ -72,11 +81,16 @@ fun CookbookAppBarDefault(
                     onClick = searchButtonAction,
                     modifier = Modifier.size(36.dp),
                 ) {
-                    Image(
-                        modifier = Modifier.size(24.dp),
-                        painter = painterResource(R.drawable.search_interface_symbol),
+//                    Image(
+//                        modifier = Modifier.size(24.dp),
+//                        painter = painterResource(R.drawable.search_interface_symbol),
+//                        contentDescription = "Search",
+//                        contentScale = ContentScale.Crop
+//                    )
+                    Icon(
+                        imageVector = Icons.Default.Search,
                         contentDescription = "Search",
-                        contentScale = ContentScale.Crop
+                        tint = MaterialTheme.colorScheme.secondary
                     )
                 }
             }
@@ -86,14 +100,19 @@ fun CookbookAppBarDefault(
                     onClick = onMenuButtonClick,
                     modifier = Modifier.size(30.dp),
                     colors = IconButtonDefaults.iconButtonColors(
-                        containerColor = Color(0xFFE8E8E8)
+                        containerColor = MaterialTheme.colorScheme.primary
                     )
                 ) {
-                    Image(
-                        modifier = Modifier.size(16.dp),
-                        painter = painterResource(R.drawable.hamburger),
+//                    Image(
+//                        modifier = Modifier.size(16.dp),
+//                        painter = painterResource(R.drawable.hamburger),
+//                        contentDescription = "Menu Button",
+//                        contentScale = ContentScale.Crop
+//                    )
+                    Icon(
+                        imageVector = Icons.Default.Menu,
                         contentDescription = "Menu Button",
-                        contentScale = ContentScale.Crop
+                        tint = MaterialTheme.colorScheme.secondary
                     )
                 }
             }
@@ -104,7 +123,7 @@ fun CookbookAppBarDefault(
                     Icon(
                         imageVector = Icons.AutoMirrored.Default.ArrowBack,
                         contentDescription = "Back Button",
-                        tint = Color.White
+                        tint = MaterialTheme.colorScheme.secondary
                     )
                 }
             }

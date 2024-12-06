@@ -82,7 +82,7 @@ fun CookbookApp(
                         navController.navigateIfNotOn(Routes.App.Category)
                     },
                     onAiChatClick = {
-                        navController.navigateIfNotOn(Routes.App.AIChat)
+                        navController.navigateIfNotOn(Routes.App.AIChef)
                     },
                     onNewsfeedClick = {
                         navController.navigateIfNotOn(Routes.App.Newsfeed)

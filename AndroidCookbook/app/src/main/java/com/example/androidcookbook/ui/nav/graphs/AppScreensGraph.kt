@@ -29,7 +29,7 @@ fun NavGraphBuilder.appScreens(navController: NavHostController, updateAppBar: (
             val categoryViewModel: CategoryViewModel = sharedViewModel(it, navController, Routes.App)
             CategoryScreen(categoryViewModel)
         }
-        composable<Routes.App.AIChat> {
+        composable<Routes.App.AIChef> {
             updateAppBar()
             AiScreenTheme {
                 AIGenScreen()
