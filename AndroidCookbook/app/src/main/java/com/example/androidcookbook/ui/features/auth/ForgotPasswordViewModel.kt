@@ -50,13 +50,14 @@ class ForgotPasswordViewModel @Inject constructor(
     fun updateDialogMessage(message: String) = this.dialogMessage.update { message }
     fun updateSuccessSubmit(success: Boolean) = this.successSubmit.update { success }
 
-    fun submitEmail() {
+    fun submitEmail(onSucces: () -> Unit) {
         viewModelScope.launch {
             val response = authRepository.sendForgotPasswordRequest(ForgotPasswordRequest(email.value))
             response.onSuccess {
                 updateOpenDialog(true)
                 updateDialogMessage(data.message)
                 updateSuccessSubmit(true)
+                onSucces()
             }.onErrorDeserialize<SuccessMessageBody, ErrorBody> {
                 errorBody ->
                 run {
@@ -79,7 +80,7 @@ class ForgotPasswordViewModel @Inject constructor(
         //TODO("Not yet implemented")
     }
 
-    fun submitPasswordResetRequest() {
+    fun submitPasswordResetRequest(onSucces: () -> Unit) {
         if (password.value != retypePassword.value) {
             updateOpenDialog(true)
             updateDialogMessage("Password and Retype Password must be the same")
@@ -99,6 +100,7 @@ class ForgotPasswordViewModel @Inject constructor(
                 updateOpenDialog(true)
                 updateDialogMessage(data.message)
                 updateSuccessSubmit(true)
+                onSucces()
             }.onErrorDeserialize<SuccessMessageBody, ErrorBody> {
                 errorBody ->
                 run {

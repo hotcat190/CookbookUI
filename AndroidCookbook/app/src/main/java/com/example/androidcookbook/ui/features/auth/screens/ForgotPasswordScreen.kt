@@ -20,6 +20,7 @@ fun ForgotPasswordScreen(
     onSubmit: () -> Unit,
     onNavigateToSignIn: () -> Unit,
     modifier: Modifier = Modifier,
+    supportingText: String = ""
 ) {
     SignLayout {
         //TODO: Email input field
@@ -30,9 +31,9 @@ fun ForgotPasswordScreen(
             placeholderText = "Email",
             type = KeyboardType.Email,
             imeAction = ImeAction.Done,
-            onDone = onSubmit
+            onDone = onSubmit,
+            supportingText = supportingText
         )
-        Spacer(Modifier.height(5.dp))
         //TODO: Submit button
         SignButton(
             onClick = onSubmit,

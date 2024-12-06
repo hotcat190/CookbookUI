@@ -28,6 +28,7 @@ fun ResetPasswordScreen(
     onSubmit: () -> Unit,
     onNavigateToSignIn: () -> Unit,
     modifier: Modifier = Modifier,
+    supportingText: String = ""
 ) {
     SignLayout {
         val focusManager = LocalFocusManager.current
@@ -55,7 +56,8 @@ fun ResetPasswordScreen(
             type = KeyboardType.Password,
             imeAction = ImeAction.Done,
             onDone = onSubmit,
-            modifier = Modifier.focusRequester(retype)
+            modifier = Modifier.focusRequester(retype),
+            supportingText = supportingText
         )
 
         //TODO: Submit button

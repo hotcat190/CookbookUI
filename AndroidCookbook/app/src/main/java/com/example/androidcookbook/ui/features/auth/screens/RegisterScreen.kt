@@ -115,7 +115,7 @@ fun SignUpComponents(
     }
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(25.dp)
+        verticalArrangement = Arrangement.spacedBy(0.dp)
     ) {
         InputField(email, onTypeEmail, "Email", KeyboardType.Email,
             onDone = changeFocus,

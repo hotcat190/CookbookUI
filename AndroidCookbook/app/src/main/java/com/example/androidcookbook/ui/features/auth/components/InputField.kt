@@ -13,7 +13,7 @@ import androidx.compose.material.IconButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material.Text
 import androidx.compose.material.TextField
-import androidx.compose.material.TextFieldDefaults
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.Visibility
@@ -22,6 +22,8 @@ import androidx.compose.material.icons.outlined.Lock
 import androidx.compose.material.icons.outlined.Visibility
 import androidx.compose.material.icons.outlined.VisibilityOff
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextFieldDefaults
+import androidx.compose.material3.TextFieldColors
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -46,7 +48,8 @@ fun InputField(
     type: KeyboardType,
     imeAction: ImeAction,
     modifier: Modifier = Modifier,
-    onDone: () -> Unit
+    onDone: () -> Unit,
+    supportingText: String = "",
 ) {
     when (type) {
         KeyboardType.Password -> PasswordInputField(
@@ -56,6 +59,7 @@ fun InputField(
             modifier = modifier,
             onDone = onDone,
             imeAction = imeAction,
+            supportingText = supportingText
         )
         else -> DefaultInputField(
             text = text,
@@ -64,7 +68,8 @@ fun InputField(
             type = type,
             modifier = modifier,
             onDone = onDone,
-            imeAction = imeAction
+            imeAction = imeAction,
+            supportingText = supportingText
         )
     }
 }
@@ -76,7 +81,8 @@ private fun PasswordInputField(
     placeholderText: String,
     imeAction: ImeAction,
     modifier: Modifier = Modifier,
-    onDone: () -> Unit
+    onDone: () -> Unit,
+    supportingText: String = "",
 ) {
     var passwordVisible by remember { mutableStateOf(false) }
 
@@ -101,7 +107,8 @@ private fun PasswordInputField(
         },
         keyboardType = KeyboardType.Password,
         onDone = onDone,
-        imeAction = imeAction
+        imeAction = imeAction,
+        supportingText = supportingText
     )
 }
 
@@ -110,6 +117,7 @@ private fun DefaultInputField(
     text: String,
     onChange: (String) -> Unit,
     placeholderText: String,
+    supportingText: String = "",
     type: KeyboardType,
     modifier: Modifier = Modifier,
     imeAction: ImeAction,
@@ -124,7 +132,8 @@ private fun DefaultInputField(
         trailingIcon = null,
         keyboardType = type,
         onDone = onDone,
-        imeAction = imeAction
+        imeAction = imeAction,
+        supportingText = supportingText
     )
 }
 
@@ -133,6 +142,7 @@ private fun BaseTextField(
     text: String,
     onChange: (String) -> Unit,
     placeholderText: String,
+    supportingText: String = "",
     modifier: Modifier = Modifier,
     visualTransformation: VisualTransformation = VisualTransformation.None,
     trailingIcon: @Composable (() -> Unit)? = null,
@@ -141,20 +151,29 @@ private fun BaseTextField(
     onDone: () -> Unit = {}
 ) {
     OutlinedTextField(
-        modifier = modifier,
+        modifier = modifier.width(325.dp),
         value = text,
         onValueChange = onChange,
-        label = { Text(text = placeholderText) },
+        label = { Text(text = placeholderText, color = MaterialTheme.colorScheme.primary) },
         textStyle = TextStyle.Default.copy(fontSize = 20.sp),
         visualTransformation = visualTransformation,
         keyboardOptions = KeyboardOptions(keyboardType = keyboardType, imeAction = imeAction),
         trailingIcon = trailingIcon,
         singleLine = true,
+        colors = OutlinedTextFieldDefaults.colors(
+            focusedBorderColor = MaterialTheme.colorScheme.primary,
+            unfocusedBorderColor = MaterialTheme.colorScheme.primary,
+            focusedTextColor = MaterialTheme.colorScheme.primary,
+            unfocusedTextColor = MaterialTheme.colorScheme.primary,
+            focusedTrailingIconColor = MaterialTheme.colorScheme.outline,
+            unfocusedTrailingIconColor = MaterialTheme.colorScheme.outline
+        ),
         keyboardActions = KeyboardActions(
             onDone = {
                 onDone()
             }
-        )
+        ),
+        supportingText = { Text(text = supportingText, color = MaterialTheme.colorScheme.error) }
     )
 }
 

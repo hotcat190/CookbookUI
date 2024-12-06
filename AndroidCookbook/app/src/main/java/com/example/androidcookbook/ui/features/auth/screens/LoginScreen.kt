@@ -2,6 +2,8 @@ package com.example.androidcookbook.ui.features.auth.screens
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.height
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -35,12 +37,14 @@ fun LoginScreen(
     onSignInClick: (String, String) -> Unit,
     onUseAsGuest: () -> Unit,
     modifier: Modifier = Modifier,
+    supportingText: String = "",
 ) {
     SignLayout {
         SignInComponent(
             onSignInClick = onSignInClick,
             onForgotPasswordClick = onForgotPasswordClick,
             onSignUpClick = onNavigateToSignUp,
+            supportingText = supportingText
         )
         ClickableText(
             clickableText = "Use as guest",
@@ -55,10 +59,11 @@ fun SignInComponent(
     onForgotPasswordClick: () -> Unit,
     onSignInClick: (String, String) -> Unit,
     modifier: Modifier = Modifier,
+    supportingText: String = ""
 ) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(25.dp)
+        verticalArrangement = Arrangement.spacedBy(5.dp)
     ) {
         val focusManager = LocalFocusManager.current
         val changeFocus: () -> Unit = {
@@ -82,9 +87,10 @@ fun SignInComponent(
             onDone = {
                 onSignInClick(username.trim(), password)
             },
-            imeAction = ImeAction.Done
+            imeAction = ImeAction.Done,
+            supportingText = supportingText
         )
-
+        Spacer(Modifier.height(5.dp))
         SignButton(
             onClick = { onSignInClick(username.trim(), password) },
             actionText = "Sign In"

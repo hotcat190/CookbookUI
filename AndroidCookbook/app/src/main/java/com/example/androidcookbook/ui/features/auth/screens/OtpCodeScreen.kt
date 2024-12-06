@@ -2,8 +2,13 @@ package com.example.androidcookbook.ui.features.auth.screens
 
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
+import androidx.compose.material.Text
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.focus.FocusRequester
@@ -29,6 +34,8 @@ fun OtpCodeScreen(
 ) {
     SignLayout {
         //TODO: Otp 6 digits field
+        Text(text = "We have sent you otp code to your email", color = MaterialTheme.colorScheme.primary)
+        var supportingText by remember { mutableStateOf("") }
         Spacer(Modifier.height(15.dp))
         InputField(
             text = otpCode,
@@ -43,10 +50,12 @@ fun OtpCodeScreen(
             onDone = {
                 if (otpCode.length == 6) {
                     onSubmit()
+                } else {
+                    supportingText = "Otp code must have 6 digits"
                 }
-            }
+            },
+            supportingText = supportingText
         )
-        Spacer(Modifier.height(5.dp))
         //TODO: Submit button
         SignButton(
             onClick = {

@@ -31,7 +31,7 @@ fun AppLogo() {
                 .width(150.dp)
                 .height(150.dp)
                 .background(
-                    color = Color(0xFFFFFFFF),
+                    color = MaterialTheme.colorScheme.surface,
                     shape = RoundedCornerShape(size = 150.dp)
                 )
                 .padding(start = 11.dp, top = 11.dp, end = 11.dp, bottom = 11.dp)
