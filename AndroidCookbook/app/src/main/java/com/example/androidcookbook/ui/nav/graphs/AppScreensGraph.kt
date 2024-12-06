@@ -22,7 +22,7 @@ import com.example.androidcookbook.ui.nav.utils.sharedViewModel
  */
 fun NavGraphBuilder.appScreens(navController: NavHostController, updateAppBar: () -> Unit) {
     navigation<Routes.App> (
-        startDestination = Routes.App.Category
+        startDestination = Routes.App.Newsfeed
     ) {
         composable<Routes.App.Category> {
             updateAppBar()
