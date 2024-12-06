@@ -2,6 +2,7 @@ package com.example.androidcookbook.ui.features.post
 
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -20,9 +21,9 @@ import androidx.compose.material.Checkbox
 import androidx.compose.material.CheckboxDefaults
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.Email
 import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material.icons.outlined.Share
 import androidx.compose.runtime.Composable
@@ -110,8 +111,25 @@ fun PostDetailsScreen(
                 OutlinedIconButton(icon = Icons.Outlined.FavoriteBorder) {
 
                 }
-                OutlinedIconButton(icon = Icons.Outlined.Email) {
 
+                IconButton(onClick = {}) {
+                    if (isSystemInDarkTheme()) {
+
+                        Image(
+                            painter = painterResource(R.drawable.comment_icon_dark_theme),
+                            modifier = Modifier.size(21.dp),
+
+                            contentDescription = "Comment icon"
+                        )
+
+                    } else {
+
+                        Image(
+                            painter = painterResource(R.drawable.comment_icon_light_theme),
+                            modifier = Modifier.size(21.dp),
+                            contentDescription = "Comment icon"
+                        )
+                    }
                 }
                 Spacer(modifier = Modifier.weight(1f))
                 OutlinedIconButton(icon = Icons.Outlined.Share) {
@@ -122,7 +140,10 @@ fun PostDetailsScreen(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 modifier = Modifier.fillMaxWidth()
             ) {
-                LobsterTextButton(onclick = { state = DetailState.Description }, text = "Description")
+                LobsterTextButton(
+                    onclick = { state = DetailState.Description },
+                    text = "Description"
+                )
                 LobsterTextButton(onclick = { state = DetailState.Ingredient }, text = "Ingredient")
                 LobsterTextButton(onclick = { state = DetailState.Recipe }, text = "Recipe")
             }
@@ -140,10 +161,11 @@ fun PostDetailsScreen(
                             style = TextStyle(
                                 fontSize = 24.sp,
                                 fontWeight = FontWeight(400),
-                                color = Color(0xFF000000),
+                                color = MaterialTheme.colorScheme.secondary,
                             )
                         )
                     }
+
                     DetailState.Ingredient -> {
                         checkedStates.forEachIndexed { index, checked ->
                             val ingredientText: String
@@ -156,19 +178,27 @@ fun PostDetailsScreen(
                                 Canvas(modifier = Modifier.size(12.dp)) {
                                     drawCircle(Color.Black)
                                 }
-                                Text(text = ingredientText, fontSize = 20.sp)
+                                Text(
+                                    text = ingredientText,
+                                    fontSize = 20.sp,
+                                    color = MaterialTheme.colorScheme.secondary
+                                )
                                 Checkbox(
                                     checked = checked,
                                     onCheckedChange = { isChecked ->
                                         checkedStates[index] = isChecked
                                     },
                                     colors = CheckboxDefaults.colors(
-                                        checkedColor = Color(101,85,143)
+
+                                        checkmarkColor = MaterialTheme.colorScheme.secondary,
+                                        uncheckedColor = MaterialTheme.colorScheme.secondary,
+                                        checkedColor = Color(101, 85, 143)
                                     )
                                 )
                             }
                         }
                     }
+
                     DetailState.Recipe -> {
                         Text(
                             text = post.steps ?: "",
@@ -176,7 +206,7 @@ fun PostDetailsScreen(
                             style = TextStyle(
                                 fontSize = 24.sp,
                                 fontWeight = FontWeight(400),
-                                color = Color(0xFF000000),
+                                color = MaterialTheme.colorScheme.secondary,
                             )
                         )
                     }
@@ -198,7 +228,8 @@ fun OutlinedIconButton(
     ) {
         Icon(
             icon,
-            contentDescription = null
+            contentDescription = null,
+            tint = MaterialTheme.colorScheme.secondary
         )
     }
 }
@@ -214,7 +245,7 @@ fun LobsterTextButton(
             .wrapContentHeight()
             .width(110.dp)
             .padding(5.dp),
-        colors = ButtonDefaults.buttonColors(Color(0xFFFF7F63)),
+        colors = ButtonDefaults.buttonColors(MaterialTheme.colorScheme.tertiary),
         shape = RoundedCornerShape(size = 999.dp),
         onClick = onclick
     ) {
@@ -224,7 +255,7 @@ fun LobsterTextButton(
                 fontSize = 14.sp,
                 fontFamily = FontFamily(Font(R.font.lobster_regular)),
                 fontWeight = FontWeight(400),
-                color = Color(0xFFFFFBFB),
+                color = MaterialTheme.colorScheme.secondary,
             )
         )
     }
