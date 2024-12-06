@@ -46,14 +46,28 @@ val DarkClickableText = Color(134, 147, 95)
 val DarkBackground = Color(25, 87, 135)
 val DarkOval = Color(26, 54, 76)
 val DarkErrorText = Color(127, 60, 57)
-val DarkTextOutline = Color(38, 69, 93)
+val DarkTextOutline = Color(217, 231, 242)
 val DarkGradientHighest = Color(25, 87, 135)
 val DarkGradientHigh = Color(25, 87, 135)
 val DarkGradientLow = Color(11, 28, 40)
 val DarkGradientLowest = Color(11, 28, 40)
 val DarkLogo = Color(17, 53, 81)
 
-val DarkSignLayout = darkColorScheme()
+val DarkSignLayout = darkColorScheme(
+    primary = DarkTitle,
+    inversePrimary = DarkText,
+    secondary = DarkButtonColor,
+    tertiary = DarkClickableText,
+    background = DarkBackground,
+    onBackground = DarkOval,
+    error = DarkErrorText,
+    outline = DarkTextOutline,
+    surfaceContainerHigh = DarkGradientHigh,
+    surfaceContainerHighest = DarkGradientHighest,
+    surfaceContainerLow = DarkGradientLow,
+    surfaceContainerLowest = DarkGradientLowest,
+    surface = DarkLogo
+)
 
 @Composable
 fun SignLayoutTheme(
