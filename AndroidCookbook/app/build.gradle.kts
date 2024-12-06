@@ -113,6 +113,9 @@ dependencies {
 
     // Kotlin serialization
     implementation(libs.kotlinx.serialization.json)
+
+    //Icon extended
+    implementation("androidx.compose.material:material-icons-extended:1.7.5")
 }
 
 // Allow references to generated code
