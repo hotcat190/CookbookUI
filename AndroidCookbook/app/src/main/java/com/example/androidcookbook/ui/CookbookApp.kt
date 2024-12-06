@@ -24,7 +24,7 @@ import com.example.androidcookbook.ui.common.appbars.CookbookBottomNavigationBar
 import com.example.androidcookbook.ui.common.appbars.SearchBar
 import com.example.androidcookbook.ui.features.post.CreatePostScreen
 import com.example.androidcookbook.ui.features.post.CreatePostViewModel
-import com.example.androidcookbook.ui.features.post.PostDetailsScreen
+import com.example.androidcookbook.ui.features.recipedetail.PostDetailsScreen
 import com.example.androidcookbook.ui.features.post.PostDetailsViewModel
 import com.example.androidcookbook.ui.features.search.SearchScreen
 import com.example.androidcookbook.ui.features.search.SearchViewModel

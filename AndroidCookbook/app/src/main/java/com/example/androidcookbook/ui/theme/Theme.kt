@@ -10,16 +10,18 @@ import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import com.example.androidcookbook.ui.theme.Dark.OnSecondary
+import com.example.androidcookbook.ui.theme.Dark.PrimaryContainer
+import com.example.androidcookbook.ui.theme.Dark.Scrim
+import com.example.androidcookbook.ui.theme.Dark.Tertiary
 
 private val DarkColorScheme = darkColorScheme(
-    primary = Color.hsl(hue = 207f, saturation = 0.5f, lightness = 0.1f),
-    secondary = Color.hsl(hue = 207f, saturation = 0.5f, lightness = 0.9f),
-    tertiary = Color.hsl(hue = 178f, saturation = 0.49f, lightness = 0.1f),
-    scrim = Color.hsl(hue = 147f, saturation = 0.8f, lightness = 0.2f), // this is accent
-    primaryContainer = Color.hsl(175f, 0.49f, 0.9f),
-
-
-    onSecondary = Color.hsl(207f, 0.48f, 0.82f),
+    primary = Dark.Primary,
+    secondary = Dark.Secondary,
+    tertiary = Tertiary,
+    scrim = Scrim, // this is accent
+    primaryContainer = PrimaryContainer,
+    onSecondary = OnSecondary,
 
 )
 

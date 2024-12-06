@@ -36,7 +36,7 @@ import com.example.androidcookbook.data.mocks.SamplePosts
 import com.example.androidcookbook.domain.model.post.Post
 import com.example.androidcookbook.domain.model.recipe.Recipe
 import com.example.androidcookbook.ui.features.newsfeed.NewsfeedScreen
-import com.example.androidcookbook.ui.features.post.PostDetailsScreen
+import com.example.androidcookbook.ui.features.recipedetail.PostDetailsScreen
 
 
 @Composable

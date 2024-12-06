@@ -1,11 +1,13 @@
 package com.example.androidcookbook.ui.common.appbars
 
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.HorizontalDivider
@@ -36,10 +38,9 @@ fun CookbookBottomNavigationBar(
     onCreatePostClick: () -> Unit,
     currentDestination: NavDestination? = null,
 ) {
-
     val colors = NavigationBarItemDefaults.colors(
 
-        indicatorColor = MaterialTheme.colorScheme.secondary ,
+        indicatorColor = MaterialTheme.colorScheme.secondary,
         selectedIconColor = MaterialTheme.colorScheme.primary,
         selectedTextColor = MaterialTheme.colorScheme.onSecondary,
 
@@ -100,7 +101,13 @@ private fun RowScope.CookbookNavigationBarItem(
     NavigationBarItem(
         selected = currentDestination?.hasRoute(route) == true,
         onClick = onClick,
-        icon = icon,
+        icon = {
+            Box(
+                modifier = Modifier.size(24.dp)
+            ) {
+                icon()
+            }
+        },
 //        label = label,
         alwaysShowLabel = alwaysShowLabel,
         colors = colors
