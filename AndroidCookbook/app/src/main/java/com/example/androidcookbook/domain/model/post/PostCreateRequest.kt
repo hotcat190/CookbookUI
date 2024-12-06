@@ -8,3 +8,8 @@ data class PostCreateRequest(
     val ingredient: List<String>?,
     val steps: String?,
 )
+
+data class PostCreateResponse(
+    val message: String,
+    val post: Post,
+)

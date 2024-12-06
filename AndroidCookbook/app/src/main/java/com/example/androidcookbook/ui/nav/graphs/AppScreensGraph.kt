@@ -6,6 +6,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigation
 import androidx.navigation.toRoute
+import com.example.androidcookbook.ui.common.containers.RefreshableScreen
 import com.example.androidcookbook.ui.features.aigen.AIGenScreen
 import com.example.androidcookbook.ui.features.aigen.AiScreenTheme
 import com.example.androidcookbook.ui.features.category.CategoryScreen
@@ -40,12 +41,16 @@ fun NavGraphBuilder.appScreens(navController: NavHostController, updateAppBar: (
             val newsfeedViewModel = sharedViewModel<NewsfeedViewModel>(it, navController, Routes.App)
             val posts = newsfeedViewModel.posts.collectAsState().value
 
-            NewsfeedScreen(
-                posts = posts,
-                onSeeDetailsClick = { postId ->
-                    navController.navigate(Routes.App.PostDetails(postId))
-                }
-            )
+            RefreshableScreen(
+                onRefresh = { newsfeedViewModel.refresh() }
+            ) {
+                NewsfeedScreen(
+                    posts = posts,
+                    onSeeDetailsClick = { postId ->
+                        navController.navigate(Routes.App.PostDetails(postId))
+                    }
+                )
+            }
         }
 
         composable<Routes.App.UserProfile> {
@@ -55,7 +60,8 @@ fun NavGraphBuilder.appScreens(navController: NavHostController, updateAppBar: (
                 userId = userRoute.id,
                 onPostSeeDetailsClick = { postId ->
                     navController.navigate(Routes.App.PostDetails(postId))
-                })
+                }
+            )
         }
     }
 }

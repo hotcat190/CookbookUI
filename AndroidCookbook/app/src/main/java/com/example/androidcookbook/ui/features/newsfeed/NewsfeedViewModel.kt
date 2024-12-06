@@ -29,7 +29,7 @@ class NewsfeedViewModel @Inject constructor(
     private val newsfeedLimit = 10
 
     init {
-        getNewsfeed()
+        refresh()
         Log.d("Newsfeed", posts.toString())
     }
 
@@ -43,6 +43,10 @@ class NewsfeedViewModel @Inject constructor(
             }
             Log.d("Newsfeed", response.toString())
         }
+    }
+
+    fun refresh() {
+        getNewsfeed()
     }
 
 

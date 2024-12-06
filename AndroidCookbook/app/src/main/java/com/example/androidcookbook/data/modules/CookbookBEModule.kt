@@ -27,7 +27,7 @@ import javax.inject.Singleton
 @InstallIn(SingletonComponent::class)
 object CookbookBEModule {
 
-    private const val COOKBOOK_BE = "https://cookbookbe-tk91.onrender.com/"
+    private const val COOKBOOK_BE = "https://cookbook-f98z.onrender.com/"
 
     private val loggingInterceptor = HttpLoggingInterceptor().apply {
         level = HttpLoggingInterceptor.Level.BODY

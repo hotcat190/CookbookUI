@@ -24,7 +24,8 @@ import com.example.androidcookbook.ui.common.appbars.CookbookBottomNavigationBar
 import com.example.androidcookbook.ui.common.appbars.SearchBar
 import com.example.androidcookbook.ui.features.post.CreatePostScreen
 import com.example.androidcookbook.ui.features.post.CreatePostViewModel
-import com.example.androidcookbook.ui.features.recipedetail.PostDetailsScreen
+import com.example.androidcookbook.ui.features.post.PostDetailsScreen
+import com.example.androidcookbook.ui.features.post.PostDetailsViewModel
 import com.example.androidcookbook.ui.features.search.SearchScreen
 import com.example.androidcookbook.ui.features.search.SearchViewModel
 import com.example.androidcookbook.ui.nav.Routes
@@ -77,10 +78,10 @@ fun CookbookApp(
             when (uiState.bottomBarState) {
                 is CookbookUiState.BottomBarState.NoBottomBar -> {}
                 is CookbookUiState.BottomBarState.Default -> CookbookBottomNavigationBar(
-                    onHomeClick = {
+                    onCategoryClick = {
                         navController.navigateIfNotOn(Routes.App.Category)
                     },
-                    onChatClick = {
+                    onAiChatClick = {
                         navController.navigateIfNotOn(Routes.App.AIChef)
                     },
                     onNewsfeedClick = {
@@ -88,6 +89,9 @@ fun CookbookApp(
                     },
                     onUserProfileClick = {
                         navController.navigateIfNotOn(Routes.App.UserProfile(currentUser.id))
+                    },
+                    onCreatePostClick = {
+                        navController.navigateIfNotOn(Routes.CreatePost)
                     },
                     currentDestination = currentDestination
                 )
@@ -139,12 +143,6 @@ fun CookbookApp(
                 viewModel.updateBottomBarState(CookbookUiState.BottomBarState.NoBottomBar)
                 viewModel.updateCanNavigateBack(true)
 
-//                val accessToken = viewModel.accessToken.collectAsState().value
-
-//                val createPostViewModel = hiltViewModel<CreatePostViewModel, CreatePostViewModel.CreatePostViewModelFactory> { factory ->
-//                    factory.create(accessToken)
-//                }
-
                 val createPostViewModel = hiltViewModel<CreatePostViewModel>()
 
                 val postTitle by createPostViewModel.postTitle.collectAsState()
@@ -166,7 +164,11 @@ fun CookbookApp(
                         createPostViewModel.updatePostImageUri(it)
                     },
                     onPostButtonClick = {
-                        createPostViewModel.createPost()
+                        createPostViewModel.createPost(
+                            onSuccessNavigate = { postId ->
+                                navController.navigate(Routes.App.PostDetails(postId))
+                            }
+                        )
                     },
                     onBackButtonClick = {
                         navController.navigateUp()
@@ -180,7 +182,15 @@ fun CookbookApp(
                 viewModel.updateCanNavigateBack(true)
 
                 val postRoute = it.toRoute<Routes.App.PostDetails>()
-                PostDetailsScreen(postRoute.id)
+
+                val postDetailsViewModel = hiltViewModel<PostDetailsViewModel, PostDetailsViewModel.PostDetailsViewModelFactory> { factory ->
+                    factory.create(postRoute.id)
+                }
+
+                val post = postDetailsViewModel.post.collectAsState().value
+
+                PostDetailsScreen(post)
+
 
             }
         }
