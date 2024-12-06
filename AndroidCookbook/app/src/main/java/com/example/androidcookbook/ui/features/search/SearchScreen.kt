@@ -32,9 +32,11 @@ import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.example.androidcookbook.R
+import com.example.androidcookbook.data.mocks.SamplePosts
+import com.example.androidcookbook.domain.model.post.Post
 import com.example.androidcookbook.domain.model.recipe.Recipe
 import com.example.androidcookbook.ui.features.newsfeed.NewsfeedScreen
-import com.example.androidcookbook.ui.features.recipedetail.PostDetailsScreen
+import com.example.androidcookbook.ui.features.post.PostDetailsScreen
 
 
 @Composable
@@ -69,16 +71,16 @@ fun SearchScreen(
                     modifier = Modifier.padding(horizontal = 20.dp, vertical = 10.dp),
                     verticalArrangement = Arrangement.spacedBy(10.dp)
                 ) {
-items(searchUiState.resultList) { item ->
-    ResultCardTheme {
-        ResultCard(
-            onClick = {
-                viewModel.ChangeScreenState(SearchScreenState.Posts)
-            },
-            recipe = item
-        )
-    }
-}
+                    items(searchUiState.resultList) { item ->
+                        ResultCardTheme {
+                            ResultCard(
+                                onClick = {
+                                    viewModel.ChangeScreenState(SearchScreenState.Posts)
+                                },
+                                recipe = item
+                            )
+                        }
+                    }
                 }
             }
             SearchScreenState.Posts -> {
@@ -90,7 +92,7 @@ items(searchUiState.resultList) { item ->
                 )
             }
             SearchScreenState.Detail -> {
-                PostDetailsScreen(0) //TODO
+                PostDetailsScreen(Post()) //TODO
             }
         }
 

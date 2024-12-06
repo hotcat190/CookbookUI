@@ -1,4 +1,4 @@
-package com.example.androidcookbook.ui.features.recipedetail
+package com.example.androidcookbook.ui.features.post
 
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
@@ -46,8 +46,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.androidcookbook.R
+import com.example.androidcookbook.domain.model.post.Post
 import com.example.androidcookbook.ui.features.newsfeed.PostHeader
-import com.example.androidcookbook.ui.features.search.SamplePosts
+import com.example.androidcookbook.data.mocks.SamplePosts
 
 enum class DetailState {
     Description,
@@ -57,7 +58,8 @@ enum class DetailState {
 
 @Composable
 fun PostDetailsScreen(
-    id: Int,
+    post: Post,
+    modifier: Modifier = Modifier,
 ) {
     var state by remember { mutableStateOf(DetailState.Description) }
     var checkedStates = remember { mutableStateListOf(false, false, false) }
@@ -68,8 +70,8 @@ fun PostDetailsScreen(
     ) {
         item {
             PostHeader(
-                author = SamplePosts.posts[0].author,
-                createdAt = SamplePosts.posts[0].createdAt
+                author = post.author,
+                createdAt = post.createdAt
             )
             Column(
                 modifier = Modifier
@@ -88,6 +90,19 @@ fun PostDetailsScreen(
                         .clip(RoundedCornerShape(5)),
                     contentScale = ContentScale.Crop,
                 )
+//                AsyncImage(
+//                    model = ImageRequest.Builder(LocalContext.current)
+//                        .data(post.mainImage)
+//                        .crossfade(true)
+//                        .build(),
+//                    contentDescription = null,
+//                    modifier =
+//                    Modifier
+//                        .fillMaxWidth()
+//                        .height(200.dp)
+//                        .clip(RoundedCornerShape(5)),
+//                    contentScale = ContentScale.Crop,
+//                )
             }
             Row(
                 modifier = Modifier.fillMaxWidth()
@@ -121,7 +136,7 @@ fun PostDetailsScreen(
                 when (state) {
                     DetailState.Description -> {
                         Text(
-                            text = SamplePosts.posts[0].description,
+                            text = post.description,
                             style = TextStyle(
                                 fontSize = 24.sp,
                                 fontWeight = FontWeight(400),
@@ -131,6 +146,8 @@ fun PostDetailsScreen(
                     }
                     DetailState.Ingredient -> {
                         checkedStates.forEachIndexed { index, checked ->
+                            val ingredientText: String
+                                = post.ingredient?.get(index)?.name + " " + post.ingredient?.get(index)?.quantity
                             Row(
                                 verticalAlignment = Alignment.CenterVertically,
                                 modifier = Modifier.fillMaxWidth(),
@@ -139,7 +156,7 @@ fun PostDetailsScreen(
                                 Canvas(modifier = Modifier.size(12.dp)) {
                                     drawCircle(Color.Black)
                                 }
-                                Text(text = "Ingredient ${index + 1}", fontSize = 20.sp)
+                                Text(text = ingredientText, fontSize = 20.sp)
                                 Checkbox(
                                     checked = checked,
                                     onCheckedChange = { isChecked ->
@@ -154,7 +171,8 @@ fun PostDetailsScreen(
                     }
                     DetailState.Recipe -> {
                         Text(
-                            text = "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not.",
+                            text = post.steps ?: "",
+
                             style = TextStyle(
                                 fontSize = 24.sp,
                                 fontWeight = FontWeight(400),
@@ -214,6 +232,6 @@ fun LobsterTextButton(
 
 @Preview(showBackground = true)
 @Composable
-fun RecipePreview() {
-    PostDetailsScreen(0)
+fun PostDetailsPreview() {
+    PostDetailsScreen(SamplePosts.posts[0])
 }

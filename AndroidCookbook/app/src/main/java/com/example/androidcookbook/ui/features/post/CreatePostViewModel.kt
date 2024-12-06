@@ -6,9 +6,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.androidcookbook.data.repositories.PostRepository
 import com.example.androidcookbook.domain.model.post.PostCreateRequest
-import dagger.assisted.Assisted
-import dagger.assisted.AssistedFactory
-import dagger.assisted.AssistedInject
+import com.skydoves.sandwich.onFailure
+import com.skydoves.sandwich.onSuccess
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
@@ -19,11 +18,6 @@ import javax.inject.Inject
 class CreatePostViewModel @Inject constructor(
     private val postRepository: PostRepository,
 ) : ViewModel() {
-
-//    @AssistedFactory
-//    interface CreatePostViewModelFactory {
-//        fun create(accessToken: String): CreatePostViewModel
-//    }
 
     val postImageUri = MutableStateFlow<Uri?>(null)
     var postTitle = MutableStateFlow("")
@@ -41,12 +35,12 @@ class CreatePostViewModel @Inject constructor(
         postImageUri.update { uri }
     }
 
-    fun createPost() {
+    fun createPost(onSuccessNavigate: (Int) -> Unit) {
         viewModelScope.launch {
 //            val mainImage = imageRepository.uploadImage(postImage.value)
 
             try {
-                postRepository.createPost(
+                val response = postRepository.createPost(
                     PostCreateRequest(
                         title = postTitle.value,
                         description = postBody.value,
@@ -56,6 +50,11 @@ class CreatePostViewModel @Inject constructor(
                         steps = null,
                     )
                 )
+                response.onSuccess {
+                    onSuccessNavigate(data.post.id)
+                }.onFailure {
+                    //TODO
+                }
             } catch (e: Exception) {
                 Log.e("CreatePost", e.stackTraceToString())
             }
