@@ -40,12 +40,20 @@ fun OtpCodeScreen(
             placeholderText = "Otp Code",
             type = KeyboardType.Number,
             imeAction = ImeAction.Done,
-            onDone = onSubmit
+            onDone = {
+                if (otpCode.length == 6) {
+                    onSubmit()
+                }
+            }
         )
         Spacer(Modifier.height(5.dp))
         //TODO: Submit button
         SignButton(
-            onClick = onSubmit,
+            onClick = {
+                if (otpCode.length == 6) {
+                    onSubmit()
+                }
+            },
             actionText = "Continue"
         )
 

@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Text
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -41,7 +42,7 @@ fun AppLogo() {
                 fontSize = 40.sp,
                 fontFamily = FontFamily(Font(R.font.lobster_regular)),
                 fontWeight = FontWeight(400),
-                color = Color(0xFFFFFFFF),
+                color = MaterialTheme.colorScheme.primary,
             )
         )
     }

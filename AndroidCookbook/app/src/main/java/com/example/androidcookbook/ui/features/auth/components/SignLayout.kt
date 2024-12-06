@@ -12,47 +12,58 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.example.androidcookbook.ui.features.auth.theme.SignLayoutTheme
 
 @Composable
 fun SignLayout(
     modifier: Modifier = Modifier,
     content: @Composable () -> Unit,
 ) {
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(color = Color(0xFF251404))
-            .verticalScroll(rememberScrollState())
-    ) {
-        // Background and layout setup
-        Canvas(modifier = Modifier.fillMaxSize()) {
-            drawOval(
-                color = Color(0xFF4F3423),
-                topLeft = Offset(-215f, -290f),
-                size = Size(1500f, 750f)
-            )
-        }
-
-        Column(
+    SignLayoutTheme {
+        Box(
             modifier = Modifier
-                .wrapContentWidth()
-                .fillMaxHeight()
-                .padding(11.dp)
-                .align(Alignment.TopCenter)
-                .offset(y = 70.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(15.dp)
+                .fillMaxSize()
+                .background(color = MaterialTheme.colorScheme.background)
+                .verticalScroll(rememberScrollState())
         ) {
-            AppLogo()
+            val ovalColor = MaterialTheme.colorScheme.onBackground
+            // Background and layout setup
+            Canvas(modifier = Modifier.fillMaxSize()) {
+                drawOval(
+                    color = ovalColor,
+                    topLeft = Offset(-215f, -290f),
+                    size = Size(1500f, 750f)
+                )
+            }
 
-            content()
+            Column(
+                modifier = Modifier
+                    .wrapContentWidth()
+                    .fillMaxHeight()
+                    .padding(11.dp)
+                    .align(Alignment.TopCenter)
+                    .offset(y = 70.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(15.dp)
+            ) {
+                AppLogo()
+
+                content()
+            }
         }
     }
+}
+
+@Preview
+@Composable
+fun LayoutPreview() {
+    SignLayout {  }
 }

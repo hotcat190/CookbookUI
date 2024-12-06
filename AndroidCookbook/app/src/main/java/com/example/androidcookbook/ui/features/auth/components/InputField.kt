@@ -1,12 +1,16 @@
 package com.example.androidcookbook.ui.features.auth.components
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material.Text
 import androidx.compose.material.TextField
 import androidx.compose.material.TextFieldDefaults
@@ -17,6 +21,7 @@ import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material.icons.outlined.Lock
 import androidx.compose.material.icons.outlined.Visibility
 import androidx.compose.material.icons.outlined.VisibilityOff
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -29,6 +34,7 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
@@ -130,27 +136,16 @@ private fun BaseTextField(
     modifier: Modifier = Modifier,
     visualTransformation: VisualTransformation = VisualTransformation.None,
     trailingIcon: @Composable (() -> Unit)? = null,
-    keyboardType: KeyboardType,
-    imeAction: ImeAction,
-    onDone: () -> Unit
+    keyboardType: KeyboardType = KeyboardType.Text,
+    imeAction: ImeAction = ImeAction.Done,
+    onDone: () -> Unit = {}
 ) {
-    TextField(
-        modifier = modifier
-            .background(
-                color = Color(0xFFD1CACB),
-                shape = RoundedCornerShape(size = 30.dp)
-            )
-            .width(325.dp),
+    OutlinedTextField(
+        modifier = modifier,
         value = text,
         onValueChange = onChange,
-        placeholder = { Text(text = placeholderText) },
+        label = { Text(text = placeholderText) },
         textStyle = TextStyle.Default.copy(fontSize = 20.sp),
-        colors = TextFieldDefaults.textFieldColors(
-            disabledTextColor = Color.Transparent,
-            focusedIndicatorColor = Color.Transparent,
-            unfocusedIndicatorColor = Color.Transparent,
-            disabledIndicatorColor = Color.Transparent
-        ),
         visualTransformation = visualTransformation,
         keyboardOptions = KeyboardOptions(keyboardType = keyboardType, imeAction = imeAction),
         trailingIcon = trailingIcon,
@@ -160,5 +155,15 @@ private fun BaseTextField(
                 onDone()
             }
         )
+    )
+}
+
+@Preview
+@Composable
+fun BaseTextPreview() {
+    BaseTextField(
+        text = "",
+        onChange = {},
+        placeholderText = "Email *",
     )
 }
