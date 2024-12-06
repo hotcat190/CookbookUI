@@ -14,6 +14,6 @@ data class Post(
     val totalComment: Int = 0,
     val totalLike: Int = 0,
     val ingredient: List<Ingredient>? = null,
-    val steps: String? = null,
+    val steps: List<String>? = null,
     val createdAt: String = "",
 )

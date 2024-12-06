@@ -20,7 +20,9 @@ object SamplePosts {
             ingredient = listOf(
                 Ingredient("Ingredient1", "Quantity 1")
             ),
-            steps = "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard.",
+            steps = listOf(
+                "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard.",
+            )
         ),
         Post(
             id = 0,
@@ -33,8 +35,12 @@ object SamplePosts {
             totalView = 0,
             totalLike = 0,
             totalComment = 0,
-            ingredient = null,
-            steps = null,
+            ingredient = listOf(
+                Ingredient("Ingredient1", "Quantity 1")
+            ),
+            steps = listOf(
+                "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard.",
+            )
         ),
         Post(
             id = 0,
@@ -47,8 +53,12 @@ object SamplePosts {
             totalView = 0,
             totalLike = 0,
             totalComment = 0,
-            ingredient = null,
-            steps = null,
+            ingredient = listOf(
+                Ingredient("Ingredient1", "Quantity 1")
+            ),
+            steps = listOf(
+                "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard.",
+            )
         ),
         Post(
             id = 0,
@@ -61,8 +71,12 @@ object SamplePosts {
             totalView = 0,
             totalLike = 0,
             totalComment = 0,
-            ingredient = null,
-            steps = null,
+            ingredient = listOf(
+                Ingredient("Ingredient1", "Quantity 1")
+            ),
+            steps = listOf(
+                "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard.",
+            )
         ),
         Post(
             id = 0,
@@ -75,8 +89,12 @@ object SamplePosts {
             totalView = 0,
             totalLike = 0,
             totalComment = 0,
-            ingredient = null,
-            steps = null,
-        )
+            ingredient = listOf(
+                Ingredient("Ingredient1", "Quantity 1")
+            ),
+            steps = listOf(
+                "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard.",
+            )
+        ),
     )
 }

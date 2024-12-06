@@ -32,6 +32,7 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -63,7 +64,15 @@ fun PostDetailsScreen(
     modifier: Modifier = Modifier,
 ) {
     var state by remember { mutableStateOf(DetailState.Description) }
-    var checkedStates = remember { mutableStateListOf(false, false, false) }
+    var checkedStates: SnapshotStateList<Boolean> = remember {
+        mutableStateListOf<Boolean>()
+    }
+    checkedStates.addAll(
+        List(
+            size = post.ingredient?.size ?: 0,
+            init = {false}
+        )
+    )
     LazyColumn(
         modifier = Modifier
             .fillMaxWidth()
@@ -175,8 +184,9 @@ fun PostDetailsScreen(
                                 modifier = Modifier.fillMaxWidth(),
                                 horizontalArrangement = Arrangement.SpaceBetween
                             ) {
+                                val bulletColor = MaterialTheme.colorScheme.secondary
                                 Canvas(modifier = Modifier.size(12.dp)) {
-                                    drawCircle(Color.Black)
+                                    drawCircle(bulletColor)
                                 }
                                 Text(
                                     text = ingredientText,
@@ -200,15 +210,17 @@ fun PostDetailsScreen(
                     }
 
                     DetailState.Recipe -> {
-                        Text(
-                            text = post.steps ?: "",
-
-                            style = TextStyle(
-                                fontSize = 24.sp,
-                                fontWeight = FontWeight(400),
-                                color = MaterialTheme.colorScheme.secondary,
+                        post.steps?.forEachIndexed {index, stepText ->
+                            Text(
+                                text = "${index+1}. $stepText\n",
+                                style = TextStyle(
+                                    fontSize = 24.sp,
+                                    fontWeight = FontWeight(400),
+                                    color = MaterialTheme.colorScheme.secondary,
+                                )
                             )
-                        )
+                        }
+
                     }
                 }
             }
