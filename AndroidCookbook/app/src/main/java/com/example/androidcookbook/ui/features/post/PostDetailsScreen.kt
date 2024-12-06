@@ -24,6 +24,7 @@ import androidx.compose.material.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material.icons.outlined.Share
 import androidx.compose.runtime.Composable
@@ -39,6 +40,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
@@ -47,6 +49,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import coil.compose.AsyncImage
+import coil.request.ImageRequest
 import com.example.androidcookbook.R
 import com.example.androidcookbook.domain.model.post.Post
 import com.example.androidcookbook.ui.features.newsfeed.PostHeader
@@ -61,10 +65,12 @@ enum class DetailState {
 @Composable
 fun PostDetailsScreen(
     post: Post,
+    isLiked: Boolean,
+    onLikedClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     var state by remember { mutableStateOf(DetailState.Description) }
-    var checkedStates: SnapshotStateList<Boolean> = remember {
+    val checkedStates: SnapshotStateList<Boolean> = remember {
         mutableStateListOf<Boolean>()
     }
     checkedStates.addAll(
@@ -90,21 +96,8 @@ fun PostDetailsScreen(
                     .padding(15.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Image(
-                    painter = painterResource(id = R.drawable.image_4),
-                    contentDescription = null,
-                    modifier =
-                    Modifier
-                        .fillMaxWidth()
-                        .height(200.dp)
-                        .clip(RoundedCornerShape(5)),
-                    contentScale = ContentScale.Crop,
-                )
-//                AsyncImage(
-//                    model = ImageRequest.Builder(LocalContext.current)
-//                        .data(post.mainImage)
-//                        .crossfade(true)
-//                        .build(),
+//                Image(
+//                    painter = painterResource(id = R.drawable.image_4),
 //                    contentDescription = null,
 //                    modifier =
 //                    Modifier
@@ -113,14 +106,36 @@ fun PostDetailsScreen(
 //                        .clip(RoundedCornerShape(5)),
 //                    contentScale = ContentScale.Crop,
 //                )
+                AsyncImage(
+                    model = ImageRequest.Builder(LocalContext.current)
+                        .data(post.mainImage)
+                        .crossfade(true)
+                        .build(),
+                    contentDescription = null,
+                    modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .height(200.dp)
+                        .clip(RoundedCornerShape(5)),
+                    contentScale = ContentScale.Crop,
+                )
             }
             Row(
                 modifier = Modifier.fillMaxWidth()
             ) {
-                OutlinedIconButton(icon = Icons.Outlined.FavoriteBorder) {
+                // Like button
+                OutlinedIconButton(
+                    icon = (
+                        if (isLiked) {
+                            Icons.Filled.Favorite
+                        } else {
+                            Icons.Outlined.FavoriteBorder
+                        }
+                    ),
+                    onclick = onLikedClick
+                )
 
-                }
-
+                // Chat button
                 IconButton(onClick = {}) {
                     if (isSystemInDarkTheme()) {
 
@@ -141,6 +156,8 @@ fun PostDetailsScreen(
                     }
                 }
                 Spacer(modifier = Modifier.weight(1f))
+
+                // Share button
                 OutlinedIconButton(icon = Icons.Outlined.Share) {
 
                 }
@@ -276,5 +293,5 @@ fun LobsterTextButton(
 @Preview(showBackground = true)
 @Composable
 fun PostDetailsPreview() {
-    PostDetailsScreen(SamplePosts.posts[0])
+    PostDetailsScreen(SamplePosts.posts[0], false, {})
 }

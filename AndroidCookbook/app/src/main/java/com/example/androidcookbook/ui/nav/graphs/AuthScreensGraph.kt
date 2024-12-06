@@ -55,117 +55,129 @@ fun NavGraphBuilder.authScreens(navController: NavController, updateAppBar: () -
             }
         }
         composable<Routes.Auth.Register> {
-            updateAppBar()
-            val authViewModel: AuthViewModel = sharedViewModel(it, navController, Routes.Auth)
-            RegisterScreen(
-                authViewModel = authViewModel,
-                onNavigateToSignIn = {
-                    navController.navigate(Routes.Auth.Login)
-                },
-            )
+            SignTheme {
+                updateAppBar()
+                val authViewModel: AuthViewModel = sharedViewModel(it, navController, Routes.Auth)
+                RegisterScreen(
+                    authViewModel = authViewModel,
+                    onNavigateToSignIn = {
+                        navController.navigate(Routes.Auth.Login)
+                    },
+                )
+            }
         }
         navigation<Routes.Auth.ForgotPassword>(
             startDestination = Routes.Auth.ForgotPassword.Screen
         ) {
             composable<Routes.Auth.ForgotPassword.Screen> {
-                updateAppBar()
+                SignTheme {
+                    updateAppBar()
 
-                val forgotPasswordViewModel: ForgotPasswordViewModel = sharedViewModel(it, navController, Routes.Auth.ForgotPassword)
-                val email = forgotPasswordViewModel.email.collectAsState().value
+                    val forgotPasswordViewModel: ForgotPasswordViewModel =
+                        sharedViewModel(it, navController, Routes.Auth.ForgotPassword)
+                    val email = forgotPasswordViewModel.email.collectAsState().value
 
-                ForgotPasswordScreen(
-                    email = email,
-                    onEmailChanged = { newEmail ->
-                        forgotPasswordViewModel.updateEmail(newEmail)
-                    },
-                    onSubmit = {
-                        forgotPasswordViewModel.submitEmail()
-                        //navController.navigate(Routes.Auth.ForgotPassword.Reset)
-                    },
-                    onNavigateToSignIn = {
-                        navController.navigate(Routes.Auth.Login)
-                    }
-                )
-                val openDialog = forgotPasswordViewModel.openDialog.collectAsState().value
-                val dialogMessage = forgotPasswordViewModel.dialogMessage.collectAsState().value
-                val success = forgotPasswordViewModel.successSubmit.collectAsState().value
-                if (openDialog) {
-                    MinimalDialog(
-                        dialogMessage = dialogMessage,
-                        onDismissRequest = {
-                            forgotPasswordViewModel.updateOpenDialog(false)
-                            if (success) {
-                                navController.navigate(Routes.Auth.ForgotPassword.Otp)
-                                forgotPasswordViewModel.updateSuccessSubmit(false)
+                    ForgotPasswordScreen(
+                        email = email,
+                        onEmailChanged = { newEmail ->
+                            forgotPasswordViewModel.updateEmail(newEmail)
+                        },
+                        onSubmit = {
+                            forgotPasswordViewModel.submitEmail()
+                            //navController.navigate(Routes.Auth.ForgotPassword.Reset)
+                        },
+                        onNavigateToSignIn = {
+                            navController.navigate(Routes.Auth.Login)
+                        }
+                    )
+                    val openDialog = forgotPasswordViewModel.openDialog.collectAsState().value
+                    val dialogMessage = forgotPasswordViewModel.dialogMessage.collectAsState().value
+                    val success = forgotPasswordViewModel.successSubmit.collectAsState().value
+                    if (openDialog) {
+                        MinimalDialog(
+                            dialogMessage = dialogMessage,
+                            onDismissRequest = {
+                                forgotPasswordViewModel.updateOpenDialog(false)
+                                if (success) {
+                                    navController.navigate(Routes.Auth.ForgotPassword.Otp)
+                                    forgotPasswordViewModel.updateSuccessSubmit(false)
+                                }
                             }
+                        )
+                    }
+                }
+            }
+            composable<Routes.Auth.ForgotPassword.Otp> {
+                SignTheme {
+                    updateAppBar()
+
+                    val forgotPasswordViewModel: ForgotPasswordViewModel =
+                        sharedViewModel(it, navController, Routes.Auth.ForgotPassword)
+                    val otpCode = forgotPasswordViewModel.otpCode.collectAsState().value
+
+                    OtpCodeScreen(
+                        otpCode = otpCode,
+                        onOtpCodeChange = { newOtpCode ->
+                            forgotPasswordViewModel.updateOtpCode(newOtpCode)
+                        },
+                        onSubmit = {
+                            forgotPasswordViewModel.submitOtpRequest()
+                            navController.navigate(Routes.Auth.ForgotPassword.Reset)
+                        },
+                        onNavigateToEmail = {
+                            navController.navigate(Routes.Auth.ForgotPassword.Screen)
+                        },
+                        onNavigateToSignIn = {
+                            navController.navigate(Routes.Auth.Login)
+                        },
+                        onGoBack = {
+                            navController.navigateUp()
                         }
                     )
                 }
             }
-            composable<Routes.Auth.ForgotPassword.Otp> {
-                updateAppBar()
-
-                val forgotPasswordViewModel: ForgotPasswordViewModel = sharedViewModel(it, navController, Routes.Auth.ForgotPassword)
-                val otpCode = forgotPasswordViewModel.otpCode.collectAsState().value
-
-                OtpCodeScreen(
-                    otpCode = otpCode,
-                    onOtpCodeChange = { newOtpCode ->
-                        forgotPasswordViewModel.updateOtpCode(newOtpCode)
-                    },
-                    onSubmit = {
-                        forgotPasswordViewModel.submitOtpRequest()
-                        navController.navigate(Routes.Auth.ForgotPassword.Reset)
-                    },
-                    onNavigateToEmail = {
-                        navController.navigate(Routes.Auth.ForgotPassword.Screen)
-                    },
-                    onNavigateToSignIn = {
-                        navController.navigate(Routes.Auth.Login)
-                    },
-                    onGoBack = {
-                        navController.navigateUp()
-                    }
-                )
-            }
             composable<Routes.Auth.ForgotPassword.Reset> {
-                updateAppBar()
+                SignTheme {
+                    updateAppBar()
 
-                val forgotPasswordViewModel: ForgotPasswordViewModel = sharedViewModel(it, navController, Routes.Auth.ForgotPassword)
-                val password = forgotPasswordViewModel.password.collectAsState().value
-                val retypePassword = forgotPasswordViewModel.retypePassword.collectAsState().value
+                    val forgotPasswordViewModel: ForgotPasswordViewModel =
+                        sharedViewModel(it, navController, Routes.Auth.ForgotPassword)
+                    val password = forgotPasswordViewModel.password.collectAsState().value
+                    val retypePassword =
+                        forgotPasswordViewModel.retypePassword.collectAsState().value
 
-                ResetPasswordScreen(
-                    password = password,
-                    onPasswordChange = { newPassword ->
-                        forgotPasswordViewModel.updatePassword(newPassword)
-                    },
-                    retypePassword = retypePassword,
-                    onRetypePasswordChange = { newRetypePassword ->
-                        forgotPasswordViewModel.updateRetypePassword(newRetypePassword)
-                    },
-                    onSubmit = {
-                        forgotPasswordViewModel.submitPasswordResetRequest()
-                    },
-                    onNavigateToSignIn = {
-                        navController.navigate(Routes.Auth.Login)
-                    }
-                )
-
-                val openDialog = forgotPasswordViewModel.openDialog.collectAsState().value
-                val dialogMessage = forgotPasswordViewModel.dialogMessage.collectAsState().value
-                val success = forgotPasswordViewModel.successSubmit.collectAsState().value
-                if (openDialog) {
-                    MinimalDialog(
-                        dialogMessage = dialogMessage,
-                        onDismissRequest = {
-                            forgotPasswordViewModel.updateOpenDialog(false)
-                            if (success) {
-                                navController.navigate(Routes.Auth.Login)
-                                forgotPasswordViewModel.updateSuccessSubmit(false)
-                            }
+                    ResetPasswordScreen(
+                        password = password,
+                        onPasswordChange = { newPassword ->
+                            forgotPasswordViewModel.updatePassword(newPassword)
+                        },
+                        retypePassword = retypePassword,
+                        onRetypePasswordChange = { newRetypePassword ->
+                            forgotPasswordViewModel.updateRetypePassword(newRetypePassword)
+                        },
+                        onSubmit = {
+                            forgotPasswordViewModel.submitPasswordResetRequest()
+                        },
+                        onNavigateToSignIn = {
+                            navController.navigate(Routes.Auth.Login)
                         }
                     )
+
+                    val openDialog = forgotPasswordViewModel.openDialog.collectAsState().value
+                    val dialogMessage = forgotPasswordViewModel.dialogMessage.collectAsState().value
+                    val success = forgotPasswordViewModel.successSubmit.collectAsState().value
+                    if (openDialog) {
+                        MinimalDialog(
+                            dialogMessage = dialogMessage,
+                            onDismissRequest = {
+                                forgotPasswordViewModel.updateOpenDialog(false)
+                                if (success) {
+                                    navController.navigate(Routes.Auth.Login)
+                                    forgotPasswordViewModel.updateSuccessSubmit(false)
+                                }
+                            }
+                        )
+                    }
                 }
             }
         }

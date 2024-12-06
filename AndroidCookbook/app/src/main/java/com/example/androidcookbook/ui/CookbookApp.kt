@@ -3,7 +3,6 @@ package com.example.androidcookbook.ui
 import android.app.Activity
 import android.graphics.Color
 import android.util.Log
-import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -12,7 +11,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -39,6 +37,7 @@ import com.example.androidcookbook.ui.features.post.CreatePostScreen
 import com.example.androidcookbook.ui.features.post.CreatePostViewModel
 import com.example.androidcookbook.ui.features.post.PostDetailsScreen
 import com.example.androidcookbook.ui.features.post.PostDetailsViewModel
+import com.example.androidcookbook.ui.features.post.PostUiState
 import com.example.androidcookbook.ui.features.search.SearchScreen
 import com.example.androidcookbook.ui.features.search.SearchViewModel
 import com.example.androidcookbook.ui.nav.CustomNavTypes
@@ -149,12 +148,14 @@ fun CookbookApp(
                 viewModel.updateBottomBarState(CookbookUiState.BottomBarState.NoBottomBar)
                 viewModel.updateCanNavigateBack(true)
                 viewModel.updateTopBarState(CookbookUiState.TopBarState.Custom {
-                    SearchBar(
-                        onSearch = { searchViewModel.search(it) },
-                        navigateBackAction = {
-                            navController.navigateUp()
-                        },
-                    )
+                    AppBarTheme {
+                        SearchBar(
+                            onSearch = { searchViewModel.search(it) },
+                            navigateBackAction = {
+                                navController.navigateUp()
+                            },
+                        )
+                    }
                 })
                 SearchScreen(
                     viewModel = searchViewModel,
@@ -217,11 +218,23 @@ fun CookbookApp(
                     factory.create(postRoute.post)
                 }
 
-                val post = postDetailsViewModel.post.collectAsState().value
-
-                PostDetailsScreen(post)
-
-
+                when (val postUiState = postDetailsViewModel.postUiState.collectAsState().value) {
+                    is PostUiState.Success -> {
+                        PostDetailsScreen(
+                            post = postUiState.post,
+                            isLiked = postDetailsViewModel.isLiked.collectAsState().value,
+                            onLikedClick = {
+                                postDetailsViewModel.toggleLike()
+                            }
+                        )
+                    }
+                    is PostUiState.Error -> {
+                        // TODO
+                    }
+                    is PostUiState.Loading -> {
+                        // TODO
+                    }
+                }
             }
         }
     }

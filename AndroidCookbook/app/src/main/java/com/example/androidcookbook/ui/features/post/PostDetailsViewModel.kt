@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.androidcookbook.data.repositories.PostRepository
 import com.example.androidcookbook.domain.model.post.Post
+import com.skydoves.sandwich.message
 import com.skydoves.sandwich.onFailure
 import com.skydoves.sandwich.onSuccess
 import dagger.assisted.Assisted
@@ -26,22 +27,73 @@ class PostDetailsViewModel @AssistedInject constructor(
         fun create(post: Post): PostDetailsViewModel
     }
 
-    var post: MutableStateFlow<Post> = MutableStateFlow(_post)
+    var postUiState: MutableStateFlow<PostUiState> = MutableStateFlow(PostUiState.Loading)
+        private set
+
+    var isLiked: MutableStateFlow<Boolean> = MutableStateFlow(false)
         private set
 
     init {
         getPost()
+        queryPostLike(_post.id)
     }
 
     private fun getPost() {
         viewModelScope.launch {
-            val response = postRepository.getPost(post.value.id)
+            val response = postRepository.getPost(_post.id)
             response.onSuccess {
-                post.update { data }
+                postUiState.update { PostUiState.Success(post = data) }
             }.onFailure {
-                //TODO
+                postUiState.update { PostUiState.Error(message = message()) }
             }
             Log.d("PostDetails", response.toString())
         }
     }
+
+    private fun queryPostLike(postId: Int) {
+        viewModelScope.launch {
+            val response = postRepository.queryPostLike(postId)
+            response.onSuccess {
+                isLiked.update { true }
+            }.onFailure {
+                isLiked.update { false }
+                Log.d("PostDetails", message())
+            }
+        }
+    }
+
+    private fun likePost() {
+        viewModelScope.launch {
+            val response = postRepository.likePost(_post.id)
+            response.onSuccess {
+                isLiked.update { true }
+            }
+        }
+    }
+
+    private fun unlikePost() {
+        viewModelScope.launch {
+            val response = postRepository.unlikePost(_post.id)
+            response.onSuccess {
+                isLiked.update { false }
+            }
+        }
+    }
+
+    fun toggleLike() {
+        if (isLiked.value) {
+            unlikePost()
+        } else {
+            likePost()
+        }
+        isLiked.update { !it }
+    }
+
+
+}
+
+sealed class PostUiState {
+    data class Success(val post: Post) : PostUiState()
+    data class Error(val message: String) : PostUiState()
+    data object Loading : PostUiState()
 }

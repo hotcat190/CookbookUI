@@ -36,7 +36,7 @@ private val DarkColorScheme = darkColorScheme(
 //    primaryContainer = Color.Transparent,
     onSecondary = Dark.OnSecondary,
 
-    )
+)
 
 private val LightColorScheme = lightColorScheme(
     primary = Light.Primary,
