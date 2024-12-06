@@ -78,10 +78,10 @@ fun CookbookApp(
             when (uiState.bottomBarState) {
                 is CookbookUiState.BottomBarState.NoBottomBar -> {}
                 is CookbookUiState.BottomBarState.Default -> CookbookBottomNavigationBar(
-                    onHomeClick = {
+                    onCategoryClick = {
                         navController.navigateIfNotOn(Routes.App.Category)
                     },
-                    onChatClick = {
+                    onAiChatClick = {
                         navController.navigateIfNotOn(Routes.App.AIChat)
                     },
                     onNewsfeedClick = {
@@ -89,6 +89,9 @@ fun CookbookApp(
                     },
                     onUserProfileClick = {
                         navController.navigateIfNotOn(Routes.App.UserProfile(currentUser.id))
+                    },
+                    onCreatePostClick = {
+                        navController.navigateIfNotOn(Routes.CreatePost)
                     },
                     currentDestination = currentDestination
                 )
