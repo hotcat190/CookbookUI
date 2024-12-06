@@ -124,7 +124,20 @@ export class AuthController {
   async getUserProfile(@Param('userId') userId: number) {
     return this.authService.getProfileByUserId(userId);
   }
-
+  @Get('search/username/:username/:page')
+  @ApiOperation({ summary: 'Tìm kiếm người dùng theo username' })
+  @ApiResponse({ status: 200, description: 'Tìm kiếm thành công' })
+  @ApiResponse({ status: 404, description: 'Err' })
+  async searchUserByUsername(@Param('username') username: string, @Param('page') page: number) {
+    return this.authService.searchUserByUsername(username, page);
+  }
+  @Get('search/name/:name/:page')
+  @ApiOperation({ summary: 'Tìm kiếm người dùng theo name' })
+  @ApiResponse({ status: 200, description: 'Thông tin hồ sơ người dùng' })
+  @ApiResponse({ status: 404, description: 'Err' })
+  async searchUserByName(@Param('name') name: string, @Param('page') page: number) {
+    return this.authService.searchUserByName(name, page);
+  }
   /*
   @Post('profile/uploadImage')
   @UseInterceptors(
@@ -176,5 +189,5 @@ export class AuthController {
     console.log("ok");
     return await this.authService.sendImageToAI(file.buffer);
   }
-      
+
 }

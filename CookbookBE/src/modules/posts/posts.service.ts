@@ -3,7 +3,7 @@ import { Injectable, NotFoundException, ForbiddenException, BadRequestException 
 import { InjectRepository } from '@nestjs/typeorm';
 import { Post } from './entities/post.entity';
 import { Comment } from './entities/comment.entity';
-import { Repository } from 'typeorm';
+import { Like, Repository } from 'typeorm';
 import { CreateCommentDto, CreatePostDto, FullReponseCommentDto, FullReponsePostDto, LiteReponsePostDto, ReponseUserDto } from './dtos/create-post.dto';
 import { UpdatePostDto } from './dtos/update-post.dto';
 import { User } from '../auth/entities/user.entity';
@@ -151,7 +151,44 @@ export class PostsService {
     await this.postsRepository.save(post);
     return { message: 'Đã bỏ thích bài viết.', totalLike: post.totalLike };
   }
-  
+  async searchAll(query: string): Promise<any> {
+    const posts = await this.postsRepository.find({
+      where: [
+        { title: Like(`%${query}%`) },
+        { description: Like(`%${query}%`) },
+      ],
+      take: 10,
+    });
+    const users = await this.usersRepository.find({
+      where: [
+        { username: Like(`%${query}%`) },
+        { name: Like(`%${query}%`) },
+      ],
+      take: 10,
+      relations: ['followers', 'following'],
+    });
+
+    return {
+      posts: posts.map(post => new LiteReponsePostDto(post)),
+      users: users.map(user => new ReponseUserDto(user)),
+    };
+  }
+  async searchPost(query: string, page: number): Promise<any> {
+    const posts = await this.postsRepository.find({
+      where: [
+        { title: Like(`%${query}%`) },
+        { description: Like(`%${query}%`) },
+      ],
+    });
+    const itemsPerPage = 10;
+    const startIndex = (page - 1) * itemsPerPage;
+    if (posts.length > itemsPerPage*page) {
+      return {nextPage: "true", posts: posts.slice(startIndex, startIndex + itemsPerPage).map(post => new LiteReponsePostDto(post))};
+    }
+    else{
+      return {nextPage: "false", posts: posts.slice(startIndex, startIndex + itemsPerPage).map(post => new LiteReponsePostDto(post))};
+    }
+  }
   async getNewsfeed(userId: number, limit: number): Promise<any> {
     const currentTime = new Date();
     const posts = await this.postsRepository.find();

@@ -6,14 +6,14 @@ import { ForgotDto } from './dtos/forgot.dto';
 import { ResetPassword1Dto, ResetPassword2Dto } from './dtos/reset-password.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './entities/user.entity';
-import { Repository } from 'typeorm';
+import { Like, Repository } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
 import { MailerService } from '../mailer/mailer.service';
 import { v4 as uuidv4 } from 'uuid';
 import { UpdateProfileDto } from './dtos/update-profile.dto';
 import { Post } from '../posts/entities/post.entity';
-import { FullReponsePostDto, LiteReponsePostDto, ReponseUserDto } from '../posts/dtos/create-post.dto';
+import { FullReponsePostDto, LiteReponsePostDto, ReponseUserDto, ReponseUserProfileDto } from '../posts/dtos/create-post.dto';
 import { ChangePasswordDto } from './dtos/change-password.dto';
 import { v2 as cloudinary } from 'cloudinary';
 import { Readable } from 'stream';
@@ -241,7 +241,40 @@ export class AuthService {
     return { userId: id, bio, name, avatar, totalFollowers, totalFollowing };
 
   }
-
+  async searchUserByUsername(username: string, page: number): Promise<any> {
+    const users = await this.usersRepository.find
+    ({
+      where: {
+        username: Like(`%${username}%`)
+      },
+      relations: ['followers', 'following'],
+    })
+    const itemsPerPage = 10;
+    const startIndex = (page - 1) * itemsPerPage;
+    if (users.length > itemsPerPage*page) {
+      return {nextPage: "true", users: users.slice(startIndex, startIndex + itemsPerPage).map(user => new ReponseUserProfileDto(user, user.followers.length, user.following.length))};
+    }
+    else{
+      return {nextPage: "false", users: users.slice(startIndex, startIndex + itemsPerPage).map(user => new ReponseUserProfileDto(user, user.followers.length, user.following.length))};
+    }
+  }
+  async searchUserByName(name: string, page: number): Promise<any> {
+    const users = await this.usersRepository.find
+    ({
+      where: {
+        name: Like(`%${name}%`)
+      },
+      relations: ['followers', 'following'],
+    })
+    const itemsPerPage = 10;
+    const startIndex = (page - 1) * itemsPerPage;
+    if (users.length > itemsPerPage*page) {
+      return {nextPage: "true", users: users.slice(startIndex, startIndex + itemsPerPage).map(user => new ReponseUserProfileDto(user, user.followers.length, user.following.length))};
+    }
+    else{
+      return {nextPage: "false", users: users.slice(startIndex, startIndex + itemsPerPage).map(user => new ReponseUserProfileDto(user, user.followers.length, user.following.length))};
+    }
+  }
   async addToFavorites(postId: any, userId: number): Promise<any> {
     const user = await this.usersRepository.createQueryBuilder('user')
       .leftJoinAndSelect('user.favorites', 'favorites')

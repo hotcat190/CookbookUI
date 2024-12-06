@@ -29,6 +29,21 @@ import {
     getPostByUserId(@Param('userId') userId: number) {
       return this.postsService.getPostByUserId(userId);
     }
+    @Get('search/all/:query')
+    @ApiOperation({ summary: 'Tìm kiếm bài viết và người dùng' })
+    @ApiResponse({ status: 200, description: 'Bài viết và Người dùng' })
+    @ApiResponse({ status: 404, description: 'Err' })
+    async searchAll(@Param('query') query: string) {
+      return this.postsService.searchAll(query);
+    }
+    @Get('search/post/:post/:page')
+    @ApiOperation({ summary: 'Tìm kiếm bài viết' })
+    @ApiResponse({ status: 200, description: 'Bài viết' })
+    @ApiResponse({ status: 404, description: 'Err' })
+    async searchPost(@Param('post') query: string, @Param('page') page: number) {
+      return this.postsService.searchPost(query, page);
+    }
+
     @ApiBearerAuth()
     @UseGuards(JwtAuthGuard)
     @Get('newsfeed/:limit')
@@ -154,13 +169,6 @@ import {
       return this.postsService.deleteComment(commentId, req.user.id);
     }
 
-    @ApiBearerAuth()
-    @UseGuards(JwtAuthGuard)
-    @Post('recipe/')
-    @ApiOperation({ summary: 'Tìm công thức' })
-    @ApiResponse({ status: 200, description: 'Tìm công thức thành công' })
-    createRecipe(@Body('commentId') commentId: number, @Request() req) {
-      return this.postsService.deleteComment(commentId, req.user.id);
-    }
+    
 }
   
