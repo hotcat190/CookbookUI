@@ -4,6 +4,7 @@ import com.example.androidcookbook.data.network.AuthService
 import com.example.androidcookbook.domain.model.auth.ForgotPasswordRequest
 import com.example.androidcookbook.domain.model.auth.RegisterRequest
 import com.example.androidcookbook.domain.model.auth.RegisterResponse
+import com.example.androidcookbook.domain.model.auth.ResetPasswordRequest
 import com.example.androidcookbook.domain.model.auth.SignInRequest
 import com.example.androidcookbook.domain.model.auth.SignInResponse
 import com.skydoves.sandwich.ApiResponse
@@ -24,6 +25,7 @@ class AuthRepository @Inject constructor(
     suspend fun sendForgotPasswordRequest(forgotPasswordRequest: ForgotPasswordRequest)
         = authService.sendForgotPasswordRequest(forgotPasswordRequest)
 
-
+    suspend fun sendPasswordResetRequest(resetPasswordRequest: ResetPasswordRequest)
+        = authService.sendResetPasswordRequest(resetPasswordRequest)
 }
 

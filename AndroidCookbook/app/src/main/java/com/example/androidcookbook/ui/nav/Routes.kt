@@ -4,31 +4,34 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 object Routes {
+
     @Serializable
     object Auth {
         @Serializable
-        data object Login
+        object Login
+
         @Serializable
-        data object Register
+        object Register
+
         @Serializable
-        data object ForgotPassword {
+        object ForgotPassword {
             @Serializable
-            data object Screen
+            object Screen
             @Serializable
-            data object Otp
+            object Otp
             @Serializable
-            data object Reset
+            object Reset
         }
     }
 
     @Serializable
     object App {
         @Serializable
-        data object Category
+        object Category
         @Serializable
-        data object AIChef
+        object AIChat
         @Serializable
-        data object Newsfeed
+        object Newsfeed
         @Serializable
         data class UserProfile(val id: Int)
         @Serializable
@@ -36,9 +39,9 @@ object Routes {
     }
 
     @Serializable
-    data object Search
+    object Search
     @Serializable
-    data object CreatePost
+    object CreatePost
 
     @Serializable
     object DialogDestination
