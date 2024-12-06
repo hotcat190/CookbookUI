@@ -2,7 +2,9 @@ package com.example.androidcookbook.domain.model.post
 
 import com.example.androidcookbook.domain.model.ingredient.Ingredient
 import com.example.androidcookbook.domain.model.user.User
+import kotlinx.serialization.Serializable
 
+@Serializable
 data class Post(
     val id: Int = 0,
     val author: User = User(),

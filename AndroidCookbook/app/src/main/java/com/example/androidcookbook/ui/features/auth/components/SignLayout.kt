@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -19,6 +20,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import com.example.androidcookbook.ui.features.auth.components.SignColor.Oval
 
 @Composable
 fun SignLayout(
@@ -28,13 +30,13 @@ fun SignLayout(
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(color = Color(0xFF251404))
+            .background(color = MaterialTheme.colorScheme.background)
             .verticalScroll(rememberScrollState())
     ) {
         // Background and layout setup
         Canvas(modifier = Modifier.fillMaxSize()) {
             drawOval(
-                color = Color(0xFF4F3423),
+                color = Oval,
                 topLeft = Offset(-215f, -290f),
                 size = Size(1500f, 750f)
             )

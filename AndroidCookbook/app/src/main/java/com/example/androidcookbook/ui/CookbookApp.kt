@@ -1,17 +1,27 @@
 package com.example.androidcookbook.ui
 
+import android.app.Activity
+import android.graphics.Color
 import android.util.Log
+import androidx.compose.foundation.background
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.core.view.WindowCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -19,19 +29,24 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
+import com.example.androidcookbook.domain.model.post.Post
+import com.example.androidcookbook.ui.common.appbars.AppBarTheme
 import com.example.androidcookbook.ui.common.appbars.CookbookAppBarDefault
 import com.example.androidcookbook.ui.common.appbars.CookbookBottomNavigationBar
 import com.example.androidcookbook.ui.common.appbars.SearchBar
+import com.example.androidcookbook.ui.features.auth.components.SignColor
 import com.example.androidcookbook.ui.features.post.CreatePostScreen
 import com.example.androidcookbook.ui.features.post.CreatePostViewModel
 import com.example.androidcookbook.ui.features.post.PostDetailsScreen
 import com.example.androidcookbook.ui.features.post.PostDetailsViewModel
 import com.example.androidcookbook.ui.features.search.SearchScreen
 import com.example.androidcookbook.ui.features.search.SearchViewModel
+import com.example.androidcookbook.ui.nav.CustomNavTypes
 import com.example.androidcookbook.ui.nav.Routes
 import com.example.androidcookbook.ui.nav.graphs.appScreens
 import com.example.androidcookbook.ui.nav.graphs.authScreens
 import com.example.androidcookbook.ui.nav.utils.navigateIfNotOn
+import kotlin.reflect.typeOf
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -51,27 +66,38 @@ fun CookbookApp(
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
 
     Scaffold(
-        modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
+        modifier = Modifier
+            .nestedScroll(scrollBehavior.nestedScrollConnection),
         topBar = {
             when (uiState.topBarState) {
-                is CookbookUiState.TopBarState.NoTopBar -> {}
+                is CookbookUiState.TopBarState.Auth -> {
+                    updateSystemBarColors(SignColor.Oval.toArgb(), SignColor.Background.toArgb(), true)
+                }
                 is CookbookUiState.TopBarState.Custom -> (uiState.topBarState as CookbookUiState.TopBarState.Custom).topAppBar.invoke()
-                is CookbookUiState.TopBarState.Default -> CookbookAppBarDefault(
-                    showBackButton = uiState.canNavigateBack,
-                    searchButtonAction = {
-                        navController.navigateIfNotOn(Routes.Search)
-                    },
-                    onCreatePostClick = {
-                        navController.navigateIfNotOn(Routes.CreatePost)
-                    },
-                    onMenuButtonClick = {
-                        //TODO: Add menu button
-                    },
-                    onBackButtonClick = {
-                        navController.navigateUp()
-                    },
-                    scrollBehavior = scrollBehavior
-                )
+                is CookbookUiState.TopBarState.Default -> {
+                    AppBarTheme {
+                        updateSystemBarColors(
+                            Color.TRANSPARENT,
+                            MaterialTheme.colorScheme.background.toArgb()
+                        )
+                        CookbookAppBarDefault(
+                            showBackButton = uiState.canNavigateBack,
+                            searchButtonAction = {
+                                navController.navigateIfNotOn(Routes.Search)
+                            },
+                            onCreatePostClick = {
+                                navController.navigateIfNotOn(Routes.CreatePost)
+                            },
+                            onMenuButtonClick = {
+                                //TODO: Add menu button
+                            },
+                            onBackButtonClick = {
+                                navController.navigateUp()
+                            },
+                            scrollBehavior = scrollBehavior
+                        )
+                    }
+                }
             }
         },
         bottomBar = {
@@ -106,7 +132,7 @@ fun CookbookApp(
                 .padding(innerPadding),
         ) {
             authScreens(navController = navController, updateAppBar = {
-                viewModel.updateTopBarState(CookbookUiState.TopBarState.NoTopBar)
+                viewModel.updateTopBarState(CookbookUiState.TopBarState.Auth)
                 viewModel.updateBottomBarState(CookbookUiState.BottomBarState.NoBottomBar)
             }, updateUser = { response ->
                 viewModel.updateUser(response)
@@ -165,8 +191,8 @@ fun CookbookApp(
                     },
                     onPostButtonClick = {
                         createPostViewModel.createPost(
-                            onSuccessNavigate = { postId ->
-                                navController.navigate(Routes.App.PostDetails(postId))
+                            onSuccessNavigate = { post ->
+                                navController.navigate(Routes.App.PostDetails(post))
                             }
                         )
                     },
@@ -176,7 +202,11 @@ fun CookbookApp(
                 )
             }
 
-            composable<Routes.App.PostDetails> {
+            composable<Routes.App.PostDetails>(
+                typeMap = mapOf(
+                    typeOf<Post>() to CustomNavTypes.PostType,
+                )
+            ) {
                 viewModel.updateTopBarState(CookbookUiState.TopBarState.Default)
                 viewModel.updateBottomBarState(CookbookUiState.BottomBarState.NoBottomBar)
                 viewModel.updateCanNavigateBack(true)
@@ -184,7 +214,7 @@ fun CookbookApp(
                 val postRoute = it.toRoute<Routes.App.PostDetails>()
 
                 val postDetailsViewModel = hiltViewModel<PostDetailsViewModel, PostDetailsViewModel.PostDetailsViewModelFactory> { factory ->
-                    factory.create(postRoute.id)
+                    factory.create(postRoute.post)
                 }
 
                 val post = postDetailsViewModel.post.collectAsState().value
@@ -193,6 +223,21 @@ fun CookbookApp(
 
 
             }
+        }
+    }
+}
+
+@Composable
+private fun updateSystemBarColors(statusBarColor: Int, navigationBarColor: Int, darkTheme: Boolean = isSystemInDarkTheme()) {
+    val view = LocalView.current
+
+    if (!view.isInEditMode) {
+        SideEffect {
+            val window = (view.context as Activity).window
+            window.statusBarColor = statusBarColor
+            window.navigationBarColor = navigationBarColor
+            WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = !darkTheme
+            WindowCompat.getInsetsController(window, view).isAppearanceLightNavigationBars = !darkTheme
         }
     }
 }

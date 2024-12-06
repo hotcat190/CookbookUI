@@ -11,6 +11,7 @@ import com.example.androidcookbook.domain.model.auth.SignInResponse
 import com.example.androidcookbook.ui.common.dialog.MinimalDialog
 import com.example.androidcookbook.ui.features.auth.AuthViewModel
 import com.example.androidcookbook.ui.features.auth.ForgotPasswordViewModel
+import com.example.androidcookbook.ui.features.auth.components.SignTheme
 import com.example.androidcookbook.ui.features.auth.screens.ForgotPasswordScreen
 import com.example.androidcookbook.ui.features.auth.screens.LoginScreen
 import com.example.androidcookbook.ui.features.auth.screens.RegisterScreen
@@ -29,27 +30,29 @@ fun NavGraphBuilder.authScreens(navController: NavController, updateAppBar: () -
     ) {
         // Scope the ViewModel to the navigation graph
         composable<Routes.Auth.Login> {
-            updateAppBar()
-            val authViewModel: AuthViewModel = sharedViewModel(it, navController, Routes.Auth)
-            LoginScreen(
-                onForgotPasswordClick = {
-                    navController.navigate(Routes.Auth.ForgotPassword)
-                },
-                onNavigateToSignUp = {
-                    navController.navigate(Routes.Auth.Register)
-                },
-                onSignInClick = { username, password ->
-                    authViewModel.signIn(username, password) { response ->
-                        updateUser(response)
+            SignTheme {
+                updateAppBar()
+                val authViewModel: AuthViewModel = sharedViewModel(it, navController, Routes.Auth)
+                LoginScreen(
+                    onForgotPasswordClick = {
+                        navController.navigate(Routes.Auth.ForgotPassword)
+                    },
+                    onNavigateToSignUp = {
+                        navController.navigate(Routes.Auth.Register)
+                    },
+                    onSignInClick = { username, password ->
+                        authViewModel.signIn(username, password) { response ->
+                            updateUser(response)
+                        }
+                        navController.navigate(Routes.DialogDestination)
+                    },
+                    onUseAsGuest = {
+                        navController.navigate(Routes.App) {
+                            popUpTo<Routes.Auth> { inclusive = true }
+                        }
                     }
-                    navController.navigate(Routes.DialogDestination)
-                },
-                onUseAsGuest = {
-                    navController.navigate(Routes.App) {
-                        popUpTo<Routes.Auth> { inclusive = true }
-                    }
-                }
-            )
+                )
+            }
         }
         composable<Routes.Auth.Register> {
             updateAppBar()
@@ -115,6 +118,9 @@ fun NavGraphBuilder.authScreens(navController: NavController, updateAppBar: () -
                     },
                     onNavigateToSignIn = {
                         navController.navigate(Routes.Auth.Login)
+                    },
+                    onGoBack = {
+                        navController.navigateUp()
                     }
                 )
             }

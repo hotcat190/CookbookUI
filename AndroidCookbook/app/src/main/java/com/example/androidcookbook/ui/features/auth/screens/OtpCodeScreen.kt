@@ -8,6 +8,7 @@ fun OtpCodeScreen(
     otpCode: String,
     onOtpCodeChange: (String) -> Unit,
     onSubmit: () -> Unit,
+    onGoBack: () -> Unit,
     onNavigateToSignIn: () -> Unit,
     modifier: Modifier = Modifier,
 ) {

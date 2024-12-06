@@ -18,15 +18,15 @@ import kotlinx.coroutines.launch
 @HiltViewModel(assistedFactory = PostDetailsViewModel.PostDetailsViewModelFactory::class)
 class PostDetailsViewModel @AssistedInject constructor(
     private val postRepository: PostRepository,
-    @Assisted private val postId: Int,
+    @Assisted private val _post: Post,
 ) : ViewModel() {
 
     @AssistedFactory
     interface PostDetailsViewModelFactory {
-        fun create(userId: Int): PostDetailsViewModel
+        fun create(post: Post): PostDetailsViewModel
     }
 
-    var post: MutableStateFlow<Post> = MutableStateFlow(Post())
+    var post: MutableStateFlow<Post> = MutableStateFlow(_post)
         private set
 
     init {
@@ -35,7 +35,7 @@ class PostDetailsViewModel @AssistedInject constructor(
 
     private fun getPost() {
         viewModelScope.launch {
-            val response = postRepository.getPost(postId)
+            val response = postRepository.getPost(post.value.id)
             response.onSuccess {
                 post.update { data }
             }.onFailure {

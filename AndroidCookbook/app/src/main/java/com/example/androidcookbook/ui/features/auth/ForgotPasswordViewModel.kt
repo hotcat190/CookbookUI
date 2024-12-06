@@ -5,15 +5,11 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.androidcookbook.data.repositories.AuthRepository
 import com.example.androidcookbook.domain.model.auth.ForgotPasswordRequest
-import com.example.androidcookbook.domain.model.auth.RegisterResponse
 import com.example.androidcookbook.domain.model.auth.ResetPasswordRequest
 import com.example.androidcookbook.domain.network.ErrorBody
 import com.example.androidcookbook.domain.network.SuccessMessageBody
-import com.skydoves.sandwich.ApiResponse.Companion.operate
 import com.skydoves.sandwich.onException
-import com.skydoves.sandwich.onFailure
 import com.skydoves.sandwich.onSuccess
-import com.skydoves.sandwich.retrofit.errorBody
 import com.skydoves.sandwich.retrofit.serialization.onErrorDeserialize
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -30,6 +26,8 @@ class ForgotPasswordViewModel @Inject constructor(
     var email = MutableStateFlow("")
         private set
     var otpCode = MutableStateFlow("")
+        private set
+    var token = MutableStateFlow("")
         private set
     var password = MutableStateFlow("")
         private set
@@ -87,11 +85,10 @@ class ForgotPasswordViewModel @Inject constructor(
         }
 
         viewModelScope.launch {
-            //TODO password reset requests stuff
             val response = authRepository.sendPasswordResetRequest(
                 ResetPasswordRequest(
                     email = email.value,
-                    code = otpCode.value,
+                    token = token.value,
                     password = password.value,
                 )
             )

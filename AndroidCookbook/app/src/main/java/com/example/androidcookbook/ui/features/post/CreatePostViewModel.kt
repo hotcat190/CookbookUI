@@ -5,6 +5,7 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.androidcookbook.data.repositories.PostRepository
+import com.example.androidcookbook.domain.model.post.Post
 import com.example.androidcookbook.domain.model.post.PostCreateRequest
 import com.skydoves.sandwich.onFailure
 import com.skydoves.sandwich.onSuccess
@@ -35,7 +36,7 @@ class CreatePostViewModel @Inject constructor(
         postImageUri.update { uri }
     }
 
-    fun createPost(onSuccessNavigate: (Int) -> Unit) {
+    fun createPost(onSuccessNavigate: (Post) -> Unit) {
         viewModelScope.launch {
 //            val mainImage = imageRepository.uploadImage(postImage.value)
 
@@ -51,7 +52,7 @@ class CreatePostViewModel @Inject constructor(
                     )
                 )
                 response.onSuccess {
-                    onSuccessNavigate(data.post.id)
+                    onSuccessNavigate(data.post)
                 }.onFailure {
                     //TODO
                 }

@@ -22,7 +22,7 @@ fun ForgotPasswordScreen(
     modifier: Modifier = Modifier,
 ) {
     SignLayout {
-        //TODO: Email input field
+        // Email input field
         Spacer(Modifier.height(15.dp))
         InputField(
             text = email,
@@ -33,13 +33,14 @@ fun ForgotPasswordScreen(
             onDone = onSubmit
         )
         Spacer(Modifier.height(5.dp))
-        //TODO: Submit button
+
+        // Submit button
         SignButton(
             onClick = onSubmit,
             actionText = "Continue"
         )
 
-        //TODO: Back to Sign In clickable
+        // Back to Sign In clickable
         ClickableSeparatedText(
             unclickableText = "Return to ",
             clickableText = "Sign In",

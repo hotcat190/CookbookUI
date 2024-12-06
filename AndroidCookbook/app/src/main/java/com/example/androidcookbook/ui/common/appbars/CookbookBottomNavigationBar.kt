@@ -8,10 +8,13 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.size
+import androidx.compose.material.LocalContentAlpha
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.AddCircle
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
@@ -19,6 +22,7 @@ import androidx.compose.material3.NavigationBarItemColors
 import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -38,54 +42,54 @@ fun CookbookBottomNavigationBar(
     onCreatePostClick: () -> Unit,
     currentDestination: NavDestination? = null,
 ) {
-    val colors = NavigationBarItemDefaults.colors(
 
-        indicatorColor = MaterialTheme.colorScheme.secondary,
-        selectedIconColor = MaterialTheme.colorScheme.primary,
-        selectedTextColor = MaterialTheme.colorScheme.onSecondary,
+        val colors = NavigationBarItemDefaults.colors(
 
-    )
+            indicatorColor = MaterialTheme.colorScheme.secondary,
+            selectedIconColor = MaterialTheme.colorScheme.primary,
+            selectedTextColor = MaterialTheme.colorScheme.onSecondary,
 
-    Column {
-        HorizontalDivider(
-            thickness = 1.dp,
-            modifier = Modifier
-                .height(1.dp)
-                .fillMaxWidth(),
-            color = MaterialTheme.colorScheme.onSurface.copy(0.25F)
         )
 
-        NavigationBar(
-            containerColor = Color.Transparent,
-            modifier = Modifier.heightIn(max = 96.dp)
-        ) {
-            NewsfeedNavigationBarItem(currentDestination, onNewsfeedClick, colors)
-
-            AiChatNavigationBarItem(currentDestination, onAiChatClick, colors)
-
-            NavigationBarItem(
-                selected = currentDestination?.hasRoute(Routes.CreatePost) == true,
-                onClick = onCreatePostClick,
-                icon = {
-                    //                Icon(
-                    //                    painter = painterResource(R.drawable.plus),
-                    //                    contentDescription = "Create post",
-                    //                    modifier = Modifier.size(18.dp)
-                    //                )
-                    Icon(
-                        imageVector = Icons.Default.Add,
-                        contentDescription = "Create post"
-                    )
-                },
-                alwaysShowLabel = false,
-                colors = colors
+        Column {
+            HorizontalDivider(
+                thickness = 1.dp,
+                modifier = Modifier
+                    .height(1.dp)
+                    .fillMaxWidth(),
+                color = MaterialTheme.colorScheme.onSurface.copy(0.25F)
             )
 
-            CategoryNavigationBarItem(currentDestination, onCategoryClick, colors)
+            NavigationBar(
+                containerColor = Color.Transparent,
+                modifier = Modifier.heightIn(max = 96.dp),
+            ) {
+                NewsfeedNavigationBarItem(currentDestination, onNewsfeedClick, colors)
 
-            UserProfileNavigationBarItem(currentDestination, onUserProfileClick,colors)
+                AiChatNavigationBarItem(currentDestination, onAiChatClick, colors)
+
+                NavigationBarItem(
+                    selected = currentDestination?.hasRoute(Routes.CreatePost) == true,
+                    onClick = onCreatePostClick,
+                    icon = {
+                        Icon(
+//                            painter = painterResource(R.drawable.add_box_24dp_e8eaed_fill1_wght400_grad0_opsz24),
+                            imageVector = Icons.Default.AddCircle,
+                            contentDescription = "Create post",
+                            tint = LocalContentColor.current.copy(alpha = 0.8F),
+                            modifier = Modifier.scale(1.2F)
+                        )
+                    },
+                    alwaysShowLabel = false,
+                    colors = colors
+                )
+
+                CategoryNavigationBarItem(currentDestination, onCategoryClick, colors)
+
+                UserProfileNavigationBarItem(currentDestination, onUserProfileClick, colors)
+            }
         }
-    }
+
 }
 
 @Composable
@@ -182,7 +186,8 @@ private fun RowScope.AiChatNavigationBarItem(
         icon = {
             Icon(
                 painter = painterResource(R.drawable.ai_gen_light_mode),
-                contentDescription = "Chat"
+                contentDescription = "Chat",
+                modifier = Modifier.scale(1.2F)
             )
         },
 //        label = {
@@ -223,10 +228,10 @@ private fun RowScope.CategoryNavigationBarItem(
     )
 }
 
-@Preview
+@Preview(showBackground = true)
 @Composable
 fun NavBarPreview() {
-    AndroidCookbookTheme {
+    AppBarTheme {
         CookbookBottomNavigationBar({}, {}, {}, {}, {})
     }
 }
@@ -234,7 +239,7 @@ fun NavBarPreview() {
 @Preview
 @Composable
 fun NavBarDarkPreview() {
-    AndroidCookbookTheme(darkTheme = true) {
+    AppBarTheme(darkTheme = true) {
         CookbookBottomNavigationBar({}, {}, {}, {}, {})
     }
 }
