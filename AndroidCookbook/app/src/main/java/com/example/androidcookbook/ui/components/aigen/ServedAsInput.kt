@@ -7,11 +7,13 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.ExposedDropdownMenuBox
-import androidx.compose.material.ExposedDropdownMenuDefaults
+import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.Text
 import androidx.compose.material.TextFieldDefaults
 import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -25,7 +27,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.example.androidcookbook.R
 
-@OptIn(ExperimentalMaterialApi::class)
+@OptIn(ExperimentalMaterialApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun ServedAsInput(
     modifier: Modifier = Modifier,
@@ -52,6 +54,8 @@ fun ServedAsInput(
                 modifier = Modifier.weight(1f)// Toggles dropdown
             ) {
 
+
+
                 OutlinedTextField(
                     value = selectedOption,
                     textStyle = TextStyle(textAlign = TextAlign.Center),
@@ -63,9 +67,9 @@ fun ServedAsInput(
                     colors = TextFieldDefaults.textFieldColors(
                         focusedIndicatorColor = Color.Transparent,
                         unfocusedIndicatorColor = Color.Transparent,
-                        cursorColor = Color.White,
-                        textColor = Color.White.copy(alpha = 0.75f),
-                        backgroundColor = Color(0xFF4A4A4A)
+                        cursorColor = MaterialTheme.colorScheme.outline,
+                        textColor = MaterialTheme.colorScheme.outline,
+                        backgroundColor = MaterialTheme.colorScheme.surfaceContainer
                     ),
                     singleLine = true,
 
