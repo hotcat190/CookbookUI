@@ -26,7 +26,7 @@ object Routes {
         @Serializable
         data object Category
         @Serializable
-        data object AIChat
+        data object AIChef
         @Serializable
         data object Newsfeed
         @Serializable

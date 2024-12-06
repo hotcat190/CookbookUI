@@ -12,17 +12,24 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 
 private val DarkColorScheme = darkColorScheme(
-    primary = Color(0xFF7F5346),
-    secondary = PurpleGrey80,
-    tertiary = Pink80,
+    primary = Color.hsl(hue = 207f, saturation = 0.5f, lightness = 0.1f),
+    secondary = Color.hsl(hue = 207f, saturation = 0.5f, lightness = 0.9f),
+    tertiary = Color.hsl(hue = 178f, saturation = 0.49f, lightness = 0.1f),
+    scrim = Color.hsl(hue = 147f, saturation = 0.8f, lightness = 0.2f), // this is accent
+    primaryContainer = Color.hsl(175f, 0.49f, 0.9f),
+
+
+    onSecondary = Color.hsl(207f, 0.48f, 0.82f),
 
 )
 
 private val LightColorScheme = lightColorScheme(
-    primary = Color(0xFF7F5346),
-    secondary = PurpleGrey40,
-    tertiary = Pink40
-
+    primary = Color.hsl(hue = 207f, saturation = 0.5f, lightness = 0.9f),
+    secondary = Color.hsl(hue = 207f, saturation = 0.5f, lightness = 0.1f),
+    tertiary = Color.hsl(hue = 326f, saturation = 0.49f, lightness = 0.9f),
+    scrim = Color.hsl(hue = 147f, saturation = 0.8f, lightness = 0.8f), // this is accent
+    primaryContainer = Color.hsl(206f, 0.49f, 0.1f),
+    onSecondary = Color.hsl(207f, 0.48f, 0.18f),
     /* Other default colors to override
     background = Color(0xFFFFFBFE),
     surface = Color(0xFFFFFBFE),
