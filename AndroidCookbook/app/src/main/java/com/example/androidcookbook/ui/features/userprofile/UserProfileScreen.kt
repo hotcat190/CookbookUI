@@ -18,6 +18,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -46,7 +47,7 @@ import com.example.androidcookbook.ui.theme.AndroidCookbookTheme
 @Composable
 fun UserProfileScreen(
     userId: Int,
-    onPostSeeDetailsClick: (Int) -> Unit,
+    onPostSeeDetailsClick: (Post) -> Unit,
     modifier: Modifier = Modifier
 ) {
     val userProfileViewModel = hiltViewModel<UserProfileViewModel, UserProfileViewModel.UserProfileViewModelFactory> {
@@ -71,7 +72,7 @@ fun UserProfileScreen(
                     item {
                         Column (
                             Modifier
-                                .background(color = Color.White)
+//                                .background(color = MaterialTheme.colorScheme.surface)
                                 .padding(bottom = 10.dp)
                         ) {
                             UserProfileHeader(avatarPath = user.avatar)
@@ -87,7 +88,7 @@ fun UserProfileScreen(
                                 NewsfeedCard(
                                     post = post,
                                     onSeeDetailsClick = onPostSeeDetailsClick,
-                                    modifier = Modifier.background(color = Color.White)
+//                                    modifier = Modifier.background(color = Color.White)
                                 )
                             }
                             if ((userProfileViewModel.userPostState as UserPostState.Success).userPosts.isEmpty()) {

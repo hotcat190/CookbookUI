@@ -28,6 +28,7 @@ fun OtpCodeScreen(
     otpCode: String,
     onOtpCodeChange: (String) -> Unit,
     onSubmit: () -> Unit,
+    onGoBack: () -> Unit,
     onNavigateToSignIn: () -> Unit,
     onNavigateToEmail: () -> Unit,
     modifier: Modifier = Modifier,

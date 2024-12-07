@@ -12,26 +12,33 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 
 private val DarkColorScheme = darkColorScheme(
-    primary = Color(0xFF7F5346),
-    secondary = PurpleGrey80,
-    tertiary = Pink80,
+//    primary = Dark.Primary,
+//    secondary = Dark.Secondary,
+//    tertiary = Dark.Tertiary,
+//    scrim = Dark.Scrim, // this is accent
+//    primaryContainer = Dark.PrimaryContainer,
+////    primaryContainer = Color.Transparent,
+//    onSecondary = Dark.OnSecondary,
 
 )
 
 private val LightColorScheme = lightColorScheme(
-    primary = Color(0xFF7F5346),
-    secondary = PurpleGrey40,
-    tertiary = Pink40
-
-    /* Other default colors to override
-    background = Color(0xFFFFFBFE),
-    surface = Color(0xFFFFFBFE),
-    onPrimary = Color.White,
-    onSecondary = Color.White,
-    onTertiary = Color.White,
-    onBackground = Color(0xFF1C1B1F),
-    onSurface = Color(0xFF1C1B1F),
-    */
+//    primary = Light.Primary,
+//    secondary = Light.Secondary,
+//    tertiary = Light.Tertiary,
+//    scrim = Light.Scrim, // this is accent
+////    primaryContainer = Light.PrimaryContainer,
+//    primaryContainer = Color.Transparent,
+//    onSecondary = Light.OnSecondary,
+//    /* Other default colors to override
+//    background = Color(0xFFFFFBFE),
+//    surface = Color(0xFFFFFBFE),
+//    onPrimary = Color.White,
+//    onSecondary = Color.White,
+//    onTertiary = Color.White,
+//    onBackground = Color(0xFF1C1B1F),
+//    onSurface = Color(0xFF1C1B1F),
+//    */
 )
 
 @Composable
@@ -42,13 +49,15 @@ fun AndroidCookbookTheme(
     content: @Composable () -> Unit
 ) {
     val colorScheme = when {
-        dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
-            val context = LocalContext.current
-            if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
-        }
+//        dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
+//            val context = LocalContext.current
+//            if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
+//        }
 
         darkTheme -> DarkColorScheme
         else -> LightColorScheme
+//        darkTheme -> darkColorScheme()
+//        else -> lightColorScheme()
     }
 
     MaterialTheme(

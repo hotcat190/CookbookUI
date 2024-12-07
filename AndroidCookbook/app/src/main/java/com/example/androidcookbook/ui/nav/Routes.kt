@@ -1,5 +1,6 @@
 package com.example.androidcookbook.ui.nav
 
+import com.example.androidcookbook.domain.model.post.Post
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -26,14 +27,17 @@ object Routes {
 
     @Serializable
     object App {
+
         @Serializable
         object Category
         @Serializable
-        object AIChat
+        object AIChef
         @Serializable
         object Newsfeed
         @Serializable
-        data class UserProfile(val userId: Int)
+        data class UserProfile(val id: Int)
+        @Serializable
+        data class PostDetails(val post: Post)
     }
 
     @Serializable

@@ -37,7 +37,8 @@ fun ResetPasswordScreen(
         }
         val (retype) = remember { FocusRequester.createRefs() }
         Spacer(Modifier.height(15.dp))
-        //TODO: Password Field
+
+        // Password Field
         InputField(
             text = password,
             onChange = onPasswordChange,
@@ -48,7 +49,7 @@ fun ResetPasswordScreen(
             modifier = Modifier.focusProperties { next = retype },
         )
 
-        //TODO: RetypePassword Field
+        // RetypePassword Field
         InputField(
             text = retypePassword,
             onChange = onRetypePasswordChange,
@@ -60,13 +61,13 @@ fun ResetPasswordScreen(
             supportingText = supportingText
         )
 
-        //TODO: Submit button
+        // Submit button
         SignButton(
             onClick = onSubmit,
             actionText = "Submit"
         )
 
-        //TODO: ClickableText("Return to Sign In")
+        // ClickableText("Return to Sign In")
         ClickableSeparatedText(
             unclickableText = "Return to ",
             clickableText = "Sign In",

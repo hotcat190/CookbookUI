@@ -23,7 +23,11 @@ import com.example.androidcookbook.ui.nav.utils.sharedViewModel
  * Login, registration, forgot password screens nav graph builder
  * (Unauthenticated user)
  */
-fun NavGraphBuilder.authScreens(navController: NavController, updateAppBar: () -> Unit, updateUser: (SignInResponse) -> Unit) {
+fun NavGraphBuilder.authScreens(
+    navController: NavController,
+    updateAppBar: () -> Unit,
+    updateUser: (SignInResponse) -> Unit,
+) {
     navigation<Routes.Auth>(
         startDestination = Routes.Auth.Login
     ) {
@@ -79,7 +83,8 @@ fun NavGraphBuilder.authScreens(navController: NavController, updateAppBar: () -
             composable<Routes.Auth.ForgotPassword.Screen> {
                 updateAppBar()
 
-                val forgotPasswordViewModel: ForgotPasswordViewModel = sharedViewModel(it, navController, Routes.Auth.ForgotPassword)
+                val forgotPasswordViewModel: ForgotPasswordViewModel =
+                    sharedViewModel(it, navController, Routes.Auth.ForgotPassword)
                 val email = forgotPasswordViewModel.email.collectAsState().value
                 val dialogMessage = forgotPasswordViewModel.dialogMessage.collectAsState().value
 
@@ -120,6 +125,9 @@ fun NavGraphBuilder.authScreens(navController: NavController, updateAppBar: () -
                     },
                     onNavigateToSignIn = {
                         navController.navigate(Routes.Auth.Login)
+                    },
+                    onGoBack = {
+                        navController.navigateUp()
                     }
                 )
             }
