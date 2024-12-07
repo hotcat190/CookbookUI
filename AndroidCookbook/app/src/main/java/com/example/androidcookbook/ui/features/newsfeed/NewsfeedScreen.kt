@@ -36,7 +36,7 @@ import com.example.androidcookbook.ui.theme.AndroidCookbookTheme
 @Composable
 fun NewsfeedScreen(
     posts: List<Post>,
-    onSeeDetailsClick: (Int) -> Unit,
+    onSeeDetailsClick: (Post) -> Unit,
     modifier: Modifier = Modifier) {
     LazyColumn(
         modifier = modifier
@@ -52,7 +52,7 @@ fun NewsfeedScreen(
 @Composable
 fun NewsfeedCard(
     post: Post,
-    onSeeDetailsClick: (Int) -> Unit,
+    onSeeDetailsClick: (Post) -> Unit,
     modifier: Modifier = Modifier) {
     Column(
         modifier = modifier
@@ -91,13 +91,13 @@ fun NewsfeedCard(
             color = MaterialTheme.colorScheme.onSurface,
             modifier = Modifier
                 .align(Alignment.End)
-                .clickable { onSeeDetailsClick(post.id) }
+                .clickable { onSeeDetailsClick(post) }
         )
     }
 }
 
 @Composable
-fun PostHeader(
+fun     PostHeader(
     author: User,
     createdAt: String?,
     modifier: Modifier = Modifier

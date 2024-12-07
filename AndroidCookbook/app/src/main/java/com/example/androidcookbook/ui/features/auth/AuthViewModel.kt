@@ -63,16 +63,19 @@ class AuthViewModel @Inject constructor(
                     )
                 }
             }.onErrorDeserialize<RegisterResponse, ErrorBody> { errorBody ->
-                _uiState.update { it.copy(openDialog = true, dialogMessage = errorBody.message.joinToString(".\n\n")) }
+                _uiState.update { it.copy(dialogMessage = errorBody.message.joinToString(".\n\n")) }
             }.onException {
                 when (throwable) {
-                    is SocketTimeoutException -> _uiState.update { it.copy(openDialog = true, dialogMessage = "Request timed out.\n Please try again.") }
+                    is SocketTimeoutException -> _uiState.update { it.copy(dialogMessage = "Request timed out.\n Please try again.") }
                 }
             }
         }
     }
 
     fun signIn(username: String, password: String, onSuccess: (SignInResponse) -> Unit) {
+        _uiState.update {
+            it.copy(dialogMessage = "Loading...")
+        }
         viewModelScope.launch {
             // Send request and receive the response
             val response = authRepository.login(SignInRequest(username, password))

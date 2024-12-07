@@ -15,13 +15,17 @@ val ResultCardDarkSurfaceContainer = Color(0xFF7C7C7C)
 val ResultCardDarkOutline = Color(0xFFFFFFFF)
 
 private val ResultCardLight = lightColorScheme(
-    surfaceContainer = ResultCardLightSurfaceContainer,
-    outline = ResultCardLightOutline,
+//    surfaceContainer = ResultCardLightSurfaceContainer,
+//    outline = ResultCardLightOutline,
+    surfaceContainer = Color.hsl(26f, 0.49f, 0.9f),
+    outline = Color.hsl(hue = 207f, saturation = 0.5f, lightness = 0.9f)
 )
 
 private val ResultCardDark = darkColorScheme(
 //    surfaceContainer = ResultCardDarkSurfaceContainer,
 //    outline = ResultCardDarkOutline,
+    surfaceContainer = Color.hsl(26f, 0.49f, 0.1f),
+    outline =Color.hsl(hue = 207f, saturation = 0.5f, lightness = 0.9f)
 )
 
 @Composable

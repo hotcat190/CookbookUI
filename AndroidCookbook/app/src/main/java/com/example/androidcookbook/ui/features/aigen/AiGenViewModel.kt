@@ -7,7 +7,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.androidcookbook.data.network.AiGenService
 import com.example.androidcookbook.data.repositories.AiGenRepository
 import com.example.androidcookbook.domain.model.aigen.AiRecipe
-import com.example.androidcookbook.domain.model.aigen.Ingredient
+import com.example.androidcookbook.domain.model.ingredient.Ingredient
 import com.google.gson.GsonBuilder
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -73,6 +73,9 @@ class AiGenViewModel @Inject constructor(
         }
     }
 
+
+
+
     fun updateIngredientQuantity(index: Int, updatedIngredientQuantity: String) {
         _aiGenUiState.update { currentState ->
             val updatedIngredient = currentState.ingredients.toMutableList()
@@ -85,6 +88,14 @@ class AiGenViewModel @Inject constructor(
         _aiGenUiState.update { currentState ->
             val updatedIngredients = currentState.ingredients.toMutableList()
             updatedIngredients.add(Ingredient("",""))
+            currentState.copy(ingredients = updatedIngredients)
+        }
+    }
+
+    fun addIngredient(ingredient: Ingredient) {
+        _aiGenUiState.update { currentState ->
+            val updatedIngredients = currentState.ingredients.toMutableList()
+            updatedIngredients.add(ingredient)
             currentState.copy(ingredients = updatedIngredients)
         }
     }
@@ -131,7 +142,7 @@ class AiGenViewModel @Inject constructor(
 
     fun updateIsProcessing() {
         _aiGenUiState.update { currentState ->
-            currentState.copy(isProcessing = true, isTakingInput = true)
+            currentState.copy(isProcessing = true, isTakingInput = false, isDone = false)
         }
     }
 
@@ -170,20 +181,19 @@ class AiGenViewModel @Inject constructor(
         return gson.toJson(currentState) // Convert to JSON
     }
 
-    fun uploadImage(imagePart: MultipartBody.Part) {
-        viewModelScope.launch {
-            try {
-                val response: Response<AiRecipe> = aiGenRepository.uploadImage(
-                    image = imagePart
-                )
+    suspend fun uploadImage(imagePart: MultipartBody.Part): AiRecipe? {
+        return try {
+            val response: Response<AiRecipe> = aiGenRepository.uploadImage(image = imagePart)
+            if (response.isSuccessful) {
                 _uploadResponse.value = response.body()
-
-
-
-
-            } catch (e: Exception) {
-                Log.d("Error","Upload Error")
+                response.body()
+            } else {
+                Log.d("Error", "Upload failed with code: ${response.code()}")
+                null
             }
+        } catch (e: Exception) {
+            Log.d("Error", "Upload Error: ${e.message}")
+            null
         }
     }
 

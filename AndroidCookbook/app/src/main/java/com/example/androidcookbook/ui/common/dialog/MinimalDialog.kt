@@ -38,7 +38,7 @@ fun MinimalDialog(
                     .fillMaxSize()
                     .wrapContentSize(Alignment.Center)
                     .padding(8.dp),
-                textAlign = TextAlign.Justify,
+                textAlign = TextAlign.Center,
                 fontSize = 25.sp
             )
         }

@@ -1,22 +1,25 @@
 package com.example.androidcookbook.ui
 
 import androidx.lifecycle.ViewModel
+import com.example.androidcookbook.data.providers.AccessTokenProvider
 import com.example.androidcookbook.domain.model.auth.SignInResponse
 import com.example.androidcookbook.domain.model.user.User
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import javax.inject.Inject
 
-class CookbookViewModel : ViewModel() {
+@HiltViewModel
+class CookbookViewModel @Inject constructor(
+    private val accessTokenProvider: AccessTokenProvider
+): ViewModel() {
     private val _uiState = MutableStateFlow(CookbookUiState())
     val uiState: StateFlow<CookbookUiState> = _uiState.asStateFlow()
 
     private val _user = MutableStateFlow(User())
     val user = _user.asStateFlow()
-
-    var accessToken = MutableStateFlow("")
-        private set
 
     fun updateCanNavigateBack(updatedCanNavigateBack: Boolean) {
         _uiState.update { currentState ->
@@ -36,6 +39,6 @@ class CookbookViewModel : ViewModel() {
 
     fun updateUser(response: SignInResponse) {
         _user.update { response.user }
-        accessToken.update { response.accessToken }
+        accessTokenProvider.updateAccessToken(response.accessToken)
     }
 }

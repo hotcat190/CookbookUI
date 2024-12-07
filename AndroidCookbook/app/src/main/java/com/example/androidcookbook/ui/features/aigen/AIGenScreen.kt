@@ -2,32 +2,39 @@ package com.example.androidcookbook.ui.features.aigen
 
 import android.annotation.SuppressLint
 import android.app.Activity
+import android.content.Context
 import android.content.Intent
 import android.net.Uri
+import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Button
+import androidx.compose.material3.Button
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.IconButton
 import androidx.compose.material.Text
 import androidx.compose.material.TextField
 import androidx.compose.material.TextFieldDefaults
+import androidx.compose.material3.ButtonColors
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -35,6 +42,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.PathEffect
 import androidx.compose.ui.layout.ContentScale
@@ -49,15 +57,19 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.rememberAsyncImagePainter
 import com.example.androidcookbook.R
 import com.example.androidcookbook.domain.model.aigen.AiRecipe
+import com.example.androidcookbook.domain.usecase.createImageRequestBody
+import com.example.androidcookbook.ui.components.aigen.CookingLoadingAnimation
 import com.example.androidcookbook.ui.components.aigen.CookingTimeInput
 import com.example.androidcookbook.ui.components.aigen.IngredientsInput
+import com.example.androidcookbook.ui.components.aigen.LoadingTextWithEllipsis
 import com.example.androidcookbook.ui.components.aigen.MealTitleInput
 import com.example.androidcookbook.ui.components.aigen.PortionInput
 import com.example.androidcookbook.ui.components.aigen.ServedAsInput
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
@@ -65,6 +77,7 @@ import okhttp3.RequestBody.Companion.asRequestBody
 import java.io.File
 
 
+@SuppressLint("StateFlowValueCalledInComposition")
 @Composable
 fun AIGenScreen(modifier: Modifier = Modifier) {
 
@@ -74,56 +87,97 @@ fun AIGenScreen(modifier: Modifier = Modifier) {
     val aiGenViewModel: AiGenViewModel = hiltViewModel()
     val uiState by aiGenViewModel.aiGenUiState.collectAsState()
     val selectedImageUri by aiGenViewModel.selectedImageUri.collectAsState()
-    var testJson = ""
 
-    val uploadResult by aiGenViewModel.uploadResponse.collectAsState()
+
+
 
     LazyColumn(horizontalAlignment = Alignment.CenterHorizontally, modifier = modifier) {
-        item {
-            Text(
-                text = "AI Chef",
-                fontFamily = FontFamily(Font(R.font.playfairdisplay_regular)),
-                color = MaterialTheme.colorScheme.onBackground,
-                fontSize = 36.sp
-            )
+
+
+        if (uiState.isTakingInput || uiState.isDone) {
+            item {
+                Text(
+                    text = "AI Chef",
+                    fontFamily = FontFamily(Font(R.font.playfairdisplay_regular)),
+                    color = MaterialTheme.colorScheme.onBackground,
+                    fontSize = 36.sp
+                )
+            }
         }
 
         if (uiState.isTakingInput) {
+
             item {
                 TakingInputScreen(
                     modifier = Modifier
                         .fillMaxSize()
                         .padding(horizontal = 12.dp),
                     viewModel = aiGenViewModel,
-                    uiState = uiState
+                    uiState = uiState,
+                    context = context,
+                    scope = scope,
                 )
+            }
+
+
+        } else if (uiState.isProcessing) {
+            item {
+                setAnimation()
             }
         } else if (uiState.isDone) {
             item {
-                AiResultScreen(
+                AiUploadResultScreen(
                     modifier = Modifier
                         .fillMaxSize()
                         .padding(horizontal = 12.dp),
-                    result = uploadResult,
-                    imageUri = selectedImageUri
+                    result = aiGenViewModel.uploadResponse.value,
+
+                    imageUri = selectedImageUri,
+                    uiState = uiState,
+                    viewModel = aiGenViewModel
                 )
             }
         }
 
-        item {
-            Button(onClick = {
-                testJson = aiGenViewModel.getUiStateJson()
-                scope.launch {
-                    val file = getFileFromUri(context, aiGenViewModel.selectedImageUri.value)
-                    file?.let {
-                        val requestFile = it.asRequestBody("image/*".toMediaTypeOrNull())
-                        val body = MultipartBody.Part.createFormData("image", it.name, requestFile)
-                        aiGenViewModel.uploadImage(body)
-                    }
+        if (uiState.isTakingInput) {
+            item {
+                Button(
+                    onClick = {
+
+
+                    },
+                    colors = ButtonColors(
+                        containerColor = MaterialTheme.colorScheme.secondary,
+                        contentColor = MaterialTheme.colorScheme.primary,
+                        disabledContentColor = Color.Gray,
+                        disabledContainerColor = Color.LightGray
+                    )
+                ) {
+                    Text(
+                        "Let's cook", fontFamily = FontFamily(Font(R.font.playfairdisplay_regular)),
+                        color = MaterialTheme.colorScheme.onBackground,
+                        fontSize = 24.sp
+                    )
                 }
-                aiGenViewModel.updateIsDone()
-            }) { }
+            }
         }
+    }
+}
+
+@Composable
+fun setAnimation() {
+    Column(
+        verticalArrangement = Arrangement.SpaceBetween,
+        horizontalAlignment = Alignment.CenterHorizontally,
+
+        ) {
+        Spacer(modifier = Modifier.size(200.dp))
+
+
+        CookingLoadingAnimation()
+        LoadingTextWithEllipsis()
+
+
     }
 }
 
@@ -134,16 +188,40 @@ fun TakingInputScreen(
     modifier: Modifier = Modifier,
     uiState: AIGenUiState,
     viewModel: AiGenViewModel,
+    context: Context,
+    scope: CoroutineScope
 ) {
+
 
     val launcher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.StartActivityForResult()
     ) { result ->
         if (result.resultCode == Activity.RESULT_OK) {
-            val uri: Uri? = result.data?.data
-            viewModel.updateSelectedUri(uri)
+
+
+            scope.launch {
+                val uri: Uri? = result.data?.data
+                viewModel.updateSelectedUri(uri)
+                viewModel.updateIsProcessing()
+
+                val body = uri?.let { createImageRequestBody(context, it) }
+
+                val result = body?.let { viewModel.uploadImage(it) }
+
+                if (result != null) {
+                    Log.d("Upload", "Upload successful")
+                    viewModel.uploadResponse.value?.ingredients?.forEach { ingredient ->
+                        viewModel.addIngredient(ingredient)
+                    }
+                } else {
+                    Log.d("Upload", "Upload failed.")
+                }
+                viewModel.updateIsDone()
+            }
+
         }
     }
+
 
     Box(
         modifier = modifier
@@ -151,9 +229,7 @@ fun TakingInputScreen(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-//                .background(color = Color(0xFFF9F4F1))
                 .background(color = MaterialTheme.colorScheme.surfaceContainer)
-//                .border(width = 1.dp, color = Color(0xFF7F5346))
                 .border(width = 1.dp, color = MaterialTheme.colorScheme.outline)
                 .padding(top = 24.dp, bottom = 12.dp, start = 24.dp, end = 24.dp),
         ) {
@@ -191,19 +267,24 @@ fun TakingInputScreen(
                     selectedOption = uiState.servedAs,
                     onServedAsClick = { viewModel.updateServedAs(it) })
 
-                Spacer(Modifier.weight(1f))
+                Spacer(Modifier.weight(1.5f))
 
-                IconButton(onClick = {
-                    val intent = Intent(Intent.ACTION_PICK).apply {
-                        type = "image/*"
-                    }
-                    launcher.launch(intent)
-                },
-                    modifier = Modifier.weight(1f).padding(top = 12.dp)) {
-                    Image(
-                        modifier = Modifier.size(32.dp),
-                        painter = painterResource(R.drawable.camera_icon),
-                        contentDescription = "Camera Icon"
+                IconButton(
+                    onClick = {
+                        val intent = Intent(Intent.ACTION_PICK).apply {
+                            type = "image/*"
+                        }
+                        launcher.launch(intent)
+
+                    },
+                    modifier = Modifier
+                        .weight(1f)
+                        .padding(top = 12.dp)
+                ) {
+
+                    Icon(
+                        painter = painterResource(R.drawable.gallery_icon),
+                        contentDescription = "Camera"
                     )
                 }
             }
@@ -212,7 +293,7 @@ fun TakingInputScreen(
 
             //TODO Dashed line
             DashedLine(
-                color = Color.Black,
+                color = MaterialTheme.colorScheme.outline,
                 dashWidth = 6f,
                 dashGap = 6f,
                 strokeWidth = 2f
@@ -236,7 +317,7 @@ fun TakingInputScreen(
 
 
             DashedLine(
-                color = Color.Black,
+                color = MaterialTheme.colorScheme.outline,
                 dashWidth = 6f,
                 dashGap = 6f,
                 strokeWidth = 2f
@@ -250,22 +331,30 @@ fun TakingInputScreen(
 }
 
 @Composable
-fun AiResultScreen(modifier: Modifier = Modifier, result: AiRecipe?, imageUri: Uri?) {
+fun AiUploadResultScreen(
+    modifier: Modifier = Modifier,
+    result: AiRecipe?,
+    imageUri: Uri?,
+    uiState: AIGenUiState,
+    viewModel: AiGenViewModel,
+) {
     Box(
         modifier = modifier
     ) {
+
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .background(color = Color(0xFFF9F4F1))
+                .background(color = MaterialTheme.colorScheme.surfaceContainer)
                 .border(width = 1.dp, color = Color(0xFF7F5346))
                 .padding(top = 24.dp, bottom = 12.dp, start = 24.dp, end = 24.dp),
         ) {
+
             Text(
                 text = "Recipe Details",
                 fontFamily = FontFamily(Font(R.font.playfairdisplay_regular)),
                 fontSize = 24.sp,
-                color = Color.Black,
+                color = MaterialTheme.colorScheme.outline,
                 modifier = Modifier.padding(bottom = 16.dp)
             )
 
@@ -274,39 +363,37 @@ fun AiResultScreen(modifier: Modifier = Modifier, result: AiRecipe?, imageUri: U
                     text = "Ingredients:",
                     fontWeight = FontWeight.Bold,
                     fontSize = 20.sp,
-                    color = Color.Black
+                    color = MaterialTheme.colorScheme.outline
                 )
                 Spacer(modifier = Modifier.size(8.dp))
-                result.ingredients.forEach { ingredient ->
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(vertical = 4.dp)
-                    ) {
-                        Text(
-                            text = "- ${ingredient.name}",
-                            fontSize = 16.sp,
-                            color = Color.Black
+
+
+
+                IngredientsInput(
+                    ingredients = uiState.ingredients,
+                    onIngredientNameChange = { index, it ->
+                        viewModel.updateIngredientName(
+                            index,
+                            it
                         )
-                        Spacer(modifier = Modifier.weight(1f))
-                        Text(
-                            text = "${ingredient.quantity} ",
-                            fontSize = 16.sp,
-                            color = Color.Gray,
-                            textAlign = TextAlign.End
+                    },
+                    onIngredientQuantityChange = { index, it ->
+                        viewModel.updateIngredientQuantity(
+                            index,
+                            it
                         )
-                    }
-                }
+                    },
+                    onDeleteIngredient = { viewModel.deleteIngredient(it) },
+                    addIngredient = { viewModel.addEmptyIngredient() })
 
                 Text(
                     text = "Recipes:",
                     fontWeight = FontWeight.Bold,
                     fontSize = 20.sp,
-                    color = Color.Black
+                    color = MaterialTheme.colorScheme.outline
                 )
 
-                result.recipes.forEach {
-                    recipe ->
+                result.recipes.forEach { recipe ->
 
 
                     Spacer(modifier = Modifier.size(8.dp))
@@ -314,16 +401,16 @@ fun AiResultScreen(modifier: Modifier = Modifier, result: AiRecipe?, imageUri: U
                     Text(
                         text = "- ${recipe}",
                         fontSize = 16.sp,
-                        color = Color.Black
+                        color = MaterialTheme.colorScheme.outline
                     )
                     Spacer(modifier = Modifier.weight(1f))
 
                 }
-             } else {
+            } else {
 
                 Text(
                     text = "No ingredients available",
-                    color = Color.Gray,
+                    color = MaterialTheme.colorScheme.error,
                     fontSize = 16.sp,
                     modifier = Modifier.padding(vertical = 8.dp)
                 )
@@ -337,14 +424,15 @@ fun AiResultScreen(modifier: Modifier = Modifier, result: AiRecipe?, imageUri: U
                     contentDescription = null,
                     contentScale = ContentScale.Crop,
                     modifier = Modifier
-                        .size(200.dp)
-                        .border(1.dp, Color.Gray, shape = RoundedCornerShape(8.dp))
+                        .aspectRatio(1.5f)
+                        .border(
+                            1.dp,
+                            MaterialTheme.colorScheme.outline,
+                            shape = RoundedCornerShape(8.dp)
+                        )
+                        .clip(RoundedCornerShape(8.dp))
                 )
-            } else {
-                Text(
-                    text = "No image selected",
-                    style = TextStyle(color = Color.Gray, fontSize = 16.sp)
-                )
+
             }
         }
     }
@@ -360,7 +448,8 @@ fun NoteInput(modifier: Modifier = Modifier, note: String, onNoteChange: (String
         Text(
             text = "*Note",
             fontFamily = FontFamily(Font(R.font.nunito_regular)),
-            fontWeight = FontWeight.Bold
+            fontWeight = FontWeight.Bold,
+            color = MaterialTheme.colorScheme.outline
         )
         TextField(
             modifier = Modifier
@@ -419,7 +508,8 @@ fun DashedLine(
 
 fun getFileFromUri(context: android.content.Context, uri: Uri?): File? {
     return try {
-        val inputStream = uri?.let { context.contentResolver.openInputStream(it) } ?: return null
+        val inputStream =
+            uri?.let { context.contentResolver.openInputStream(it) } ?: return null
         val tempFile = File.createTempFile("upload", ".jpg", context.cacheDir)
         tempFile.outputStream().use { output ->
             inputStream.copyTo(output)

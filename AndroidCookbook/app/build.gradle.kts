@@ -1,3 +1,5 @@
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
@@ -38,8 +40,10 @@ android {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
     }
-    kotlinOptions {
-        jvmTarget = "11"
+    kotlin {
+        compilerOptions {
+            jvmTarget.set(JvmTarget.JVM_11)
+        }
     }
     buildFeatures {
         compose = true
@@ -74,6 +78,8 @@ dependencies {
     implementation(libs.androidx.ui.test.android)
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.0")
     implementation("com.squareup.okhttp3:logging-interceptor:4.9.1")
+    implementation("com.airbnb.android:lottie-compose:6.5.0")
+
 
 
     testImplementation(libs.junit)
@@ -108,6 +114,9 @@ dependencies {
 
     // Kotlin serialization
     implementation(libs.kotlinx.serialization.json)
+
+    //Icon extended
+    implementation("androidx.compose.material:material-icons-extended:1.7.5")
 }
 
 // Allow references to generated code

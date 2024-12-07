@@ -3,13 +3,13 @@ package com.example.androidcookbook.ui
 import androidx.compose.runtime.Composable
 
 data class CookbookUiState (
-    val topBarState: TopBarState = TopBarState.NoTopBar,
+    val topBarState: TopBarState = TopBarState.Auth,
     val bottomBarState: BottomBarState = BottomBarState.NoBottomBar,
     val canNavigateBack: Boolean = false,
 ) {
     sealed interface TopBarState {
         data object Default : TopBarState
-        data object NoTopBar : TopBarState
+        data object Auth : TopBarState
         data class Custom(val topAppBar: @Composable () -> Unit) : TopBarState
     }
 

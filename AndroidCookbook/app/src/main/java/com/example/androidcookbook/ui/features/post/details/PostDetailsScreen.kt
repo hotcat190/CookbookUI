@@ -1,7 +1,8 @@
-package com.example.androidcookbook.ui.features.recipedetail
+package com.example.androidcookbook.ui.features.post.details
 
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -20,9 +21,10 @@ import androidx.compose.material.Checkbox
 import androidx.compose.material.CheckboxDefaults
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.Email
+import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material.icons.outlined.Share
 import androidx.compose.runtime.Composable
@@ -31,12 +33,14 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
@@ -45,9 +49,12 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import coil.compose.AsyncImage
+import coil.request.ImageRequest
 import com.example.androidcookbook.R
+import com.example.androidcookbook.domain.model.post.Post
 import com.example.androidcookbook.ui.features.newsfeed.PostHeader
-import com.example.androidcookbook.ui.features.search.SamplePosts
+import com.example.androidcookbook.data.mocks.SamplePosts
 
 enum class DetailState {
     Description,
@@ -56,9 +63,22 @@ enum class DetailState {
 }
 
 @Composable
-fun RecipeDetailScreen() {
+fun PostDetailsScreen(
+    post: Post,
+    isLiked: Boolean,
+    onLikedClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
     var state by remember { mutableStateOf(DetailState.Description) }
-    var checkedStates = remember { mutableStateListOf(false, false, false) }
+    val checkedStates: SnapshotStateList<Boolean> = remember {
+        mutableStateListOf<Boolean>()
+    }
+    checkedStates.addAll(
+        List(
+            size = post.ingredient?.size ?: 0,
+            init = {false}
+        )
+    )
     LazyColumn(
         modifier = Modifier
             .fillMaxWidth()
@@ -66,8 +86,8 @@ fun RecipeDetailScreen() {
     ) {
         item {
             PostHeader(
-                author = SamplePosts.posts[0].author,
-                createdAt = SamplePosts.posts[0].createdAt
+                author = post.author,
+                createdAt = post.createdAt
             )
             Column(
                 modifier = Modifier
@@ -76,8 +96,21 @@ fun RecipeDetailScreen() {
                     .padding(15.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Image(
-                    painter = painterResource(id = R.drawable.image_4),
+//                Image(
+//                    painter = painterResource(id = R.drawable.image_4),
+//                    contentDescription = null,
+//                    modifier =
+//                    Modifier
+//                        .fillMaxWidth()
+//                        .height(200.dp)
+//                        .clip(RoundedCornerShape(5)),
+//                    contentScale = ContentScale.Crop,
+//                )
+                AsyncImage(
+                    model = ImageRequest.Builder(LocalContext.current)
+                        .data(post.mainImage)
+                        .crossfade(true)
+                        .build(),
                     contentDescription = null,
                     modifier =
                     Modifier
@@ -90,13 +123,41 @@ fun RecipeDetailScreen() {
             Row(
                 modifier = Modifier.fillMaxWidth()
             ) {
-                OutlinedIconButton(icon = Icons.Outlined.FavoriteBorder) {
+                // Like button
+                OutlinedIconButton(
+                    icon = (
+                        if (isLiked) {
+                            Icons.Filled.Favorite
+                        } else {
+                            Icons.Outlined.FavoriteBorder
+                        }
+                    ),
+                    onclick = onLikedClick
+                )
 
-                }
-                OutlinedIconButton(icon = Icons.Outlined.Email) {
+                // Chat button
+                IconButton(onClick = {}) {
+                    if (isSystemInDarkTheme()) {
 
+                        Image(
+                            painter = painterResource(R.drawable.comment_icon_dark_theme),
+                            modifier = Modifier.size(21.dp),
+
+                            contentDescription = "Comment icon"
+                        )
+
+                    } else {
+
+                        Image(
+                            painter = painterResource(R.drawable.comment_icon_light_theme),
+                            modifier = Modifier.size(21.dp),
+                            contentDescription = "Comment icon"
+                        )
+                    }
                 }
                 Spacer(modifier = Modifier.weight(1f))
+
+                // Share button
                 OutlinedIconButton(icon = Icons.Outlined.Share) {
 
                 }
@@ -105,7 +166,10 @@ fun RecipeDetailScreen() {
                 horizontalArrangement = Arrangement.SpaceBetween,
                 modifier = Modifier.fillMaxWidth()
             ) {
-                LobsterTextButton(onclick = { state = DetailState.Description }, text = "Description")
+                LobsterTextButton(
+                    onclick = { state = DetailState.Description },
+                    text = "Description"
+                )
                 LobsterTextButton(onclick = { state = DetailState.Ingredient }, text = "Ingredient")
                 LobsterTextButton(onclick = { state = DetailState.Recipe }, text = "Recipe")
             }
@@ -119,46 +183,61 @@ fun RecipeDetailScreen() {
                 when (state) {
                     DetailState.Description -> {
                         Text(
-                            text = SamplePosts.posts[0].description,
+                            text = post.description,
                             style = TextStyle(
                                 fontSize = 24.sp,
                                 fontWeight = FontWeight(400),
-                                color = Color(0xFF000000),
+                                color = MaterialTheme.colorScheme.secondary,
                             )
                         )
                     }
+
                     DetailState.Ingredient -> {
                         checkedStates.forEachIndexed { index, checked ->
+                            val ingredientText: String
+                                = post.ingredient?.get(index)?.name + " " + post.ingredient?.get(index)?.quantity
                             Row(
                                 verticalAlignment = Alignment.CenterVertically,
                                 modifier = Modifier.fillMaxWidth(),
                                 horizontalArrangement = Arrangement.SpaceBetween
                             ) {
+                                val bulletColor = MaterialTheme.colorScheme.secondary
                                 Canvas(modifier = Modifier.size(12.dp)) {
-                                    drawCircle(Color.Black)
+                                    drawCircle(bulletColor)
                                 }
-                                Text(text = "Ingredient ${index + 1}", fontSize = 20.sp)
+                                Text(
+                                    text = ingredientText,
+                                    fontSize = 20.sp,
+                                    color = MaterialTheme.colorScheme.secondary
+                                )
                                 Checkbox(
                                     checked = checked,
                                     onCheckedChange = { isChecked ->
                                         checkedStates[index] = isChecked
                                     },
                                     colors = CheckboxDefaults.colors(
-                                        checkedColor = Color(101,85,143)
+
+                                        checkmarkColor = MaterialTheme.colorScheme.secondary,
+                                        uncheckedColor = MaterialTheme.colorScheme.secondary,
+                                        checkedColor = Color(101, 85, 143)
                                     )
                                 )
                             }
                         }
                     }
+
                     DetailState.Recipe -> {
-                        Text(
-                            text = "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not.",
-                            style = TextStyle(
-                                fontSize = 24.sp,
-                                fontWeight = FontWeight(400),
-                                color = Color(0xFF000000),
+                        post.steps?.forEachIndexed {index, stepText ->
+                            Text(
+                                text = "${index+1}. $stepText\n",
+                                style = TextStyle(
+                                    fontSize = 24.sp,
+                                    fontWeight = FontWeight(400),
+                                    color = MaterialTheme.colorScheme.secondary,
+                                )
                             )
-                        )
+                        }
+
                     }
                 }
             }
@@ -178,7 +257,8 @@ fun OutlinedIconButton(
     ) {
         Icon(
             icon,
-            contentDescription = null
+            contentDescription = null,
+            tint = MaterialTheme.colorScheme.secondary
         )
     }
 }
@@ -194,7 +274,7 @@ fun LobsterTextButton(
             .wrapContentHeight()
             .width(110.dp)
             .padding(5.dp),
-        colors = ButtonDefaults.buttonColors(Color(0xFFFF7F63)),
+        colors = ButtonDefaults.buttonColors(MaterialTheme.colorScheme.tertiary),
         shape = RoundedCornerShape(size = 999.dp),
         onClick = onclick
     ) {
@@ -204,7 +284,7 @@ fun LobsterTextButton(
                 fontSize = 14.sp,
                 fontFamily = FontFamily(Font(R.font.lobster_regular)),
                 fontWeight = FontWeight(400),
-                color = Color(0xFFFFFBFB),
+                color = MaterialTheme.colorScheme.secondary,
             )
         )
     }
@@ -212,6 +292,6 @@ fun LobsterTextButton(
 
 @Preview(showBackground = true)
 @Composable
-fun RecipePreview() {
-    RecipeDetailScreen()
+fun PostDetailsPreview() {
+    PostDetailsScreen(SamplePosts.posts[0], false, {})
 }

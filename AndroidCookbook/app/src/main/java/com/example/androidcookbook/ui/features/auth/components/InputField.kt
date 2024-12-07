@@ -1,18 +1,30 @@
 package com.example.androidcookbook.ui.features.auth.components
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material.Text
 import androidx.compose.material.TextField
-import androidx.compose.material.TextFieldDefaults
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Lock
+import androidx.compose.material.icons.filled.Visibility
+import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material.icons.outlined.Lock
+import androidx.compose.material.icons.outlined.Visibility
+import androidx.compose.material.icons.outlined.VisibilityOff
+import androidx.compose.material3.LocalTextStyle
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextFieldDefaults
+import androidx.compose.material3.TextFieldColors
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -25,6 +37,7 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
@@ -36,7 +49,8 @@ fun InputField(
     type: KeyboardType,
     imeAction: ImeAction,
     modifier: Modifier = Modifier,
-    onDone: () -> Unit
+    onDone: () -> Unit,
+    supportingText: String = "",
 ) {
     when (type) {
         KeyboardType.Password -> PasswordInputField(
@@ -46,6 +60,7 @@ fun InputField(
             modifier = modifier,
             onDone = onDone,
             imeAction = imeAction,
+            supportingText = supportingText
         )
         else -> DefaultInputField(
             text = text,
@@ -53,7 +68,9 @@ fun InputField(
             placeholderText = placeholderText,
             type = type,
             modifier = modifier,
-            onDone = onDone
+            onDone = onDone,
+            imeAction = imeAction,
+            supportingText = supportingText
         )
     }
 }
@@ -65,7 +82,8 @@ private fun PasswordInputField(
     placeholderText: String,
     imeAction: ImeAction,
     modifier: Modifier = Modifier,
-    onDone: () -> Unit
+    onDone: () -> Unit,
+    supportingText: String = "",
 ) {
     var passwordVisible by remember { mutableStateOf(false) }
 
@@ -77,8 +95,8 @@ private fun PasswordInputField(
         visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
         trailingIcon = {
             val image = if (passwordVisible)
-                Icons.Outlined.Lock
-            else Icons.Filled.Lock
+                Icons.Filled.Visibility
+            else Icons.Filled.VisibilityOff
 
             val description = if (passwordVisible) "Hide password" else "Show password"
 
@@ -90,7 +108,8 @@ private fun PasswordInputField(
         },
         keyboardType = KeyboardType.Password,
         onDone = onDone,
-        imeAction = imeAction
+        imeAction = imeAction,
+        supportingText = supportingText
     )
 }
 
@@ -99,8 +118,10 @@ private fun DefaultInputField(
     text: String,
     onChange: (String) -> Unit,
     placeholderText: String,
+    supportingText: String = "",
     type: KeyboardType,
     modifier: Modifier = Modifier,
+    imeAction: ImeAction,
     onDone: () -> Unit
 ) {
     BaseTextField(
@@ -112,7 +133,8 @@ private fun DefaultInputField(
         trailingIcon = null,
         keyboardType = type,
         onDone = onDone,
-        imeAction = ImeAction.Next
+        imeAction = imeAction,
+        supportingText = supportingText
     )
 }
 
@@ -121,38 +143,47 @@ private fun BaseTextField(
     text: String,
     onChange: (String) -> Unit,
     placeholderText: String,
+    supportingText: String = "",
     modifier: Modifier = Modifier,
     visualTransformation: VisualTransformation = VisualTransformation.None,
     trailingIcon: @Composable (() -> Unit)? = null,
-    keyboardType: KeyboardType,
-    imeAction: ImeAction,
-    onDone: () -> Unit
+    keyboardType: KeyboardType = KeyboardType.Text,
+    imeAction: ImeAction = ImeAction.Done,
+    onDone: () -> Unit = {}
 ) {
-    TextField(
-        modifier = modifier
-            .background(
-                color = Color(0xFFD1CACB),
-                shape = RoundedCornerShape(size = 30.dp)
-            )
-            .width(325.dp),
+    OutlinedTextField(
+        modifier = modifier.width(325.dp),
         value = text,
         onValueChange = onChange,
-        placeholder = { Text(text = placeholderText) },
+        label = { Text(text = placeholderText, color = MaterialTheme.colorScheme.primary) },
         textStyle = TextStyle.Default.copy(fontSize = 20.sp),
-        colors = TextFieldDefaults.textFieldColors(
-            disabledTextColor = Color.Transparent,
-            focusedIndicatorColor = Color.Transparent,
-            unfocusedIndicatorColor = Color.Transparent,
-            disabledIndicatorColor = Color.Transparent
-        ),
         visualTransformation = visualTransformation,
         keyboardOptions = KeyboardOptions(keyboardType = keyboardType, imeAction = imeAction),
         trailingIcon = trailingIcon,
         singleLine = true,
+        colors = OutlinedTextFieldDefaults.colors(
+            focusedBorderColor = MaterialTheme.colorScheme.primary,
+            unfocusedBorderColor = MaterialTheme.colorScheme.primary,
+            focusedTextColor = MaterialTheme.colorScheme.primary,
+            unfocusedTextColor = MaterialTheme.colorScheme.primary,
+            focusedTrailingIconColor = MaterialTheme.colorScheme.outline,
+            unfocusedTrailingIconColor = MaterialTheme.colorScheme.outline
+        ),
         keyboardActions = KeyboardActions(
             onDone = {
                 onDone()
             }
-        )
+        ),
+        supportingText = { Text(text = supportingText, color = MaterialTheme.colorScheme.error) }
+    )
+}
+
+@Preview
+@Composable
+fun BaseTextPreview() {
+    BaseTextField(
+        text = "",
+        onChange = {},
+        placeholderText = "Email *",
     )
 }

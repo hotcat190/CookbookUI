@@ -1,12 +1,18 @@
-package com.example.androidcookbook.auth
+package com.example.androidcookbook
 
 import com.example.androidcookbook.data.modules.CookbookBEModule
 import com.example.androidcookbook.data.modules.CookbookBEModule.CookbookRetrofit
+import com.example.androidcookbook.data.network.AiGenService
 import com.example.androidcookbook.data.network.AuthService
+import com.example.androidcookbook.data.network.NewsfeedService
 import com.example.androidcookbook.data.network.PostService
+import com.example.androidcookbook.data.network.UploadService
 import com.example.androidcookbook.data.network.UserService
+import com.example.androidcookbook.data.repositories.AiGenRepository
 import com.example.androidcookbook.data.repositories.AuthRepository
+import com.example.androidcookbook.data.repositories.NewsfeedRepository
 import com.example.androidcookbook.data.repositories.PostRepository
+import com.example.androidcookbook.data.repositories.UploadRepository
 import com.example.androidcookbook.data.repositories.UserRepository
 import dagger.Module
 import dagger.Provides
@@ -54,4 +60,34 @@ class FakeCookbookBEModule {
     @Singleton
     fun providePostRepository(postService: PostService) =
         PostRepository(postService)
+
+    @Provides
+    @Singleton
+    fun provideAiGenService(): AiGenService =
+        mockk(relaxed = true)
+
+    @Provides
+    @Singleton
+    fun provideAiGenRepository(aiGenService: AiGenService): AiGenRepository =
+        AiGenRepository(aiGenService)
+
+    @Provides
+    @Singleton
+    fun provideNewsfeedService(): NewsfeedService =
+        mockk(relaxed = true)
+
+    @Provides
+    @Singleton
+    fun provideNewsfeedRepository(newsfeedService: NewsfeedService): NewsfeedRepository =
+        NewsfeedRepository(newsfeedService)
+
+    @Provides
+    @Singleton
+    fun provideUploadService(): UploadService =
+        mockk(relaxed = true)
+
+    @Provides
+    @Singleton
+    fun provideUploadRepository(uploadService: UploadService): UploadRepository =
+        UploadRepository(uploadService)
 }

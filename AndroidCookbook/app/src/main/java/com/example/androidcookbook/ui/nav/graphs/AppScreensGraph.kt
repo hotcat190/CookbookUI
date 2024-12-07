@@ -1,17 +1,18 @@
 package com.example.androidcookbook.ui.nav.graphs
 
+import androidx.compose.runtime.collectAsState
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigation
 import androidx.navigation.toRoute
-import com.example.androidcookbook.domain.model.post.Post
-import com.example.androidcookbook.domain.model.user.User
+import com.example.androidcookbook.ui.common.containers.RefreshableScreen
 import com.example.androidcookbook.ui.features.aigen.AIGenScreen
 import com.example.androidcookbook.ui.features.aigen.AiScreenTheme
 import com.example.androidcookbook.ui.features.category.CategoryScreen
 import com.example.androidcookbook.ui.features.category.CategoryViewModel
 import com.example.androidcookbook.ui.features.newsfeed.NewsfeedScreen
+import com.example.androidcookbook.ui.features.newsfeed.NewsfeedViewModel
 import com.example.androidcookbook.ui.features.userprofile.UserProfileScreen
 import com.example.androidcookbook.ui.nav.Routes
 import com.example.androidcookbook.ui.nav.utils.sharedViewModel
@@ -21,14 +22,14 @@ import com.example.androidcookbook.ui.nav.utils.sharedViewModel
  */
 fun NavGraphBuilder.appScreens(navController: NavHostController, updateAppBar: () -> Unit) {
     navigation<Routes.App> (
-        startDestination = Routes.App.Category
+        startDestination = Routes.App.Newsfeed
     ) {
         composable<Routes.App.Category> {
             updateAppBar()
             val categoryViewModel: CategoryViewModel = sharedViewModel(it, navController, Routes.App)
             CategoryScreen(categoryViewModel)
         }
-        composable<Routes.App.AIChat> {
+        composable<Routes.App.AIChef> {
             updateAppBar()
             AiScreenTheme {
                 AIGenScreen()
@@ -36,31 +37,31 @@ fun NavGraphBuilder.appScreens(navController: NavHostController, updateAppBar: (
         }
         composable<Routes.App.Newsfeed> {
             updateAppBar()
-            NewsfeedScreen(
-                // TODO
-                posts = listOf(
-                    Post(
-                        id = 0,
-                        author = User(),
-                        title = "Shrimp salad cooking :)",
-                        description = "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard.",
-                        cookTime = null,
-                        mainImage = null,
-                        createdAt = "01/28/2024",
-                        totalView = 0,
-                        totalLike = 0,
-                        totalComment = 0,
-                        ingredient = null,
-                        steps = null,
-                    )
-                ),
-                {},
-            )
+
+            val newsfeedViewModel = sharedViewModel<NewsfeedViewModel>(it, navController, Routes.App)
+            val posts = newsfeedViewModel.posts.collectAsState().value
+
+            RefreshableScreen(
+                onRefresh = { newsfeedViewModel.refresh() }
+            ) {
+                NewsfeedScreen(
+                    posts = posts,
+                    onSeeDetailsClick = { post ->
+                        navController.navigate(Routes.App.PostDetails(post))
+                    }
+                )
+            }
         }
+
         composable<Routes.App.UserProfile> {
             updateAppBar()
-            val user = it.toRoute<Routes.App.UserProfile>()
-            UserProfileScreen(user.userId, {})
+            val userRoute = it.toRoute<Routes.App.UserProfile>()
+            UserProfileScreen(
+                userId = userRoute.id,
+                onPostSeeDetailsClick = { post ->
+                    navController.navigate(Routes.App.PostDetails(post))
+                }
+            )
         }
     }
 }
