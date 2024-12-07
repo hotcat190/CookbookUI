@@ -1,7 +1,5 @@
 package com.example.androidcookbook.ui.features.userprofile
 
-import android.util.Log
-import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -18,7 +16,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -58,7 +55,7 @@ fun UserProfileScreen(
         onRefresh = { userProfileViewModel.refresh() }
     ) {
         when (userProfileUiState) {
-            is UserProfileUiState.Loading -> {
+            is UserProfileUiState.Guest -> {
                 Text(
                     "Loading"
                 )
@@ -80,7 +77,7 @@ fun UserProfileScreen(
                         }
                     }
                     when (userProfileViewModel.userPostState) {
-                        is UserPostState.Loading -> item { Text("Loading user posts") }
+                        is UserPostState.Guest -> item { Text("Loading user posts") }
                         is UserPostState.Success -> {
                             items(
                                 (userProfileViewModel.userPostState as UserPostState.Success).userPosts

@@ -33,10 +33,10 @@ class UserProfileViewModel @AssistedInject constructor(
     var isRefreshing: Boolean by mutableStateOf(false)
         private set
 
-    var uiState: UserProfileUiState by mutableStateOf(UserProfileUiState.Loading)
+    var uiState: UserProfileUiState by mutableStateOf(UserProfileUiState.Guest)
         private set
 
-    var userPostState: UserPostState by mutableStateOf(UserPostState.Loading)
+    var userPostState: UserPostState by mutableStateOf(UserPostState.Guest)
         private set
 
     private fun getUser(userId: Int) {
@@ -62,7 +62,7 @@ class UserProfileViewModel @AssistedInject constructor(
     fun refresh() {
         viewModelScope.launch {
             isRefreshing = true
-            uiState = UserProfileUiState.Loading
+            uiState = UserProfileUiState.Guest
             getUser(userId = userId)
             isRefreshing = false
         }

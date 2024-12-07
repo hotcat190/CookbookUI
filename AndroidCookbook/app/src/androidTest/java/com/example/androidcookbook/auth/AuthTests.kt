@@ -1,9 +1,12 @@
 package com.example.androidcookbook.auth
 
+import androidx.activity.viewModels
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.test.isDisplayed
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
+import androidx.compose.ui.test.onRoot
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTextInput
 import androidx.test.platform.app.InstrumentationRegistry
@@ -12,10 +15,13 @@ import com.example.androidcookbook.auth.AuthTestConst.PASSWORD
 import com.example.androidcookbook.auth.AuthTestConst.SIGN_IN_SUCCESS
 import com.example.androidcookbook.auth.AuthTestConst.TOKEN
 import com.example.androidcookbook.auth.AuthTestConst.USERNAME
+import com.example.androidcookbook.auth.AuthTestConst.USER_ID
 import com.example.androidcookbook.data.network.AuthService
 import com.example.androidcookbook.domain.model.auth.SignInRequest
 import com.example.androidcookbook.domain.model.auth.SignInResponse
 import com.example.androidcookbook.domain.model.user.User
+import com.example.androidcookbook.ui.CookbookUiState
+import com.example.androidcookbook.ui.CookbookViewModel
 import com.example.androidcookbook.ui.features.auth.screens.PASSWORD_TEXT_FIELD_TEST_TAG
 import com.example.androidcookbook.ui.features.auth.screens.USERNAME_TEXT_FIELD_TEST_TAG
 import com.skydoves.sandwich.ApiResponse
@@ -23,6 +29,7 @@ import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
 import io.mockk.coEvery
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -69,7 +76,7 @@ class AuthTests {
     fun testLoginSuccess() {
         // Mock behavior for a successful login
         coEvery { authService.login(SignInRequest(USERNAME, PASSWORD)) } returns
-                ApiResponse.Success(SignInResponse(TOKEN, SIGN_IN_SUCCESS, User()))
+                ApiResponse.Success(SignInResponse(TOKEN, SIGN_IN_SUCCESS, User(USER_ID, name = USERNAME)))
 
         composeTestRule.waitForIdle()
 
@@ -78,8 +85,8 @@ class AuthTests {
         composeTestRule.onNodeWithText("Sign In").performClick()
 
         // Add assertions
-        composeTestRule.waitUntil {
-            composeTestRule.onNodeWithText("Sign in success").isDisplayed()
-        }
+        val cookbookViewModel by composeTestRule.activity.viewModels<CookbookViewModel>()
+        val user = cookbookViewModel.user.value
+        assertTrue(user.id == USER_ID && user.name == USERNAME)
     }
 }
