@@ -142,7 +142,7 @@ class AiGenViewModel @Inject constructor(
 
     fun updateIsProcessing() {
         _aiGenUiState.update { currentState ->
-            currentState.copy(isProcessing = true, isTakingInput = false)
+            currentState.copy(isProcessing = true, isTakingInput = false, isDone = false)
         }
     }
 

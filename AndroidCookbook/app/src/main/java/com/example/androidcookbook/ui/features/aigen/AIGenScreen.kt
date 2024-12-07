@@ -216,8 +216,8 @@ fun TakingInputScreen(
                 } else {
                     Log.d("Upload", "Upload failed.")
                 }
+                viewModel.updateIsDone()
             }
-            viewModel.updateIsDone()
 
         }
     }
