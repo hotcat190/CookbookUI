@@ -97,26 +97,13 @@ fun NewsfeedCard(
 }
 
 @Composable
-fun     PostHeader(
+fun PostHeader(
     author: User,
     createdAt: String?,
     modifier: Modifier = Modifier
 ) {
     Row(modifier = modifier) {
-        AsyncImage(
-            model = ImageRequest.Builder(LocalContext.current)
-                .data(author.avatar)
-                .crossfade(true)
-                .build(),
-//            imageVector = Icons.Default.AccountCircle,
-            contentDescription = "Profile Picture",
-            modifier = Modifier
-                .size(32.dp)
-                .clip(CircleShape),
-//            tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.25f),
-            error = painterResource(R.drawable.default_avatar),
-            placeholder = painterResource(R.drawable.default_avatar)
-        )
+        SmallAvatar(author)
         Spacer(modifier = Modifier.width(8.dp)) // Spacing between icon and username
         Column {
             Text(
@@ -133,6 +120,24 @@ fun     PostHeader(
             )
         }
     }
+}
+
+@Composable
+fun SmallAvatar(author: User) {
+    AsyncImage(
+        model = ImageRequest.Builder(LocalContext.current)
+            .data(author.avatar)
+            .crossfade(true)
+            .build(),
+//            imageVector = Icons.Default.AccountCircle,
+        contentDescription = "Profile Picture",
+        modifier = Modifier
+            .size(32.dp)
+            .clip(CircleShape),
+//            tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.25f),
+        error = painterResource(R.drawable.default_avatar),
+        placeholder = painterResource(R.drawable.default_avatar)
+    )
 }
 
 @Composable

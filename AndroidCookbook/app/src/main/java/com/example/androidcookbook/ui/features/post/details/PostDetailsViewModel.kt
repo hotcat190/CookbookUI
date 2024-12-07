@@ -4,7 +4,9 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.androidcookbook.data.repositories.PostRepository
+import com.example.androidcookbook.domain.model.post.Comment
 import com.example.androidcookbook.domain.model.post.Post
+import com.example.androidcookbook.domain.model.post.SendCommentRequest
 import com.skydoves.sandwich.message
 import com.skydoves.sandwich.onFailure
 import com.skydoves.sandwich.onSuccess
@@ -29,13 +31,23 @@ class PostDetailsViewModel @AssistedInject constructor(
 
     var postUiState: MutableStateFlow<PostUiState> = MutableStateFlow(PostUiState.Loading)
         private set
-
     var isLiked: MutableStateFlow<Boolean> = MutableStateFlow(false)
+        private set
+    var showBottomCommentSheet: MutableStateFlow<Boolean> = MutableStateFlow(false)
+        private set
+    var commentsFlow: MutableStateFlow<List<Comment>> = MutableStateFlow(emptyList())
+        private set
+    var commentPage: MutableStateFlow<Int> = MutableStateFlow(1)
         private set
 
     init {
         getPost()
         queryPostLike(_post.id)
+        getComments(false)
+    }
+
+    fun updateShowBottomCommentSheet(value: Boolean) {
+        showBottomCommentSheet.update { value }
     }
 
     private fun getPost() {
@@ -89,6 +101,37 @@ class PostDetailsViewModel @AssistedInject constructor(
         isLiked.update { !it }
     }
 
+    private fun getComments(reset: Boolean) {
+        if (reset) {
+            commentsFlow.update { emptyList() }
+            commentPage.update { 1 }
+        }
+        viewModelScope.launch {
+            val response = postRepository.getComments(_post.id, commentPage.value)
+            response.onSuccess {
+                commentsFlow.update { it + data.comments }
+                commentPage.update { it + 1 }
+                Log.d("PostDetails", data.toString())
+            }.onFailure {
+                Log.d("PostDetails", message())
+            }
+        }
+    }
 
+    fun sendComment(content: String) {
+        viewModelScope.launch {
+            val response = postRepository.sendComment(
+                postId = _post.id,
+                request = SendCommentRequest(content),
+            )
+            response.onSuccess {
+                getComments(true)
+                Log.d("PostDetails", data.toString())
+            }.onFailure {
+                Log.d("PostDetails", message())
+            }
+        }
+    }
 }
+
 

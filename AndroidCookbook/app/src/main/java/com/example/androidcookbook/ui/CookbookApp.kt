@@ -26,32 +26,19 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import androidx.navigation.toRoute
-import com.example.androidcookbook.domain.model.post.Post
 import com.example.androidcookbook.ui.common.appbars.AppBarTheme
 import com.example.androidcookbook.ui.common.appbars.CookbookAppBarDefault
 import com.example.androidcookbook.ui.common.appbars.CookbookBottomNavigationBar
 import com.example.androidcookbook.ui.common.appbars.SearchBar
 import com.example.androidcookbook.ui.features.auth.theme.SignLayoutTheme
-import com.example.androidcookbook.ui.features.post.create.AddIngredientDialog
-import com.example.androidcookbook.ui.features.post.create.AddStepDialog
-import com.example.androidcookbook.ui.features.post.create.CreatePostScreen
-import com.example.androidcookbook.ui.features.post.create.CreatePostViewModel
-import com.example.androidcookbook.ui.features.post.create.UpdateIngredientDialog
-import com.example.androidcookbook.ui.features.post.create.UpdateIngredientDialogState
-import com.example.androidcookbook.ui.features.post.create.UpdateStepDialog
-import com.example.androidcookbook.ui.features.post.create.UpdateStepDialogState
-import com.example.androidcookbook.ui.features.post.details.PostDetailsScreen
-import com.example.androidcookbook.ui.features.post.details.PostDetailsViewModel
-import com.example.androidcookbook.ui.features.post.details.PostUiState
 import com.example.androidcookbook.ui.features.search.SearchScreen
 import com.example.androidcookbook.ui.features.search.SearchViewModel
-import com.example.androidcookbook.ui.nav.CustomNavTypes
 import com.example.androidcookbook.ui.nav.Routes
 import com.example.androidcookbook.ui.nav.graphs.appScreens
 import com.example.androidcookbook.ui.nav.graphs.authScreens
+import com.example.androidcookbook.ui.nav.graphs.createPost
+import com.example.androidcookbook.ui.nav.graphs.postDetails
 import com.example.androidcookbook.ui.nav.utils.navigateIfNotOn
-import kotlin.reflect.typeOf
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -177,149 +164,9 @@ fun CookbookApp(
                     }
                 )
             }
-            composable<Routes.CreatePost> {
-                viewModel.updateTopBarState(CookbookUiState.TopBarState.Default)
-                viewModel.updateBottomBarState(CookbookUiState.BottomBarState.NoBottomBar)
-                viewModel.updateCanNavigateBack(true)
+            createPost(viewModel, currentUser, navController)
 
-                val createPostViewModel = hiltViewModel<CreatePostViewModel>()
-
-                val postTitle by createPostViewModel.postTitle.collectAsState()
-                val postBody by createPostViewModel.postBody.collectAsState()
-                val postImageUri by createPostViewModel.postImageUri.collectAsState()
-
-                CreatePostScreen(
-                    author = currentUser,
-                    postTitle = postTitle,
-                    updatePostTitle = {
-                        createPostViewModel.updatePostTitle(it)
-                    },
-                    postBody = postBody,
-                    updatePostBody = {
-                        createPostViewModel.updatePostBody(it)
-                    },
-                    recipe = createPostViewModel.recipe.collectAsState().value,
-                    onAddNewStep = {
-                        createPostViewModel.openAddStepDialog()
-                    },
-                    updateStep = {
-                        createPostViewModel.openUpdateStep(it)
-                    },
-                    deleteStep = {
-                        createPostViewModel.deleteStep(it)
-                    },
-                    ingredients = createPostViewModel.ingredients.collectAsState().value,
-                    onAddNewIngredient = {
-                        createPostViewModel.openAddIngredientDialog()
-                    },
-                    updateIngredient = {
-                        createPostViewModel.openUpdateIngredient(it)
-                    },
-                    deleteIngredient = {
-                        createPostViewModel.deleteIngredient(it)
-                    },
-                    postImageUri = postImageUri,
-                    updatePostImageUri = {
-                        createPostViewModel.updatePostImageUri(it)
-                    },
-                    onPostButtonClick = {
-                        createPostViewModel.createPost(
-                            onSuccessNavigate = { post ->
-                                navController.navigate(Routes.App.PostDetails(post))
-                            }
-                        )
-                    },
-                    onBackButtonClick = {
-                        navController.navigateUp()
-                    },
-                )
-                if (createPostViewModel.isAddStepDialogOpen.collectAsState().value) {
-                    AddStepDialog(
-                        onAddStep = {
-                            createPostViewModel.addStepToRecipe(it)
-                            createPostViewModel.closeDialog()
-                        },
-                        onDismissRequest = {
-                            createPostViewModel.closeDialog()
-                        }
-                    )
-                }
-                if (createPostViewModel.isAddIngredientDialogOpen.collectAsState().value) {
-                    AddIngredientDialog(
-                        onAddIngredient = {
-                            createPostViewModel.addIngredient(it)
-                            createPostViewModel.closeDialog()
-                        },
-                        onDismissRequest = {
-                            createPostViewModel.closeDialog()
-                        }
-                    )
-                }
-                when (val updateStepDialogState = createPostViewModel.updateStepDialogState.collectAsState().value) {
-                    is UpdateStepDialogState.Open -> {
-                        UpdateStepDialog(
-                            step = updateStepDialogState.step,
-                            onUpdateStep = {
-                                createPostViewModel.updateStep(updateStepDialogState.index, it)
-                                createPostViewModel.closeDialog()
-                            },
-                            onDismissRequest = {
-                                createPostViewModel.closeDialog()
-                            }
-                        )
-                    }
-                    UpdateStepDialogState.Closed -> {}
-                }
-                when (val updateIngredientDialogState = createPostViewModel.updateIngredientDialogState.collectAsState().value) {
-                    is UpdateIngredientDialogState.Open -> {
-                        UpdateIngredientDialog(
-                            ingredient = updateIngredientDialogState.ingredient,
-                            onUpdateIngredient = {
-                                createPostViewModel.updateIngredient(updateIngredientDialogState.index, it)
-                                createPostViewModel.closeDialog()
-                            },
-                            onDismissRequest = {
-                                createPostViewModel.closeDialog()
-                            }
-                        )
-                    }
-                    UpdateIngredientDialogState.Closed -> {}
-                }
-            }
-
-            composable<Routes.App.PostDetails>(
-                typeMap = mapOf(
-                    typeOf<Post>() to CustomNavTypes.PostType,
-                )
-            ) {
-                viewModel.updateTopBarState(CookbookUiState.TopBarState.Default)
-                viewModel.updateBottomBarState(CookbookUiState.BottomBarState.NoBottomBar)
-                viewModel.updateCanNavigateBack(true)
-
-                val postRoute = it.toRoute<Routes.App.PostDetails>()
-
-                val postDetailsViewModel = hiltViewModel<PostDetailsViewModel, PostDetailsViewModel.PostDetailsViewModelFactory> { factory ->
-                    factory.create(postRoute.post)
-                }
-
-                when (val postUiState = postDetailsViewModel.postUiState.collectAsState().value) {
-                    is PostUiState.Success -> {
-                        PostDetailsScreen(
-                            post = postUiState.post,
-                            isLiked = postDetailsViewModel.isLiked.collectAsState().value,
-                            onLikedClick = {
-                                postDetailsViewModel.toggleLike()
-                            }
-                        )
-                    }
-                    is PostUiState.Error -> {
-                        // TODO
-                    }
-                    is PostUiState.Loading -> {
-                        // TODO
-                    }
-                }
-            }
+            postDetails(viewModel)
         }
     }
 }

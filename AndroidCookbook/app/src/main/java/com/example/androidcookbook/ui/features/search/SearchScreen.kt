@@ -92,7 +92,7 @@ fun SearchScreen(
                 )
             }
             SearchScreenState.Detail -> {
-                PostDetailsScreen(Post(), false, {}) //TODO
+                PostDetailsScreen(Post(), false, {}, {}) //TODO
             }
         }
 
