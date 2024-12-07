@@ -21,6 +21,7 @@ import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material.icons.outlined.Lock
 import androidx.compose.material.icons.outlined.Visibility
 import androidx.compose.material.icons.outlined.VisibilityOff
+import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -145,7 +146,7 @@ private fun BaseTextField(
         value = text,
         onValueChange = onChange,
         label = { Text(text = placeholderText) },
-        textStyle = TextStyle.Default.copy(fontSize = 20.sp),
+        textStyle = LocalTextStyle.current.copy(fontSize = 20.sp),
         visualTransformation = visualTransformation,
         keyboardOptions = KeyboardOptions(keyboardType = keyboardType, imeAction = imeAction),
         trailingIcon = trailingIcon,

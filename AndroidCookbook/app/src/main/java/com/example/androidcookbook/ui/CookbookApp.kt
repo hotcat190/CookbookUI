@@ -32,12 +32,18 @@ import com.example.androidcookbook.ui.common.appbars.AppBarTheme
 import com.example.androidcookbook.ui.common.appbars.CookbookAppBarDefault
 import com.example.androidcookbook.ui.common.appbars.CookbookBottomNavigationBar
 import com.example.androidcookbook.ui.common.appbars.SearchBar
-import com.example.androidcookbook.ui.features.auth.components.SignColor
-import com.example.androidcookbook.ui.features.post.CreatePostScreen
-import com.example.androidcookbook.ui.features.post.CreatePostViewModel
-import com.example.androidcookbook.ui.features.post.PostDetailsScreen
-import com.example.androidcookbook.ui.features.post.PostDetailsViewModel
-import com.example.androidcookbook.ui.features.post.PostUiState
+import com.example.androidcookbook.ui.features.auth.theme.SignLayoutTheme
+import com.example.androidcookbook.ui.features.post.create.AddIngredientDialog
+import com.example.androidcookbook.ui.features.post.create.AddStepDialog
+import com.example.androidcookbook.ui.features.post.create.CreatePostScreen
+import com.example.androidcookbook.ui.features.post.create.CreatePostViewModel
+import com.example.androidcookbook.ui.features.post.create.UpdateIngredientDialog
+import com.example.androidcookbook.ui.features.post.create.UpdateIngredientDialogState
+import com.example.androidcookbook.ui.features.post.create.UpdateStepDialog
+import com.example.androidcookbook.ui.features.post.create.UpdateStepDialogState
+import com.example.androidcookbook.ui.features.post.details.PostDetailsScreen
+import com.example.androidcookbook.ui.features.post.details.PostDetailsViewModel
+import com.example.androidcookbook.ui.features.post.details.PostUiState
 import com.example.androidcookbook.ui.features.search.SearchScreen
 import com.example.androidcookbook.ui.features.search.SearchViewModel
 import com.example.androidcookbook.ui.nav.CustomNavTypes
@@ -70,7 +76,13 @@ fun CookbookApp(
         topBar = {
             when (uiState.topBarState) {
                 is CookbookUiState.TopBarState.Auth -> {
-                    updateSystemBarColors(SignColor.Oval.toArgb(), SignColor.Background.toArgb(), true)
+                    SignLayoutTheme {
+                        updateSystemBarColors(
+                            MaterialTheme.colorScheme.onBackground.toArgb(),
+                            MaterialTheme.colorScheme.background.toArgb(),
+                            true
+                        )
+                    }
                 }
                 is CookbookUiState.TopBarState.Custom -> (uiState.topBarState as CookbookUiState.TopBarState.Custom).topAppBar.invoke()
                 is CookbookUiState.TopBarState.Default -> {
@@ -186,6 +198,26 @@ fun CookbookApp(
                     updatePostBody = {
                         createPostViewModel.updatePostBody(it)
                     },
+                    recipe = createPostViewModel.recipe.collectAsState().value,
+                    onAddNewStep = {
+                        createPostViewModel.openAddStepDialog()
+                    },
+                    updateStep = {
+                        createPostViewModel.openUpdateStep(it)
+                    },
+                    deleteStep = {
+                        createPostViewModel.deleteStep(it)
+                    },
+                    ingredients = createPostViewModel.ingredients.collectAsState().value,
+                    onAddNewIngredient = {
+                        createPostViewModel.openAddIngredientDialog()
+                    },
+                    updateIngredient = {
+                        createPostViewModel.openUpdateIngredient(it)
+                    },
+                    deleteIngredient = {
+                        createPostViewModel.deleteIngredient(it)
+                    },
                     postImageUri = postImageUri,
                     updatePostImageUri = {
                         createPostViewModel.updatePostImageUri(it)
@@ -201,6 +233,58 @@ fun CookbookApp(
                         navController.navigateUp()
                     },
                 )
+                if (createPostViewModel.isAddStepDialogOpen.collectAsState().value) {
+                    AddStepDialog(
+                        onAddStep = {
+                            createPostViewModel.addStepToRecipe(it)
+                            createPostViewModel.closeDialog()
+                        },
+                        onDismissRequest = {
+                            createPostViewModel.closeDialog()
+                        }
+                    )
+                }
+                if (createPostViewModel.isAddIngredientDialogOpen.collectAsState().value) {
+                    AddIngredientDialog(
+                        onAddIngredient = {
+                            createPostViewModel.addIngredient(it)
+                            createPostViewModel.closeDialog()
+                        },
+                        onDismissRequest = {
+                            createPostViewModel.closeDialog()
+                        }
+                    )
+                }
+                when (val updateStepDialogState = createPostViewModel.updateStepDialogState.collectAsState().value) {
+                    is UpdateStepDialogState.Open -> {
+                        UpdateStepDialog(
+                            step = updateStepDialogState.step,
+                            onUpdateStep = {
+                                createPostViewModel.updateStep(updateStepDialogState.index, it)
+                                createPostViewModel.closeDialog()
+                            },
+                            onDismissRequest = {
+                                createPostViewModel.closeDialog()
+                            }
+                        )
+                    }
+                    UpdateStepDialogState.Closed -> {}
+                }
+                when (val updateIngredientDialogState = createPostViewModel.updateIngredientDialogState.collectAsState().value) {
+                    is UpdateIngredientDialogState.Open -> {
+                        UpdateIngredientDialog(
+                            ingredient = updateIngredientDialogState.ingredient,
+                            onUpdateIngredient = {
+                                createPostViewModel.updateIngredient(updateIngredientDialogState.index, it)
+                                createPostViewModel.closeDialog()
+                            },
+                            onDismissRequest = {
+                                createPostViewModel.closeDialog()
+                            }
+                        )
+                    }
+                    UpdateIngredientDialogState.Closed -> {}
+                }
             }
 
             composable<Routes.App.PostDetails>(

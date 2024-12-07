@@ -1,7 +1,7 @@
 package com.example.androidcookbook.ui.features.aigen
 
 import android.net.Uri
-import com.example.androidcookbook.domain.model.aigen.Ingredient
+import com.example.androidcookbook.domain.model.ingredient.Ingredient
 import com.google.gson.annotations.Expose
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
@@ -11,7 +11,7 @@ data class AIGenUiState(
     @Expose val mealTitle: String = "",
     @Expose val portion: String = "",
     @Expose val cookingTime: String = "",
-    @Expose val ingredients: MutableList<Ingredient> = mutableListOf(Ingredient()),
+    @Expose val ingredients: MutableList<Ingredient> = mutableListOf(Ingredient("", "")),
     val response: String = "",
     @Expose val servedAs: String = "Main Dish",
     @Expose val timeMeasurement: String = "Minute",

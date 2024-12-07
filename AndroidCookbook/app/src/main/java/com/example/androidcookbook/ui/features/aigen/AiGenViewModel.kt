@@ -7,7 +7,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.androidcookbook.data.network.AiGenService
 import com.example.androidcookbook.data.repositories.AiGenRepository
 import com.example.androidcookbook.domain.model.aigen.AiRecipe
-import com.example.androidcookbook.domain.model.aigen.Ingredient
+import com.example.androidcookbook.domain.model.ingredient.Ingredient
 import com.google.gson.GsonBuilder
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow

@@ -55,6 +55,8 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.rememberAsyncImagePainter
 import com.example.androidcookbook.R
 import com.example.androidcookbook.domain.model.aigen.AiRecipe
+import com.example.androidcookbook.domain.usecase.createImageRequestBody
+import com.example.androidcookbook.domain.usecase.getFileFromUri
 import com.example.androidcookbook.ui.components.aigen.CookingLoadingAnimation
 import com.example.androidcookbook.ui.components.aigen.CookingTimeInput
 import com.example.androidcookbook.ui.components.aigen.IngredientsInput
@@ -67,7 +69,6 @@ import kotlinx.coroutines.launch
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.asRequestBody
-import java.io.File
 
 
 @Composable
@@ -133,12 +134,13 @@ fun AIGenScreen(modifier: Modifier = Modifier) {
                     onClick = {
                         testJson = aiGenViewModel.getUiStateJson()
                         scope.launch {
-                            val file =
-                                getFileFromUri(context, aiGenViewModel.selectedImageUri.value)
-                            file?.let {
-                                val requestFile = it.asRequestBody("image/*".toMediaTypeOrNull())
-                                val body =
-                                    MultipartBody.Part.createFormData("image", it.name, requestFile)
+                            val body = aiGenViewModel.selectedImageUri.value?.let {
+                                createImageRequestBody(context,
+                                    it
+                                )
+                            }
+                            body?.let {
+                                // Use the 'body' in your network request
                                 aiGenViewModel.uploadImage(body)
                             }
                         }
@@ -486,21 +488,6 @@ fun DashedLine(
             strokeWidth = strokeWidth,
             pathEffect = PathEffect.dashPathEffect(floatArrayOf(dashWidth, dashGap), 0f)
         )
-    }
-}
-
-
-fun getFileFromUri(context: android.content.Context, uri: Uri?): File? {
-    return try {
-        val inputStream = uri?.let { context.contentResolver.openInputStream(it) } ?: return null
-        val tempFile = File.createTempFile("upload", ".jpg", context.cacheDir)
-        tempFile.outputStream().use { output ->
-            inputStream.copyTo(output)
-        }
-        tempFile
-    } catch (e: Exception) {
-        e.printStackTrace()
-        null
     }
 }
 

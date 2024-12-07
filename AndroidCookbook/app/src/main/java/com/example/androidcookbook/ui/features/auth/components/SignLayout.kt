@@ -5,10 +5,14 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.absoluteOffset
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.requiredWidth
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -36,11 +40,18 @@ fun SignLayout(
         ) {
             val ovalColor = MaterialTheme.colorScheme.onBackground
             // Background and layout setup
-            Canvas(modifier = Modifier.fillMaxSize()) {
+            Canvas(
+                modifier = Modifier
+                    .height(275.dp)
+                    .requiredWidth(500.dp)
+                    .absoluteOffset(
+                        y = (-100).dp,
+                    )
+            ) {
                 drawOval(
                     color = ovalColor,
-                    topLeft = Offset(-215f, -290f),
-                    size = Size(1500f, 750f)
+//                    topLeft = Offset(-215f, -290f),
+//                    size = Size(1500f, 750f)
                 )
             }
 

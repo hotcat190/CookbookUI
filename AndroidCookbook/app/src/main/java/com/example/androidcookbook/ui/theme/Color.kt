@@ -1,5 +1,9 @@
 package com.example.androidcookbook.ui.theme
 
+import androidx.compose.material3.ButtonColors
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.TextFieldDefaults
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 
 val Purple80 = Color(0xFFD0BCFF)
@@ -46,3 +50,23 @@ val Pink40 = Color(0xFF7D5260)
 //    val Tertiary = Color(0xFFE8DEF8)
 //    val Scrim = Color(0xFFD7C2EF)
 //}
+
+@Composable
+fun transparentTextFieldColors() = TextFieldDefaults.colors(
+    focusedContainerColor = Color.Transparent,
+    unfocusedContainerColor = Color.Transparent,
+    disabledContainerColor = Color.Transparent,
+    errorContainerColor = Color.Transparent,
+    focusedIndicatorColor = Color.Transparent,
+    unfocusedIndicatorColor = Color.Transparent,
+    errorIndicatorColor = Color.Transparent,
+    disabledIndicatorColor = Color.Transparent
+)
+
+@Composable
+fun transparentButtonColors() = ButtonColors(
+    containerColor = Color.Transparent,
+    contentColor = MaterialTheme.colorScheme.primary,
+    disabledContainerColor = Color.Transparent,
+    disabledContentColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.6f)
+)

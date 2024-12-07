@@ -35,7 +35,7 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.androidcookbook.R
-import com.example.androidcookbook.domain.model.aigen.Ingredient
+import com.example.androidcookbook.domain.model.ingredient.Ingredient
 
 
 @Composable

@@ -1,4 +1,4 @@
-package com.example.androidcookbook.ui.features.post
+package com.example.androidcookbook.ui.features.post.details
 
 import android.util.Log
 import androidx.lifecycle.ViewModel
@@ -92,8 +92,3 @@ class PostDetailsViewModel @AssistedInject constructor(
 
 }
 
-sealed class PostUiState {
-    data class Success(val post: Post) : PostUiState()
-    data class Error(val message: String) : PostUiState()
-    data object Loading : PostUiState()
-}

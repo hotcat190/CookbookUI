@@ -4,12 +4,14 @@ import com.example.androidcookbook.data.network.AiGenService
 import com.example.androidcookbook.data.network.AuthService
 import com.example.androidcookbook.data.network.NewsfeedService
 import com.example.androidcookbook.data.network.PostService
+import com.example.androidcookbook.data.network.UploadService
 import com.example.androidcookbook.data.network.UserService
 import com.example.androidcookbook.data.providers.AccessTokenProvider
 import com.example.androidcookbook.data.repositories.AiGenRepository
 import com.example.androidcookbook.data.repositories.AuthRepository
 import com.example.androidcookbook.data.repositories.NewsfeedRepository
 import com.example.androidcookbook.data.repositories.PostRepository
+import com.example.androidcookbook.data.repositories.UploadRepository
 import com.example.androidcookbook.data.repositories.UserRepository
 import com.skydoves.sandwich.retrofit.adapters.ApiResponseCallAdapterFactory
 import dagger.Module
@@ -113,4 +115,14 @@ object CookbookBEModule {
     @Singleton
     fun provideNewsfeedRepository(newsfeedService: NewsfeedService): NewsfeedRepository =
         NewsfeedRepository(newsfeedService)
+
+    @Provides
+    @Singleton
+    fun provideUploadService(@CookbookRetrofit retrofit: Retrofit): UploadService =
+        retrofit.create(UploadService::class.java)
+
+    @Provides
+    @Singleton
+    fun provideUploadRepository(uploadService: UploadService): UploadRepository =
+        UploadRepository(uploadService)
 }

@@ -1,4 +1,4 @@
-package com.example.androidcookbook.ui.features.post
+package com.example.androidcookbook.ui.features.post.details
 
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image

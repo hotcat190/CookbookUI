@@ -21,6 +21,9 @@ val LightGradientHigh = Color(184, 211, 233)
 val LightGradientLow = Color(99, 161, 209)
 val LightGradientLowest = Color(255, 255, 255)
 
+val DarkOval = Color(0xFF4F3423)
+val DarkBackground = Color(0xFF251404)
+
 val LightSignLayout = lightColorScheme(
     primary = LightTitle,
     inversePrimary = LightText,
@@ -36,7 +39,10 @@ val LightSignLayout = lightColorScheme(
     surfaceContainerLowest = LightGradientLowest,
 )
 
-val DarkSignLayout = darkColorScheme()
+val DarkSignLayout = darkColorScheme(
+    background = DarkBackground,
+    onBackground = DarkOval,
+)
 
 @Composable
 fun SignLayoutTheme(

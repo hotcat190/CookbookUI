@@ -4,7 +4,6 @@ import com.example.androidcookbook.domain.model.post.Post
 import com.example.androidcookbook.domain.model.post.PostCreateRequest
 import com.example.androidcookbook.domain.model.post.PostCreateResponse
 import com.example.androidcookbook.domain.network.SuccessMessageBody
-import com.example.androidcookbook.ui.features.post.PostUiState
 import com.skydoves.sandwich.ApiResponse
 import retrofit2.http.Body
 import retrofit2.http.DELETE
@@ -27,4 +26,6 @@ interface PostService {
 
     @DELETE("like/{id}")
     suspend fun unlikePost(@Path("id") id: Int): ApiResponse<SuccessMessageBody>
+
+
 }
