@@ -8,14 +8,18 @@ import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
@@ -221,19 +225,22 @@ fun CreatePostScreen(
         Row(
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier
-                .padding(8.dp)
                 .clip(MaterialTheme.shapes.medium)
                 .clickable { onAddNewStep() }
         ) {
-            Icon(
-                imageVector = Icons.Outlined.AddBox,
-                contentDescription = "Add recipe"
-            )
-            Spacer(Modifier.width(8.dp))
-            Text(
-                text = "Add step",
-                modifier = Modifier
-            )
+            Row(
+                modifier = Modifier.padding(all = 8.dp)
+            ) {
+                Icon(
+                    imageVector = Icons.Outlined.AddBox,
+                    contentDescription = "Add recipe"
+                )
+                Spacer(Modifier.width(8.dp))
+                Text(
+                    text = "Add step",
+                    modifier = Modifier
+                )
+            }
         }
 
         Spacer(Modifier.height(16.dp))
@@ -281,19 +288,22 @@ fun CreatePostScreen(
         Row(
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier
-                .padding(8.dp)
                 .clip(MaterialTheme.shapes.medium)
-                .clickable { onAddNewIngredient() }
+                .clickable { onAddNewStep() }
         ) {
-            Icon(
-                imageVector = Icons.Outlined.AddBox,
-                contentDescription = "Add ingredient"
-            )
-            Spacer(Modifier.width(8.dp))
-            Text(
-                text = "Add ingredient",
-                modifier = Modifier
-            )
+            Row(
+                modifier = Modifier.padding(all = 8.dp)
+            ) {
+                Icon(
+                    imageVector = Icons.Outlined.AddBox,
+                    contentDescription = "Add ingredient"
+                )
+                Spacer(Modifier.width(8.dp))
+                Text(
+                    text = "Add ingredient",
+                    modifier = Modifier
+                )
+            }
         }
 
         Spacer(Modifier.height(16.dp))

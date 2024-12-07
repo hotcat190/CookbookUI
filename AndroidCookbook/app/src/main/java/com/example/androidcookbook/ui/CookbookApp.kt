@@ -79,7 +79,7 @@ fun CookbookApp(
                     SignLayoutTheme {
                         updateSystemBarColors(
                             MaterialTheme.colorScheme.onBackground.toArgb(),
-                            MaterialTheme.colorScheme.background.toArgb(),
+                            MaterialTheme.colorScheme.surfaceContainerLowest.toArgb(),
                             true
                         )
                     }
