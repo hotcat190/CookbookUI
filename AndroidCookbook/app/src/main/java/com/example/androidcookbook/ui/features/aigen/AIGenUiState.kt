@@ -16,7 +16,9 @@ data class AIGenUiState(
     @Expose val servedAs: String = "Main Dish",
     @Expose val timeMeasurement: String = "Minute",
     @Expose val note: String = "",
+    val recipes: MutableList<String> = mutableListOf(),
     val isTakingInput: Boolean = true,
     val isProcessing: Boolean = false,
+    val isDoneUploadingImage:Boolean = false,
     val isDone: Boolean = false,
 )
