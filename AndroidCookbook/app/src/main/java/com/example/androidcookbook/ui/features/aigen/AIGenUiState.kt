@@ -1,7 +1,7 @@
 package com.example.androidcookbook.ui.features.aigen
 
 import android.net.Uri
-import com.example.androidcookbook.domain.model.aigen.Ingredient
+import com.example.androidcookbook.domain.model.ingredient.Ingredient
 import com.google.gson.annotations.Expose
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient

@@ -10,6 +10,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -28,10 +29,10 @@ fun SignButton(
     Button(
         onClick = onClick,
         modifier = Modifier
-            .width(300.dp)
+            .width(145.dp)
             .height(50.dp),
-        colors = ButtonDefaults.buttonColors(Color(0xFF916246)),
-        shape = RoundedCornerShape(size = 30.dp)
+        colors = ButtonDefaults.buttonColors(MaterialTheme.colorScheme.secondary),
+        shape = RoundedCornerShape(size = 12.dp)
     ) {
         Row {
             Text(

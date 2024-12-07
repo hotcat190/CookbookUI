@@ -60,6 +60,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.rememberAsyncImagePainter
 import com.example.androidcookbook.R
 import com.example.androidcookbook.domain.model.aigen.AiRecipe
+import com.example.androidcookbook.domain.usecase.createImageRequestBody
 import com.example.androidcookbook.ui.components.aigen.CookingLoadingAnimation
 import com.example.androidcookbook.ui.components.aigen.CookingTimeInput
 import com.example.androidcookbook.ui.components.aigen.IngredientsInput
@@ -192,7 +193,6 @@ fun TakingInputScreen(
 ) {
 
 
-
     val launcher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.StartActivityForResult()
     ) { result ->
@@ -203,28 +203,25 @@ fun TakingInputScreen(
                 val uri: Uri? = result.data?.data
                 viewModel.updateSelectedUri(uri)
                 viewModel.updateIsProcessing()
-                val file =
-                    getFileFromUri(context, viewModel.selectedImageUri.value)
-                file?.let {
-                    val requestFile = it.asRequestBody("image/*".toMediaTypeOrNull())
-                    val body =
-                        MultipartBody.Part.createFormData("image", it.name, requestFile)
-                    val result = viewModel.uploadImage(body)
 
-                    if (result != null) {
-                        Log.d("Upload", "Upload successful")
-                        viewModel.uploadResponse.value?.ingredients?.forEach { ingredient ->
-                            viewModel.addIngredient(ingredient)
-                        }
-                    } else {
-                        Log.d("Upload", "Upload failed.")
+                val body = uri?.let { createImageRequestBody(context, it) }
+
+                val result = body?.let { viewModel.uploadImage(it) }
+
+                if (result != null) {
+                    Log.d("Upload", "Upload successful")
+                    viewModel.uploadResponse.value?.ingredients?.forEach { ingredient ->
+                        viewModel.addIngredient(ingredient)
                     }
+                } else {
+                    Log.d("Upload", "Upload failed.")
                 }
-                viewModel.updateIsDone()
-
             }
+            viewModel.updateIsDone()
+
         }
     }
+
 
     Box(
         modifier = modifier

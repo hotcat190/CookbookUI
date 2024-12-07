@@ -3,7 +3,6 @@ package com.example.androidcookbook.ui
 import android.app.Activity
 import android.graphics.Color
 import android.util.Log
-import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -12,7 +11,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -34,11 +32,18 @@ import com.example.androidcookbook.ui.common.appbars.AppBarTheme
 import com.example.androidcookbook.ui.common.appbars.CookbookAppBarDefault
 import com.example.androidcookbook.ui.common.appbars.CookbookBottomNavigationBar
 import com.example.androidcookbook.ui.common.appbars.SearchBar
-import com.example.androidcookbook.ui.features.auth.components.SignColor
-import com.example.androidcookbook.ui.features.post.CreatePostScreen
-import com.example.androidcookbook.ui.features.post.CreatePostViewModel
-import com.example.androidcookbook.ui.features.post.PostDetailsScreen
-import com.example.androidcookbook.ui.features.post.PostDetailsViewModel
+import com.example.androidcookbook.ui.features.auth.theme.SignLayoutTheme
+import com.example.androidcookbook.ui.features.post.create.AddIngredientDialog
+import com.example.androidcookbook.ui.features.post.create.AddStepDialog
+import com.example.androidcookbook.ui.features.post.create.CreatePostScreen
+import com.example.androidcookbook.ui.features.post.create.CreatePostViewModel
+import com.example.androidcookbook.ui.features.post.create.UpdateIngredientDialog
+import com.example.androidcookbook.ui.features.post.create.UpdateIngredientDialogState
+import com.example.androidcookbook.ui.features.post.create.UpdateStepDialog
+import com.example.androidcookbook.ui.features.post.create.UpdateStepDialogState
+import com.example.androidcookbook.ui.features.post.details.PostDetailsScreen
+import com.example.androidcookbook.ui.features.post.details.PostDetailsViewModel
+import com.example.androidcookbook.ui.features.post.details.PostUiState
 import com.example.androidcookbook.ui.features.search.SearchScreen
 import com.example.androidcookbook.ui.features.search.SearchViewModel
 import com.example.androidcookbook.ui.nav.CustomNavTypes
@@ -71,7 +76,13 @@ fun CookbookApp(
         topBar = {
             when (uiState.topBarState) {
                 is CookbookUiState.TopBarState.Auth -> {
-                    updateSystemBarColors(SignColor.Oval.toArgb(), SignColor.Background.toArgb(), true)
+                    SignLayoutTheme {
+                        updateSystemBarColors(
+                            MaterialTheme.colorScheme.onBackground.toArgb(),
+                            MaterialTheme.colorScheme.background.toArgb(),
+                            true
+                        )
+                    }
                 }
                 is CookbookUiState.TopBarState.Custom -> (uiState.topBarState as CookbookUiState.TopBarState.Custom).topAppBar.invoke()
                 is CookbookUiState.TopBarState.Default -> {
@@ -149,12 +160,14 @@ fun CookbookApp(
                 viewModel.updateBottomBarState(CookbookUiState.BottomBarState.NoBottomBar)
                 viewModel.updateCanNavigateBack(true)
                 viewModel.updateTopBarState(CookbookUiState.TopBarState.Custom {
-                    SearchBar(
-                        onSearch = { searchViewModel.search(it) },
-                        navigateBackAction = {
-                            navController.navigateUp()
-                        },
-                    )
+                    AppBarTheme {
+                        SearchBar(
+                            onSearch = { searchViewModel.search(it) },
+                            navigateBackAction = {
+                                navController.navigateUp()
+                            },
+                        )
+                    }
                 })
                 SearchScreen(
                     viewModel = searchViewModel,
@@ -185,6 +198,26 @@ fun CookbookApp(
                     updatePostBody = {
                         createPostViewModel.updatePostBody(it)
                     },
+                    recipe = createPostViewModel.recipe.collectAsState().value,
+                    onAddNewStep = {
+                        createPostViewModel.openAddStepDialog()
+                    },
+                    updateStep = {
+                        createPostViewModel.openUpdateStep(it)
+                    },
+                    deleteStep = {
+                        createPostViewModel.deleteStep(it)
+                    },
+                    ingredients = createPostViewModel.ingredients.collectAsState().value,
+                    onAddNewIngredient = {
+                        createPostViewModel.openAddIngredientDialog()
+                    },
+                    updateIngredient = {
+                        createPostViewModel.openUpdateIngredient(it)
+                    },
+                    deleteIngredient = {
+                        createPostViewModel.deleteIngredient(it)
+                    },
                     postImageUri = postImageUri,
                     updatePostImageUri = {
                         createPostViewModel.updatePostImageUri(it)
@@ -200,6 +233,58 @@ fun CookbookApp(
                         navController.navigateUp()
                     },
                 )
+                if (createPostViewModel.isAddStepDialogOpen.collectAsState().value) {
+                    AddStepDialog(
+                        onAddStep = {
+                            createPostViewModel.addStepToRecipe(it)
+                            createPostViewModel.closeDialog()
+                        },
+                        onDismissRequest = {
+                            createPostViewModel.closeDialog()
+                        }
+                    )
+                }
+                if (createPostViewModel.isAddIngredientDialogOpen.collectAsState().value) {
+                    AddIngredientDialog(
+                        onAddIngredient = {
+                            createPostViewModel.addIngredient(it)
+                            createPostViewModel.closeDialog()
+                        },
+                        onDismissRequest = {
+                            createPostViewModel.closeDialog()
+                        }
+                    )
+                }
+                when (val updateStepDialogState = createPostViewModel.updateStepDialogState.collectAsState().value) {
+                    is UpdateStepDialogState.Open -> {
+                        UpdateStepDialog(
+                            step = updateStepDialogState.step,
+                            onUpdateStep = {
+                                createPostViewModel.updateStep(updateStepDialogState.index, it)
+                                createPostViewModel.closeDialog()
+                            },
+                            onDismissRequest = {
+                                createPostViewModel.closeDialog()
+                            }
+                        )
+                    }
+                    UpdateStepDialogState.Closed -> {}
+                }
+                when (val updateIngredientDialogState = createPostViewModel.updateIngredientDialogState.collectAsState().value) {
+                    is UpdateIngredientDialogState.Open -> {
+                        UpdateIngredientDialog(
+                            ingredient = updateIngredientDialogState.ingredient,
+                            onUpdateIngredient = {
+                                createPostViewModel.updateIngredient(updateIngredientDialogState.index, it)
+                                createPostViewModel.closeDialog()
+                            },
+                            onDismissRequest = {
+                                createPostViewModel.closeDialog()
+                            }
+                        )
+                    }
+                    UpdateIngredientDialogState.Closed -> {}
+                }
             }
 
             composable<Routes.App.PostDetails>(
@@ -217,11 +302,23 @@ fun CookbookApp(
                     factory.create(postRoute.post)
                 }
 
-                val post = postDetailsViewModel.post.collectAsState().value
-
-                PostDetailsScreen(post)
-
-
+                when (val postUiState = postDetailsViewModel.postUiState.collectAsState().value) {
+                    is PostUiState.Success -> {
+                        PostDetailsScreen(
+                            post = postUiState.post,
+                            isLiked = postDetailsViewModel.isLiked.collectAsState().value,
+                            onLikedClick = {
+                                postDetailsViewModel.toggleLike()
+                            }
+                        )
+                    }
+                    is PostUiState.Error -> {
+                        // TODO
+                    }
+                    is PostUiState.Loading -> {
+                        // TODO
+                    }
+                }
             }
         }
     }

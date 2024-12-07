@@ -8,9 +8,11 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Text
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
@@ -30,10 +32,11 @@ fun AppLogo() {
                 .width(150.dp)
                 .height(150.dp)
                 .background(
-                    color = Color(0xFFFFFFFF),
+                    color = MaterialTheme.colorScheme.surface,
                     shape = RoundedCornerShape(size = 150.dp)
                 )
-                .padding(start = 11.dp, top = 11.dp, end = 11.dp, bottom = 11.dp)
+                .padding(start = 11.dp, top = 11.dp, end = 11.dp, bottom = 11.dp),
+            colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.inversePrimary)
         )
         Text(
             text = "CookBook",
@@ -41,7 +44,7 @@ fun AppLogo() {
                 fontSize = 40.sp,
                 fontFamily = FontFamily(Font(R.font.lobster_regular)),
                 fontWeight = FontWeight(400),
-                color = Color(0xFFFFFFFF),
+                color = MaterialTheme.colorScheme.primary,
             )
         )
     }
