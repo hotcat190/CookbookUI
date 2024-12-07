@@ -6,7 +6,6 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigation
 import androidx.navigation.toRoute
-import com.example.androidcookbook.domain.model.post.Post
 import com.example.androidcookbook.ui.common.containers.RefreshableScreen
 import com.example.androidcookbook.ui.features.aigen.AIGenScreen
 import com.example.androidcookbook.ui.features.aigen.AiScreenTheme
@@ -15,10 +14,8 @@ import com.example.androidcookbook.ui.features.category.CategoryViewModel
 import com.example.androidcookbook.ui.features.newsfeed.NewsfeedScreen
 import com.example.androidcookbook.ui.features.newsfeed.NewsfeedViewModel
 import com.example.androidcookbook.ui.features.userprofile.UserProfileScreen
-import com.example.androidcookbook.ui.nav.CustomNavTypes
 import com.example.androidcookbook.ui.nav.Routes
 import com.example.androidcookbook.ui.nav.utils.sharedViewModel
-import kotlin.reflect.typeOf
 
 /**
  * App screens nav graph builder

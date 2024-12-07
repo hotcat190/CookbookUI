@@ -4,18 +4,21 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.ExposedDropdownMenuBox
-import androidx.compose.material.ExposedDropdownMenuDefaults
+import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.Text
 import androidx.compose.material.TextField
 import androidx.compose.material.TextFieldDefaults
 import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -24,6 +27,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.input.ImeAction
@@ -32,7 +36,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.androidcookbook.R
 
-@OptIn(ExperimentalMaterialApi::class)
+@OptIn(ExperimentalMaterialApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun CookingTimeInput(
     modifier: Modifier = Modifier,
@@ -50,40 +54,61 @@ fun CookingTimeInput(
             contentDescription = "Clock Icon"
         )
 
-        Spacer(Modifier.size(1.dp))
+        Spacer(Modifier.size(4.dp))
 
         // Time picking
         Row() {
 
-            TextField(
+//            TextField(
+//                modifier = Modifier
+//                    .weight(1.5f)
+//                    .height(48.dp),
+//                value = cookingTime,
+//                onValueChange = onCookingTimeChange,
+//                placeholder = {
+//                    Text(
+//                        "1",
+//                        textAlign = TextAlign.Center,
+//                        fontFamily = FontFamily(Font(R.font.nunito_regular)),
+//                        modifier = Modifier.fillMaxSize(),
+//                        color = Color(0xFFFFFFFF).copy(alpha = 0.5f),
+//                        fontSize = 14.sp
+//
+//                    )
+//                },
+//                singleLine = true,
+//                colors = TextFieldDefaults.textFieldColors(
+//                    focusedIndicatorColor = Color.Transparent,
+//                    unfocusedIndicatorColor = Color.Transparent,
+//                    cursorColor = Color.White,
+//                    textColor = Color.White,
+//                    backgroundColor = Color(0xFF4A4A4A)
+//                ),
+//                shape = RoundedCornerShape(4.dp),
+//                keyboardOptions = KeyboardOptions.Default.copy(
+//                    imeAction = ImeAction.Next
+//                )
+//                )
+
+            OutlinedTextField(
                 modifier = Modifier
                     .weight(1.5f)
-                    .height(48.dp),
+                    .height(44.dp),
                 value = cookingTime,
                 onValueChange = onCookingTimeChange,
-                placeholder = {
-                    Text(
-                        "1",
-                        textAlign = TextAlign.Center,
-                        fontFamily = FontFamily(Font(R.font.nunito_regular)),
-                        modifier = Modifier.fillMaxSize(),
-                        color = Color(0xFFFFFFFF).copy(alpha = 0.5f),
-                        fontSize = 14.sp
-
-                    )
-                },
                 singleLine = true,
-                colors = TextFieldDefaults.textFieldColors(
-                    focusedIndicatorColor = Color.Transparent,
-                    unfocusedIndicatorColor = Color.Transparent,
-                    cursorColor = Color.White,
-                    textColor = Color.White,
-                    backgroundColor = Color(0xFF4A4A4A)
-                ),
-                shape = RoundedCornerShape(4.dp),
                 keyboardOptions = KeyboardOptions.Default.copy(
                     imeAction = ImeAction.Next
-                )
+                ),
+                colors = TextFieldDefaults.textFieldColors(
+                    focusedIndicatorColor = MaterialTheme.colorScheme.outline,
+                    unfocusedIndicatorColor = MaterialTheme.colorScheme.outline,
+                    cursorColor = MaterialTheme.colorScheme.outline,
+                    textColor = MaterialTheme.colorScheme.outline,
+                    backgroundColor = MaterialTheme.colorScheme.surfaceContainer
+                ),
+                textStyle = TextStyle(textAlign = TextAlign.Center)
+
                 )
 
 
@@ -102,14 +127,15 @@ fun CookingTimeInput(
                     onValueChange = {},
                     readOnly = true, // Makes it non-editable
                     trailingIcon = { // Dropdown icon
-                        ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded)
+                            ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded)
+
                     },
                     colors = TextFieldDefaults.textFieldColors(
                         focusedIndicatorColor = Color.Transparent,
                         unfocusedIndicatorColor = Color.Transparent,
-                        cursorColor = Color.White,
-                        textColor = Color.Black,
-                        backgroundColor = Color(0xFFF9F4F1)
+                        cursorColor = MaterialTheme.colorScheme.outline,
+                        textColor = MaterialTheme.colorScheme.outline,
+                        backgroundColor = MaterialTheme.colorScheme.surfaceContainer
                     ),
                     singleLine = true,
 

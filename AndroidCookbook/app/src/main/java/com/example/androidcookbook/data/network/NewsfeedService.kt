@@ -6,6 +6,6 @@ import retrofit2.http.GET
 import retrofit2.http.Path
 
 interface NewsfeedService {
-    @GET("newfeeds/{limit}")
+    @GET("newsfeed/{limit}")
     suspend fun getNewsfeed(@Path("limit") limit: Int): ApiResponse<List<Post>>
 }
