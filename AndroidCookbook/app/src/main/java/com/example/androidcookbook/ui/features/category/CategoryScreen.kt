@@ -38,6 +38,8 @@ import coil.request.ImageRequest
 import com.example.androidcookbook.R
 import com.example.androidcookbook.domain.model.category.Category
 import com.example.androidcookbook.ui.common.containers.RefreshableScreen
+import com.example.androidcookbook.ui.components.AppLoadingAnimation
+import com.example.androidcookbook.ui.components.category.CategoryScreenLoading
 import com.example.androidcookbook.ui.theme.Typography
 import kotlinx.coroutines.delay
 
@@ -52,7 +54,10 @@ fun CategoryScreen(
         onRefresh = { categoryViewModel.refresh() }
     ) {
         when (val categoryUiState = categoryViewModel.categoryUiState.collectAsState().value) {
-            is CategoryUiState.Loading -> Text("Loading")
+            is CategoryUiState.Loading -> {
+                CategoryScreenLoading()
+            }
+
             is CategoryUiState.Success -> {
                 CategoryListScreen(
                     categories = categoryUiState.categories,
@@ -61,6 +66,7 @@ fun CategoryScreen(
                         .padding(start = 8.dp, top = 16.dp, end = 8.dp)
                 )
             }
+
             is CategoryUiState.Error -> Text("Error")
         }
     }
@@ -143,7 +149,7 @@ private fun CategoryListScreen(
         verticalArrangement = Arrangement.spacedBy(24.dp),
         horizontalArrangement = Arrangement.spacedBy(12.dp)
     ) {
-        item(span = { GridItemSpan(maxCurrentLineSpan) },) {
+        item(span = { GridItemSpan(maxCurrentLineSpan) }) {
             RandomMeal(randomMeals = categories)
         }
         item {

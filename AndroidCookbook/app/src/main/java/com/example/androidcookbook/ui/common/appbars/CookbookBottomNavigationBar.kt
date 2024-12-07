@@ -62,7 +62,7 @@ fun CookbookBottomNavigationBar(
 
             NavigationBar(
                 containerColor = Color.Transparent,
-                modifier = Modifier.heightIn(max = 96.dp),
+                modifier = Modifier.heightIn(max = 50.dp),
             ) {
                 NewsfeedNavigationBarItem(currentDestination, onNewsfeedClick, colors)
 
@@ -131,7 +131,8 @@ private fun RowScope.UserProfileNavigationBarItem(
         icon = {
             Icon(
                 painter = painterResource(R.drawable.icon_user_profile),
-                contentDescription = "User Profile"
+                contentDescription = "User Profile",
+                tint = Color(0xFF0D1114)
             )
         },
 //        label = {
@@ -159,7 +160,9 @@ private fun RowScope.NewsfeedNavigationBarItem(
             Icon(
                 painter = painterResource(R.drawable.home),
                 contentDescription = "Newsfeed",
-                modifier = Modifier
+                modifier = Modifier,
+                tint = Color(0xFF0D1114)
+
             )
         },
 //        label = {
@@ -187,7 +190,9 @@ private fun RowScope.AiChatNavigationBarItem(
             Icon(
                 painter = painterResource(R.drawable.ai_gen_light_mode),
                 contentDescription = "Chat",
-                modifier = Modifier.scale(1.2F)
+                modifier = Modifier.scale(1.2F),
+                tint = Color(0xFF0D1114)
+
             )
         },
 //        label = {
@@ -214,7 +219,9 @@ private fun RowScope.CategoryNavigationBarItem(
         icon = {
             Icon(
                 painter = painterResource(R.drawable.icon_category),
-                contentDescription = "Home"
+                contentDescription = "Home",
+                tint = Color(0xFF0D1114)
+
             )
         },
 //        label = {

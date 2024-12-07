@@ -73,6 +73,9 @@ class AiGenViewModel @Inject constructor(
         }
     }
 
+
+
+
     fun updateIngredientQuantity(index: Int, updatedIngredientQuantity: String) {
         _aiGenUiState.update { currentState ->
             val updatedIngredient = currentState.ingredients.toMutableList()
@@ -85,6 +88,14 @@ class AiGenViewModel @Inject constructor(
         _aiGenUiState.update { currentState ->
             val updatedIngredients = currentState.ingredients.toMutableList()
             updatedIngredients.add(Ingredient("",""))
+            currentState.copy(ingredients = updatedIngredients)
+        }
+    }
+
+    fun addIngredient(ingredient: Ingredient) {
+        _aiGenUiState.update { currentState ->
+            val updatedIngredients = currentState.ingredients.toMutableList()
+            updatedIngredients.add(ingredient)
             currentState.copy(ingredients = updatedIngredients)
         }
     }
@@ -170,20 +181,19 @@ class AiGenViewModel @Inject constructor(
         return gson.toJson(currentState) // Convert to JSON
     }
 
-    fun uploadImage(imagePart: MultipartBody.Part) {
-        viewModelScope.launch {
-            try {
-                val response: Response<AiRecipe> = aiGenRepository.uploadImage(
-                    image = imagePart
-                )
+    suspend fun uploadImage(imagePart: MultipartBody.Part): AiRecipe? {
+        return try {
+            val response: Response<AiRecipe> = aiGenRepository.uploadImage(image = imagePart)
+            if (response.isSuccessful) {
                 _uploadResponse.value = response.body()
-
-
-
-
-            } catch (e: Exception) {
-                Log.d("Error","Upload Error")
+                response.body()
+            } else {
+                Log.d("Error", "Upload failed with code: ${response.code()}")
+                null
             }
+        } catch (e: Exception) {
+            Log.d("Error", "Upload Error: ${e.message}")
+            null
         }
     }
 

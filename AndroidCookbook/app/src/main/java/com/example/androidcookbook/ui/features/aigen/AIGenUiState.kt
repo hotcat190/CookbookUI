@@ -11,7 +11,7 @@ data class AIGenUiState(
     @Expose val mealTitle: String = "",
     @Expose val portion: String = "",
     @Expose val cookingTime: String = "",
-    @Expose val ingredients: MutableList<Ingredient> = mutableListOf(Ingredient()),
+    @Expose val ingredients: MutableList<Ingredient> = mutableListOf(),
     val response: String = "",
     @Expose val servedAs: String = "Main Dish",
     @Expose val timeMeasurement: String = "Minute",

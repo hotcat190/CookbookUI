@@ -76,37 +76,7 @@ fun IngredientsInput(
 
         ingredients.forEachIndexed { index, (ingredient, quantity) ->
             Row(verticalAlignment = Alignment.CenterVertically) {
-//                TextField(
-//                    modifier = Modifier
-//                        .weight(2f),
-//                    value = ingredient,
-//                    onValueChange = { newIngredient ->
-//                        onIngredientNameChange(index, newIngredient)
-//                    },
-//                    placeholder = {
-//                        Text(
-//                            "Insert your ingredient",
-//
-//                            fontFamily = FontFamily(Font(R.font.nunito_regular)),
-//                            modifier = Modifier.fillMaxWidth(),
-//                            color = Color(0xFFFFFFFF).copy(alpha = 0.75f),
-//                            fontSize = 14.sp
-//
-//                        )
-//                    },
-//                    singleLine = true,
-//                    colors = TextFieldDefaults.textFieldColors(
-//                        focusedIndicatorColor = Color.Transparent,
-//                        unfocusedIndicatorColor = Color.Transparent,
-//                        cursorColor = Color.White,
-//                        textColor = Color.White,
-//                        backgroundColor = Color(0xFF4A4A4A)
-//                    ),
-//                    shape = RoundedCornerShape(4.dp),
-//                    keyboardOptions = KeyboardOptions.Default.copy(
-//                        imeAction = ImeAction.Next
-//                    )
-//                    )
+
 
                 OutlinedTextField(
                     modifier = Modifier
@@ -134,40 +104,7 @@ fun IngredientsInput(
 
                 Spacer(Modifier.size(4.dp))
 
-//                TextField(
-//                    modifier = Modifier
-//                        .weight(1f),
-//                    value = quantity,
-//                    onValueChange = { newQuantity ->
-//                        onIngredientQuantityChange(
-//                            index,
-//                            newQuantity
-//                        )
-//                    },
-//                    placeholder = {
-//                        Text(
-//                            "Quantity",
-//                            textAlign = TextAlign.Center,
-//                            fontFamily = FontFamily(Font(R.font.nunito_regular)),
-//                            modifier = Modifier.fillMaxWidth(),
-//                            color = Color(0xFFFFFFFF).copy(alpha = 0.75f),
-//                            fontSize = 14.sp
-//
-//                        )
-//                    },
-//                    singleLine = true,
-//                    colors = TextFieldDefaults.textFieldColors(
-//                        focusedIndicatorColor = Color.Transparent,
-//                        unfocusedIndicatorColor = Color.Transparent,
-//                        cursorColor = Color.White,
-//                        textColor = Color.White,
-//                        backgroundColor = Color(0xFF4A4A4A)
-//                    ),
-//                    shape = RoundedCornerShape(4.dp),
-//                    keyboardOptions = KeyboardOptions.Default.copy(
-//                        imeAction = ImeAction.Next
-//                    )
-//                )
+
 
                 OutlinedTextField(
                     modifier = Modifier

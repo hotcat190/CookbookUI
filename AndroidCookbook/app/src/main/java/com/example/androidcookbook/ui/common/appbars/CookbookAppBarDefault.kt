@@ -43,8 +43,8 @@ fun CookbookAppBarDefault(
         TopAppBar(
             modifier = modifier,
             colors = TopAppBarDefaults.topAppBarColors(
-                containerColor = MaterialTheme.colorScheme.primary,
-                scrolledContainerColor = MaterialTheme.colorScheme.primary
+                containerColor = MaterialTheme.colorScheme.background,
+                scrolledContainerColor = MaterialTheme.colorScheme.background
             ),
             title = {
                 Text(
