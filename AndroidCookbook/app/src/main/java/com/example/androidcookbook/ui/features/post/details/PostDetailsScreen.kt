@@ -29,6 +29,9 @@ import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Bookmark
+import androidx.compose.material.icons.outlined.BookmarkAdd
+import androidx.compose.material.icons.outlined.BookmarkBorder
 import androidx.compose.material.icons.outlined.Share
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
@@ -74,7 +77,6 @@ enum class DetailState {
 @Composable
 fun PostDetailsScreen(
     post: Post,
-    isLiked: Boolean,
     currentUser: User,
     comments: List<Comment>,
     onDeleteComment: (Comment) -> Unit,
@@ -83,9 +85,13 @@ fun PostDetailsScreen(
     showPostOptions: Boolean,
     onEditPost: () -> Unit,
     onDeletePost: () -> Unit,
+    isLiked: Boolean,
     onLikedClick: () -> Unit,
+    isBookmarked: Boolean,
+    onBookmarkClick: () -> Unit,
     onCommentClick: () -> Unit,
     onSendComment: (String) -> Unit,
+    onUserClick: (User) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val checkedStates: SnapshotStateList<Boolean> = remember {
@@ -119,21 +125,25 @@ fun PostDetailsScreen(
                         onDeletePost,
                         isLiked,
                         onLikedClick,
+                        isBookmarked,
+                        onBookmarkClick,
                         onCommentClick,
-                        checkedStates
+                        onUserClick,
+                        checkedStates,
                     )
                 }
                 items(
                     comments,
                     key = { comment -> comment.id }
                 ) { comment ->
-                    CommentRow(comment, currentUser, onDeleteComment, onEditComment, onLikeComment)
+                    CommentRow(comment, currentUser, onDeleteComment, onEditComment, onLikeComment, onUserClick)
                 }
 
             }
         }
         WriteCommentRow(
             user = currentUser,
+            onUserClick = onUserClick,
             onSendComment = onSendComment,
         )
     }
@@ -148,7 +158,10 @@ private fun PostDetailsInfo(
     onDeletePost: () -> Unit,
     isLiked: Boolean,
     onLikedClick: () -> Unit,
+    isBookmarked: Boolean,
+    onBookmarkClick: () -> Unit,
     onCommentClick: () -> Unit,
+    onUserClick: (User) -> Unit,
     checkedStates: SnapshotStateList<Boolean>,
     modifier: Modifier = Modifier
 ) {
@@ -159,6 +172,7 @@ private fun PostDetailsInfo(
         showOptionsButton = showPostOptions,
         onEditPost = onEditPost,
         onDeletePost = onDeletePost,
+        onUserClick = onUserClick,
         modifier = Modifier.padding(start = 15.dp)
     )
     Column(
@@ -168,16 +182,6 @@ private fun PostDetailsInfo(
             .padding(15.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-//                Image(
-//                    painter = painterResource(id = R.drawable.image_4),
-//                    contentDescription = null,
-//                    modifier =
-//                    Modifier
-//                        .fillMaxWidth()
-//                        .height(200.dp)
-//                        .clip(RoundedCornerShape(5)),
-//                    contentScale = ContentScale.Crop,
-//                )
         if (post.mainImage != null) {
             AsyncImage(
                 model = ImageRequest.Builder(LocalContext.current)
@@ -216,11 +220,25 @@ private fun PostDetailsInfo(
                 Image(
                     painter = painterResource(R.drawable.comment_icon_light_theme),
                     modifier = Modifier.size(21.dp),
-                    contentDescription = "Comment icon"
+                    contentDescription = "Comment icon",
+                    alpha = 0.75F,
                 )
             }
         }
         Spacer(modifier = Modifier.weight(1f))
+
+        // Bookmark button
+        IconButton(onClick = onBookmarkClick) {
+            Icon(
+                imageVector = if (isBookmarked) {
+                    Icons.Outlined.Bookmark
+                } else {
+                    Icons.Outlined.BookmarkBorder
+                },
+                contentDescription = "Bookmark",
+                tint = MaterialTheme.colorScheme.secondary
+            )
+        }
 
         // Share button
         OutlinedIconButton(
@@ -369,16 +387,19 @@ fun PostDetailsPreview() {
     PostDetailsScreen(
         SamplePosts.posts[0],
         currentUser = User(),
-        isLiked = false,
         showPostOptions = true,
         comments = listOf(),
         onDeletePost = {},
         onEditPost = {},
         onEditComment = {},
-        onLikedClick = {},
         onLikeComment = {},
         onCommentClick = {},
         onDeleteComment = {},
         onSendComment = {},
+        isLiked = false,
+        onLikedClick = {},
+        isBookmarked = false,
+        onBookmarkClick = {},
+        onUserClick = {}
     )
 }

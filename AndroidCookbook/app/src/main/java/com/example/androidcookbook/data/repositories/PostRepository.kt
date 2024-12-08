@@ -34,4 +34,9 @@ class PostRepository @Inject constructor(
     suspend fun likeComment(commentId: Int) = postService.likeComment(commentId)
 
     suspend fun unlikeComment(commentId: Int) = postService.unlikeComment(commentId)
+
+    suspend fun bookmarkPost(postId: Int) = postService.bookmarkPost(postId)
+
+    suspend fun unBookmarkPost(postId: Int) = postService.unBookmarkPost(postId)
+
 }

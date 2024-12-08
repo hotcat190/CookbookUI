@@ -6,7 +6,6 @@ import android.util.Log
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -14,7 +13,6 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.input.nestedscroll.nestedScroll
@@ -37,9 +35,9 @@ import com.example.androidcookbook.ui.features.search.SearchViewModel
 import com.example.androidcookbook.ui.nav.Routes
 import com.example.androidcookbook.ui.nav.graphs.appScreens
 import com.example.androidcookbook.ui.nav.graphs.authScreens
-import com.example.androidcookbook.ui.nav.graphs.createPost
-import com.example.androidcookbook.ui.nav.graphs.postDetails
-import com.example.androidcookbook.ui.nav.graphs.updatePost
+import com.example.androidcookbook.ui.nav.dest.createPost
+import com.example.androidcookbook.ui.nav.dest.postDetails
+import com.example.androidcookbook.ui.nav.dest.updatePost
 import com.example.androidcookbook.ui.nav.utils.navigateIfNotOn
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -114,11 +112,12 @@ fun CookbookApp(
                         navController.navigateIfNotOn(Routes.App.Newsfeed)
                     },
                     onUserProfileClick = {
-                        navController.navigateIfNotOn(Routes.App.UserProfile(currentUser.id))
+                        navController.navigateIfNotOn(Routes.App.UserProfile(currentUser))
                     },
                     onCreatePostClick = {
                         navController.navigateIfNotOn(Routes.CreatePost)
                     },
+                    currentUser = currentUser,
                     currentDestination = currentDestination
                 )
             }

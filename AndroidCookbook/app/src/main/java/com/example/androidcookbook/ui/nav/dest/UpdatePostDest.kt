@@ -1,4 +1,4 @@
-package com.example.androidcookbook.ui.nav.graphs
+package com.example.androidcookbook.ui.nav.dest
 
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -6,6 +6,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
+import androidx.navigation.toRoute
 import com.example.androidcookbook.domain.model.post.Post
 import com.example.androidcookbook.domain.model.user.User
 import com.example.androidcookbook.ui.CookbookUiState
@@ -23,23 +24,26 @@ import com.example.androidcookbook.ui.nav.CustomNavTypes
 import com.example.androidcookbook.ui.nav.Routes
 import kotlin.reflect.typeOf
 
-fun NavGraphBuilder.createPost(
+fun NavGraphBuilder.updatePost(
     viewModel: CookbookViewModel,
     currentUser: User,
     navController: NavHostController,
 ) {
-    composable<Routes.CreatePost>(
+    composable<Routes.UpdatePost> (
         typeMap = mapOf(
             typeOf<Post>() to CustomNavTypes.PostType,
         )
-    ) {
+    ) { navBackStackEntry ->
         viewModel.updateTopBarState(CookbookUiState.TopBarState.Default)
         viewModel.updateBottomBarState(CookbookUiState.BottomBarState.NoBottomBar)
         viewModel.updateCanNavigateBack(true)
 
-        val createPostViewModel = hiltViewModel<CreatePostViewModel, CreatePostViewModel.CreatePostViewModelFactory>{ factory ->
-            factory.create(Post())
-        }
+        val post = navBackStackEntry.toRoute<Routes.UpdatePost>().post
+
+        val createPostViewModel =
+            hiltViewModel<CreatePostViewModel, CreatePostViewModel.CreatePostViewModelFactory> { factory ->
+                factory.create(post)
+            }
 
         val postTitle by createPostViewModel.postTitle.collectAsState()
         val postBody by createPostViewModel.postBody.collectAsState()
@@ -80,7 +84,7 @@ fun NavGraphBuilder.createPost(
                 createPostViewModel.updatePostImageUri(it)
             },
             onPostButtonClick = {
-                createPostViewModel.createPost(
+                createPostViewModel.updatePost(
                     onSuccessNavigate = { post ->
                         navController.navigate(Routes.App.PostDetails(post))
                     }
@@ -89,7 +93,11 @@ fun NavGraphBuilder.createPost(
             onBackButtonClick = {
                 navController.navigateUp()
             },
-            createType = CreatePostType.Post
+            cookTime = createPostViewModel.cookTime.collectAsState().value,
+            onCookTimeChange = {
+                createPostViewModel.updateCookTime(it)
+            },
+            createType = CreatePostType.Update
         )
         if (createPostViewModel.isAddStepDialogOpen.collectAsState().value) {
             AddStepDialog(
@@ -149,4 +157,3 @@ fun NavGraphBuilder.createPost(
         }
     }
 }
-

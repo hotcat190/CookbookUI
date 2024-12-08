@@ -75,7 +75,10 @@ fun EditCommentBottomSheet(
             ) {
                 var commentContent by remember { mutableStateOf(comment.content) }
 
-                SmallAvatar(user)
+                SmallAvatar(
+                    author = user,
+                    onUserClick = {},
+                )
                 Spacer(Modifier.width(8.dp))
                 TextField(
                     value = commentContent,

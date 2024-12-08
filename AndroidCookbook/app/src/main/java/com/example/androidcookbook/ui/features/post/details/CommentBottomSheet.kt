@@ -2,8 +2,8 @@ package com.example.androidcookbook.ui.features.post.details
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.LocalIndication
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
-import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.indication
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
@@ -42,7 +42,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.input.pointer.pointerInteropFilter
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalContext
@@ -58,8 +57,10 @@ import androidx.compose.ui.unit.dp
 import com.example.androidcookbook.domain.model.post.Comment
 import com.example.androidcookbook.domain.model.user.User
 import com.example.androidcookbook.ui.common.iconbuttons.LikeButton
+import com.example.androidcookbook.ui.common.utils.apiDateFormatter
 import com.example.androidcookbook.ui.components.post.SmallAvatar
 import com.example.androidcookbook.ui.theme.transparentTextFieldColors
+import java.time.LocalDate
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -70,6 +71,7 @@ fun CommentBottomSheet(
     onDeleteComment: (Comment) -> Unit,
     onEditComment: (Comment) -> Unit,
     onLikeComment: (Comment) -> Unit,
+    onUserClick: (User) -> Unit,
     onDismiss: () -> Unit,
     sheetState: SheetState,
     modifier: Modifier,
@@ -99,13 +101,14 @@ fun CommentBottomSheet(
                         onDeleteComment = onDeleteComment,
                         onEditComment = onEditComment,
                         onLikeComment = onLikeComment,
+                        onUserClick = onUserClick,
                     )
                 }
             }
         }
         HorizontalDivider()
 
-        WriteCommentRow(user, onSendComment)
+        WriteCommentRow(user, onUserClick, onSendComment)
     }
 }
 
@@ -117,6 +120,7 @@ fun CommentRow(
     onDeleteComment: (Comment) -> Unit,
     onEditComment: (Comment) -> Unit,
     onLikeComment: (Comment) -> Unit,
+    onUserClick: (User) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val interactionSource = remember { MutableInteractionSource() }
@@ -166,6 +170,7 @@ fun CommentRow(
             ) {
                 SmallAvatar(
                     author = comment.user,
+                    onUserClick = onUserClick,
                     modifier = Modifier.padding(top = 4.dp)
                 )
                 Spacer(modifier = Modifier.width(16.dp))
@@ -179,11 +184,13 @@ fun CommentRow(
                         Text(
                             text = comment.user.name,
                             fontWeight = FontWeight.Bold,
+                            modifier = Modifier
+                                .clickable { onUserClick(comment.user) }
                         )
                         Spacer(modifier = Modifier.width(8.dp))
 
                         Text(
-                            text = comment.createdAt,
+                            text = LocalDate.parse(comment.createdAt, apiDateFormatter).toString(),
                             fontSize = TextUnit(
                                 value = 12f,
                                 type = TextUnitType.Sp,
@@ -279,6 +286,7 @@ fun CommentRow(
 @Composable
 fun WriteCommentRow(
     user: User,
+    onUserClick: (User) -> Unit,
     onSendComment: (String) -> Unit,
 ) {
     val focusManager = LocalFocusManager.current
@@ -290,7 +298,10 @@ fun WriteCommentRow(
     ) {
         var commentContent by remember { mutableStateOf("") }
 
-        SmallAvatar(user)
+        SmallAvatar(
+            author = user,
+            onUserClick = onUserClick,
+        )
         Spacer(Modifier.width(8.dp))
         TextField(
             value = commentContent,
@@ -347,12 +358,14 @@ fun CommentBottomSheetPreview() {
         ), user = User(
             id = 1,
             name = "Username",
-        ), onSendComment = {},{},{},{}, onDismiss = {}, sheetState = SheetState(
+        ), onSendComment = {}, {}, {}, {}, onDismiss = {}, sheetState = SheetState(
             skipPartiallyExpanded = true,
             density = Density(LocalContext.current),
             initialValue = SheetValue.Expanded,
             confirmValueChange = { true },
-        ), modifier = Modifier
+        ),
+            onUserClick = {},
+            modifier = Modifier
         )
     }
 }

@@ -40,8 +40,6 @@ class PostDetailsViewModel @AssistedInject constructor(
 
     var postUiState: MutableStateFlow<PostUiState> = MutableStateFlow(PostUiState.Loading)
         private set
-    var isPostLiked: MutableStateFlow<Boolean> = MutableStateFlow(false)
-        private set
     var showBottomCommentSheet: MutableStateFlow<Boolean> = MutableStateFlow(false)
         private set
     var commentsFlow: MutableStateFlow<List<Comment>> = MutableStateFlow(emptyList())
@@ -50,11 +48,16 @@ class PostDetailsViewModel @AssistedInject constructor(
         private set
     var editCommentState: MutableStateFlow<EditCommentState> = MutableStateFlow(EditCommentState.NotEditing)
         private set
+    var isPostLiked: MutableStateFlow<Boolean> = MutableStateFlow(false)
+        private set
+    var isPostBookmarked: MutableStateFlow<Boolean> = MutableStateFlow(false)
+        private set
 
     init {
 //        getPost()
         postUiState.update { PostUiState.Success(post = _post) }
         queryPostLike(_post.id)
+        queryPostBookmark(_post.id)
         getComments(false)
     }
 
@@ -87,6 +90,13 @@ class PostDetailsViewModel @AssistedInject constructor(
         }
     }
 
+    private fun queryPostBookmark(postId: Int) {
+        viewModelScope.launch {
+            // TODO: implement query post bookmark
+
+        }
+    }
+
     private fun likePost() {
         viewModelScope.launch {
             val response = postRepository.likePost(_post.id)
@@ -116,6 +126,36 @@ class PostDetailsViewModel @AssistedInject constructor(
             unlikePost()
         } else {
             likePost()
+        }
+    }
+
+    private fun bookmarkPost() {
+        viewModelScope.launch {
+            val response = postRepository.bookmarkPost(_post.id)
+            response.onSuccess {
+                isPostBookmarked.update { true }
+            }.onFailure {
+                showToast("Failed to bookmark post")
+            }
+        }
+    }
+
+    private fun unBookmarkPost() {
+        viewModelScope.launch {
+            val response = postRepository.unBookmarkPost(_post.id)
+            response.onSuccess {
+                isPostBookmarked.update { false }
+            }.onFailure {
+                showToast("Failed to unbookmark post")
+            }
+        }
+    }
+
+    fun togglePostBookmark() {
+        if (isPostBookmarked.value) {
+            unBookmarkPost()
+        } else {
+            bookmarkPost()
         }
     }
 

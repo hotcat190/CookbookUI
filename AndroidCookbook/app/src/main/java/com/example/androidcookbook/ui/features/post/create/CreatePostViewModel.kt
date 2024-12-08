@@ -37,6 +37,7 @@ class CreatePostViewModel @AssistedInject constructor(
         fun create(post: Post): CreatePostViewModel
     }
 
+    val cookTime = MutableStateFlow<String>("")
     val postImageUri = MutableStateFlow<Uri?>(post.mainImage?.toUri())
     val postTitle = MutableStateFlow(post.title)
     val postBody = MutableStateFlow(post.description)
@@ -47,6 +48,10 @@ class CreatePostViewModel @AssistedInject constructor(
     val isAddIngredientDialogOpen = MutableStateFlow(false)
     val updateStepDialogState = MutableStateFlow<UpdateStepDialogState>(UpdateStepDialogState.Closed)
     val updateIngredientDialogState = MutableStateFlow<UpdateIngredientDialogState>(UpdateIngredientDialogState.Closed)
+
+    fun updateCookTime(time: String) {
+        cookTime.update { time }
+    }
 
     fun updatePostTitle(title: String) {
         postTitle.update { title }

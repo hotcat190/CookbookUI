@@ -13,6 +13,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -82,6 +83,8 @@ fun CreatePostScreen(
     updatePostImageUri: (Uri?) -> Unit,
     onPostButtonClick: () -> Unit,
     onBackButtonClick: () -> Unit,
+    cookTime: String,
+    onCookTimeChange: (String) -> Unit,
     createType: CreatePostType,
     modifier: Modifier = Modifier,
 ) {
@@ -103,64 +106,75 @@ fun CreatePostScreen(
 //            scrollState.animateScrollTo(scrollState.maxValue, tween(300))
 //        }
 //    }
-
-    Column(
-        modifier = modifier
-            .fillMaxSize()
-            .padding(16.dp)
-            .verticalScroll(rememberScrollState())
-    ) {
-        PostHeader(
-            author = author,
-            showOptionsButton = false,
-            onEditPost = {},
-            onDeletePost = {},
-            createdAt = LocalDate.now().toString(),
-            modifier = Modifier.padding(bottom = 8.dp)
-        )
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        // Post
-        AddPostContent(
-            postTitle,
-            updatePostTitle,
-            title,
-            description,
-            focusManager,
-            postBody,
-            updatePostBody
-        )
-
-        Spacer(Modifier.height(16.dp))
-
-        // Recipe
-        AddSteps(recipe, updateStep, deleteStep, onAddNewStep)
-
-        Spacer(Modifier.height(16.dp))
-
-        // Ingredients
-        AddIngredients(ingredients, updateIngredient, deleteIngredient, onAddNewIngredient)
-
-        Row {
-            Text(
-                text = "Cook time:",
-                style = MaterialTheme.typography.titleMedium,
+    Column {
+        Column(
+            modifier = modifier
+                .weight(1f)
+                .padding(start = 16.dp, end = 16.dp, top = 16.dp)
+                .verticalScroll(rememberScrollState())
+        ) {
+            PostHeader(
+                author = author,
+                showOptionsButton = false,
+                onEditPost = {},
+                onDeletePost = {},
+                createdAt = LocalDate.now().toString(),
+                onUserClick = {},
             )
-            Spacer(Modifier.width(8.dp))
-            TextField(
-                value = "",
-                onValueChange = {},
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            // Post
+            AddPostContent(
+                postTitle,
+                updatePostTitle,
+                title,
+                description,
+                focusManager,
+                postBody,
+                updatePostBody
             )
+
+            Spacer(Modifier.height(16.dp))
+
+            // Recipe
+            AddSteps(recipe, updateStep, deleteStep, onAddNewStep)
+
+            Spacer(Modifier.height(16.dp))
+
+            // Ingredients
+            AddIngredients(ingredients, updateIngredient, deleteIngredient, onAddNewIngredient)
+
+            CookTime(cookTime, onCookTimeChange, Modifier.padding(vertical = 8.dp))
+
+            CreatePostImage(postImageUri, singlePhotoPickerLauncher)
         }
-
-        Spacer(Modifier.height(8.dp))
-
-        CreatePostImage(postImageUri, singlePhotoPickerLauncher)
-
-        Spacer(Modifier.weight(1F))
-
         BottomPostRow(onPostButtonClick, createType)
+    }
+}
+
+@Composable
+private fun CookTime(
+    value: String,
+    onValueChange: (String) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = modifier
+    ) {
+        Text(
+            text = "Cook time:",
+            style = MaterialTheme.typography.titleMedium,
+        )
+        Spacer(Modifier.width(8.dp))
+        TextField(
+            value = value,
+            onValueChange = onValueChange,
+            placeholder = {
+                Text("How long will it take?")
+            }
+        )
     }
 }
 
@@ -244,6 +258,7 @@ private fun AddSteps(
             ) {
                 Row(
                     modifier = Modifier
+                        .fillMaxSize()
                         .clickable { updateStep(index) }
                         .weight(1f)
                 ) {
@@ -387,13 +402,13 @@ private fun BottomPostRow(
     ) {
         Text(
             text = "Anyone can see and reply",
-            color = LocalContentColor.current.copy(alpha = 0.6f)
+            color = LocalContentColor.current.copy(alpha = 0.6f),
+            modifier = Modifier.padding(start = 16.dp)
         )
         Spacer(Modifier.weight(1F))
         Button(
             onClick = onPostButtonClick,
             modifier = Modifier
-                .padding(top = 8.dp)
         ) {
             Text(text = createType.name)
         }
@@ -433,7 +448,7 @@ private fun CreatePostImage(
 }
 
 @Composable
-@Preview
+@Preview(showBackground = true)
 fun CreatePostScreenPreview() {
     AndroidCookbookTheme(darkTheme = false) {
         CreatePostScreen(
@@ -450,8 +465,9 @@ fun CreatePostScreenPreview() {
             null, {},
             {},
             {},
+            cookTime = "1h",
+            onCookTimeChange = {},
             createType = CreatePostType.Post,
-            modifier = Modifier.background(MaterialTheme.colorScheme.background)
         )
     }
 }
@@ -474,6 +490,8 @@ fun CreatePostScreenPreviewDarkTheme() {
             null, {},
             {},
             {},
+            cookTime = "1h",
+            onCookTimeChange = {},
             createType = CreatePostType.Post
 //            modifier = Modifier.background(MaterialTheme.colorScheme.background)
         )

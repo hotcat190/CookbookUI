@@ -38,7 +38,6 @@ class NewsfeedViewModel @Inject constructor(
 
     init {
         refresh()
-        Log.d("Newsfeed", posts.toString())
     }
 
     private fun getNewsfeed() {

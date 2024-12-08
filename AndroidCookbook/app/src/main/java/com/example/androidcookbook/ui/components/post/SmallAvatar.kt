@@ -1,5 +1,6 @@
 package com.example.androidcookbook.ui.components.post
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.runtime.Composable
@@ -16,6 +17,7 @@ import com.example.androidcookbook.domain.model.user.User
 @Composable
 fun SmallAvatar(
     author: User,
+    onUserClick: (User) -> Unit,
     modifier: Modifier = Modifier
 ) {
     AsyncImage(
@@ -27,7 +29,8 @@ fun SmallAvatar(
         contentDescription = "Profile Picture",
         modifier = modifier
             .size(32.dp)
-            .clip(CircleShape),
+            .clip(CircleShape)
+            .clickable { onUserClick(author) },
 //            tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.25f),
         error = painterResource(R.drawable.default_avatar),
         placeholder = painterResource(R.drawable.default_avatar)

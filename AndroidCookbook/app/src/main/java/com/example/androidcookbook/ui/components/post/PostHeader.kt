@@ -1,5 +1,6 @@
 package com.example.androidcookbook.ui.components.post
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -35,6 +36,7 @@ fun PostHeader(
     createdAt: String?,
     onEditPost: () -> Unit,
     onDeletePost: () -> Unit,
+    onUserClick: (User) -> Unit,
     showOptionsButton: Boolean,
     modifier: Modifier = Modifier
 ) {
@@ -45,14 +47,22 @@ fun PostHeader(
         modifier = modifier
             .fillMaxWidth()
     ) {
-        SmallAvatar(author)
+        SmallAvatar(
+            author = author,
+            onUserClick = onUserClick,
+            modifier = Modifier
+        )
         Spacer(modifier = Modifier.width(8.dp)) // Spacing between icon and username
         Column {
             Text(
                 text = author.name,
                 fontSize = 19.sp,
                 style = MaterialTheme.typography.labelMedium,
-                color = MaterialTheme.colorScheme.onSurface
+                color = MaterialTheme.colorScheme.onSurface,
+                modifier = Modifier
+                    .clickable {
+                        onUserClick(author)
+                    }
             )
             Text(
                 text = createdAt ?: "",
@@ -113,6 +123,7 @@ fun PostHeaderPreview() {
                 showOptionsButton = true,
                 onDeletePost = {},
                 onEditPost = {},
+                onUserClick = {},
             )
         }
     }

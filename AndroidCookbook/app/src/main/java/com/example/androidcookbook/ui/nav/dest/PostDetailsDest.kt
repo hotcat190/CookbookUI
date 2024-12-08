@@ -1,4 +1,4 @@
-package com.example.androidcookbook.ui.nav.graphs
+package com.example.androidcookbook.ui.nav.dest
 
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.rememberModalBottomSheetState
@@ -58,11 +58,6 @@ fun NavGraphBuilder.postDetails(viewModel: CookbookViewModel, navController: Nav
                             }
                         )
                     },
-                    isLiked = postDetailsViewModel.isPostLiked.collectAsState().value,
-                    onLikedClick = {
-                        postDetailsViewModel.togglePostLike()
-                    },
-
                     onCommentClick = {
                         postDetailsViewModel.updateShowBottomCommentSheet(true)
                     },
@@ -78,6 +73,17 @@ fun NavGraphBuilder.postDetails(viewModel: CookbookViewModel, navController: Nav
                     },
                     onSendComment = { content ->
                         postDetailsViewModel.sendComment(content = content)
+                    },
+                    isLiked = postDetailsViewModel.isPostLiked.collectAsState().value,
+                    onLikedClick = {
+                        postDetailsViewModel.togglePostLike()
+                    },
+                    isBookmarked = postDetailsViewModel.isPostBookmarked.collectAsState().value,
+                    onBookmarkClick = {
+                        postDetailsViewModel.togglePostBookmark()
+                    },
+                    onUserClick = { user ->
+                        navController.navigate(Routes.App.UserProfile(user))
                     },
                     modifier = Modifier
                 )
@@ -105,6 +111,9 @@ fun NavGraphBuilder.postDetails(viewModel: CookbookViewModel, navController: Nav
                             },
                             onDismiss = {
                                 postDetailsViewModel.updateShowBottomCommentSheet(false)
+                            },
+                            onUserClick = { user ->
+                                navController.navigate(Routes.App.UserProfile(user))
                             },
                             sheetState = sheetState,
                             modifier = Modifier

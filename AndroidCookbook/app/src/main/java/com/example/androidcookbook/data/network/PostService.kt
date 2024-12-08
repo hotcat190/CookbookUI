@@ -53,4 +53,10 @@ interface PostService {
 
     @PUT("posts/{postId}")
     suspend fun updatePost(@Path("postId") postId: Int, @Body post: PostCreateRequest): ApiResponse<PostCreateResponse>
+
+    @POST("favorite/{postId}")
+    suspend fun bookmarkPost(@Path("postId") postId: Int): ApiResponse<SuccessMessageBody>
+
+    @DELETE("favorite/{postId}")
+    suspend fun unBookmarkPost(@Path("postId") postId: Int): ApiResponse<SuccessMessageBody>
 }

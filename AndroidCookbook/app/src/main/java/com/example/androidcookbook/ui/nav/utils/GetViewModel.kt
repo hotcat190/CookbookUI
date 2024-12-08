@@ -18,3 +18,19 @@ inline fun <reified VM : ViewModel> sharedViewModel(
     }
     return hiltViewModel<VM>(parentEntry)
 }
+
+@Composable
+inline fun <reified VM : ViewModel, reified VMF> sharedViewModel(
+    backStackEntry: NavBackStackEntry,
+    navController: NavController,
+    route: Any,
+    noinline creationCallback: (VMF) -> VM
+): VM {
+    val parentEntry = remember(backStackEntry) {
+        navController.getBackStackEntry(route)
+    }
+    return hiltViewModel<VM, VMF>(
+        viewModelStoreOwner = parentEntry,
+        creationCallback = creationCallback
+    )
+}

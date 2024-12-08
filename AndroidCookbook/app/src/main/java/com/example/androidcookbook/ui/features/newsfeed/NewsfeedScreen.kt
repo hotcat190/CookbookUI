@@ -36,6 +36,7 @@ fun NewsfeedScreen(
     onEditPost: (Post) -> Unit,
     onDeletePost: (Post) -> Unit,
     onSeeDetailsClick: (Post) -> Unit,
+    onUserClick: (User) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     LazyColumn(
@@ -50,6 +51,7 @@ fun NewsfeedScreen(
                 currentUser = currentUser,
                 onEditPost = { onEditPost(post) },
                 onDeletePost = { onDeletePost(post) },
+                onUserClick = onUserClick,
                 onSeeDetailsClick = onSeeDetailsClick
             )
         }
@@ -62,6 +64,7 @@ fun NewsfeedCard(
     currentUser: User,
     onEditPost: () -> Unit,
     onDeletePost: () -> Unit,
+    onUserClick: (User) -> Unit,
     onSeeDetailsClick: (Post) -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -75,6 +78,7 @@ fun NewsfeedCard(
             showOptionsButton = currentUser.id == post.author.id,
             onEditPost = onEditPost,
             onDeletePost = onDeletePost,
+            onUserClick = onUserClick,
             modifier = Modifier.padding(start = 16.dp, top = 16.dp)
         )
         Column(
@@ -113,6 +117,7 @@ fun NewsfeedCard(
                 color = MaterialTheme.colorScheme.onSurface,
                 modifier = Modifier
                     .align(Alignment.End)
+                    .clip(MaterialTheme.shapes.small)
                     .clickable { onSeeDetailsClick(post) }
             )
         }
@@ -126,7 +131,7 @@ fun NewsfeedCardPreview() {
         NewsfeedScreen(
             posts = SamplePosts.posts,
             currentUser = User(),
-            {}, {}, {},
+            {}, {}, {}, {},
             modifier = Modifier.background(MaterialTheme.colorScheme.background)
         )
     }
@@ -139,7 +144,7 @@ fun NewsfeedCardPreviewDarkTheme() {
         NewsfeedScreen(
             posts = SamplePosts.posts,
             currentUser = User(),
-            {}, {}, {},
+            {}, {}, {}, {},
             modifier = Modifier.background(MaterialTheme.colorScheme.background)
         )
     }

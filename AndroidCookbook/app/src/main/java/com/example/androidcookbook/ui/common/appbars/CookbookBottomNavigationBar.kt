@@ -35,6 +35,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavDestination
 import com.example.androidcookbook.R
+import com.example.androidcookbook.domain.model.user.User
 import com.example.androidcookbook.ui.nav.Routes
 import com.example.androidcookbook.ui.nav.utils.hasRoute
 import com.example.androidcookbook.ui.theme.AndroidCookbookTheme
@@ -46,6 +47,7 @@ fun CookbookBottomNavigationBar(
     onNewsfeedClick: () -> Unit,
     onUserProfileClick: () -> Unit,
     onCreatePostClick: () -> Unit,
+    currentUser: User,
     currentDestination: NavDestination? = null,
 ) {
 
@@ -71,6 +73,7 @@ fun CookbookBottomNavigationBar(
                 modifier = Modifier
                     .padding(WindowInsets.navigationBars.asPaddingValues())
                     .consumeWindowInsets(WindowInsets.navigationBars.asPaddingValues())
+                    .padding(bottom = 4.dp)
                     .heightIn(max = 50.dp),
             ) {
                 NewsfeedNavigationBarItem(currentDestination, onNewsfeedClick, colors)
@@ -95,7 +98,7 @@ fun CookbookBottomNavigationBar(
 
                 CategoryNavigationBarItem(currentDestination, onCategoryClick, colors)
 
-                UserProfileNavigationBarItem(currentDestination, onUserProfileClick, colors)
+                UserProfileNavigationBarItem(currentDestination, currentUser, onUserProfileClick, colors)
             }
         }
 
@@ -130,12 +133,13 @@ private fun RowScope.CookbookNavigationBarItem(
 @Composable
 private fun RowScope.UserProfileNavigationBarItem(
     currentDestination: NavDestination?,
+    currentUser: User,
     onUserProfileClick: () -> Unit,
     colors: NavigationBarItemColors
 ) {
     CookbookNavigationBarItem(
         currentDestination = currentDestination,
-        route = Routes.App.UserProfile(0),
+        route = Routes.App.UserProfile(currentUser),
         onClick = onUserProfileClick,
         icon = {
             Icon(
@@ -248,7 +252,7 @@ private fun RowScope.CategoryNavigationBarItem(
 @Composable
 fun NavBarPreview() {
     AppBarTheme {
-        CookbookBottomNavigationBar({}, {}, {}, {}, {})
+        CookbookBottomNavigationBar({}, {}, {}, {}, {}, currentUser = User())
     }
 }
 
@@ -256,6 +260,6 @@ fun NavBarPreview() {
 @Composable
 fun NavBarDarkPreview() {
     AppBarTheme(darkTheme = true) {
-        CookbookBottomNavigationBar({}, {}, {}, {}, {})
+        CookbookBottomNavigationBar({}, {}, {}, {}, {}, currentUser = User())
     }
 }
