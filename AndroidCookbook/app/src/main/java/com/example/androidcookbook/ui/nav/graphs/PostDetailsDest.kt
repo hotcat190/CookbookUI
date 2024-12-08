@@ -1,14 +1,13 @@
 package com.example.androidcookbook.ui.nav.graphs
 
-import android.widget.Toast
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavGraphBuilder
+import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
 import androidx.navigation.toRoute
 import com.example.androidcookbook.domain.model.post.Post
@@ -21,23 +20,22 @@ import com.example.androidcookbook.ui.features.post.details.EditCommentState
 import com.example.androidcookbook.ui.features.post.details.PostDetailsScreen
 import com.example.androidcookbook.ui.features.post.details.PostDetailsViewModel
 import com.example.androidcookbook.ui.features.post.details.PostUiState
-import com.example.androidcookbook.ui.features.post.details.ShowToastState
 import com.example.androidcookbook.ui.nav.CustomNavTypes
 import com.example.androidcookbook.ui.nav.Routes
 import kotlin.reflect.typeOf
 
 @OptIn(ExperimentalMaterial3Api::class)
-fun NavGraphBuilder.postDetails(viewModel: CookbookViewModel) {
+fun NavGraphBuilder.postDetails(viewModel: CookbookViewModel, navController: NavHostController) {
     composable<Routes.App.PostDetails>(
         typeMap = mapOf(
             typeOf<Post>() to CustomNavTypes.PostType,
         )
-    ) {
+    ) { backStackEntry ->
         viewModel.updateTopBarState(CookbookUiState.TopBarState.Default)
         viewModel.updateBottomBarState(CookbookUiState.BottomBarState.NoBottomBar)
         viewModel.updateCanNavigateBack(true)
 
-        val postRoute = it.toRoute<Routes.App.PostDetails>()
+        val postRoute = backStackEntry.toRoute<Routes.App.PostDetails>()
 
         val postDetailsViewModel =
             hiltViewModel<PostDetailsViewModel, PostDetailsViewModel.PostDetailsViewModelFactory> { factory ->
@@ -48,13 +46,26 @@ fun NavGraphBuilder.postDetails(viewModel: CookbookViewModel) {
             is PostUiState.Success -> {
                 PostDetailsScreen(
                     post = postUiState.post,
+                    showPostOptions = (viewModel.user.collectAsState().value.id == postUiState.post.author.id),
+                    onEditPost = {
+                        navController.navigate(Routes.UpdatePost(postUiState.post))
+                    },
+                    onDeletePost = {
+                        postDetailsViewModel.deletePost(
+                            onSuccessNavigate = {
+                                navController.navigateUp()
+                            }
+                        )
+                    },
                     isLiked = postDetailsViewModel.isPostLiked.collectAsState().value,
                     onLikedClick = {
                         postDetailsViewModel.togglePostLike()
                     },
+
                     onCommentClick = {
                         postDetailsViewModel.updateShowBottomCommentSheet(true)
-                    }
+                    },
+                    modifier = Modifier
                 )
 
                 if (postDetailsViewModel.showBottomCommentSheet.collectAsState().value) {
@@ -108,7 +119,7 @@ fun NavGraphBuilder.postDetails(viewModel: CookbookViewModel) {
                             )
                         }
                     }
-                    EditCommentState.NotEditing -> {}
+                    is EditCommentState.NotEditing -> {}
                 }
             }
 
@@ -119,14 +130,6 @@ fun NavGraphBuilder.postDetails(viewModel: CookbookViewModel) {
             is PostUiState.Loading -> {
                 // TODO
             }
-        }
-        when (val showToastState = postDetailsViewModel.showToastState.collectAsState().value) {
-            is ShowToastState.Showing -> {
-                val context = LocalContext.current
-                val toast = Toast.makeText(context, showToastState.message, Toast.LENGTH_SHORT)
-                toast.show()
-            }
-            ShowToastState.NotShowing -> {}
         }
     }
 }

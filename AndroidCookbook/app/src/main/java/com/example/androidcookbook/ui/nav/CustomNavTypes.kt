@@ -9,7 +9,7 @@ import kotlinx.serialization.json.Json
 
 object CustomNavTypes {
     val PostType = object : NavType<Post>(
-        isNullableAllowed = false
+        isNullableAllowed = true
     ) {
         override fun get(bundle: Bundle, key: String): Post? {
             return Json.decodeFromString(bundle.getString(key) ?: return null)

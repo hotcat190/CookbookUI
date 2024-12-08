@@ -1,6 +1,5 @@
 package com.example.androidcookbook.ui.features.post.details
 
-import android.annotation.SuppressLint
 import androidx.compose.foundation.LocalIndication
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.indication
@@ -21,7 +20,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Send
-import androidx.compose.material.icons.filled.Send
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -41,7 +39,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalContext
@@ -54,11 +51,10 @@ import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.TextUnitType
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.max
 import com.example.androidcookbook.domain.model.post.Comment
 import com.example.androidcookbook.domain.model.user.User
 import com.example.androidcookbook.ui.common.iconbuttons.LikeButton
-import com.example.androidcookbook.ui.features.newsfeed.SmallAvatar
+import com.example.androidcookbook.ui.components.post.SmallAvatar
 import com.example.androidcookbook.ui.theme.transparentTextFieldColors
 
 @OptIn(ExperimentalMaterial3Api::class)

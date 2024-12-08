@@ -1,23 +1,31 @@
 package com.example.androidcookbook.ui.features.userprofile
 
+import android.content.Context
+import android.widget.Toast
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.androidcookbook.data.repositories.UserRepository
+import com.example.androidcookbook.domain.model.post.Post
+import com.example.androidcookbook.domain.usecase.DeletePostUseCase
+import com.example.androidcookbook.domain.usecase.MakeToastUseCase
 import com.skydoves.sandwich.onFailure
 import com.skydoves.sandwich.onSuccess
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.launch
 
 @HiltViewModel(assistedFactory = UserProfileViewModel.UserProfileViewModelFactory::class)
 class UserProfileViewModel @AssistedInject constructor(
-    private val userRepository: UserRepository,
     @Assisted private val userId: Int,
+    private val userRepository: UserRepository,
+    private val deletePostUseCase: DeletePostUseCase,
+    private val makeToastUseCase: MakeToastUseCase,
 ) : ViewModel() {
 
     @AssistedFactory
@@ -65,6 +73,18 @@ class UserProfileViewModel @AssistedInject constructor(
             uiState = UserProfileUiState.Guest
             getUser(userId = userId)
             isRefreshing = false
+        }
+    }
+
+    fun deletePost(post: Post) {
+        viewModelScope.launch {
+            deletePostUseCase(post).onSuccess {
+                refresh()
+            }.onFailure {
+                viewModelScope.launch {
+                    makeToastUseCase("Failed to delete post")
+                }
+            }
         }
     }
 }

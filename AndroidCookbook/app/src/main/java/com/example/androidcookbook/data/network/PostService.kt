@@ -47,4 +47,10 @@ interface PostService {
 
     @DELETE("comment/{commentId}/like")
     suspend fun unlikeComment(@Path("commentId") commentId: Int): ApiResponse<SuccessMessageBody>
+
+    @DELETE("posts/{postId}")
+    suspend fun deletePost(@Path("postId")postId: Int): ApiResponse<SuccessMessageBody>
+
+    @PUT("posts/{postId}")
+    suspend fun updatePost(@Path("postId") postId: Int, @Body post: PostCreateRequest): ApiResponse<PostCreateResponse>
 }

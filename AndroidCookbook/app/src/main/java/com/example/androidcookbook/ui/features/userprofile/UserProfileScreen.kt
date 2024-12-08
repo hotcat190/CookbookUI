@@ -37,6 +37,7 @@ import coil.request.ImageRequest
 import com.example.androidcookbook.R
 import com.example.androidcookbook.domain.model.post.Post
 import com.example.androidcookbook.domain.model.user.User
+import com.example.androidcookbook.domain.usecase.DeletePostUseCase
 import com.example.androidcookbook.ui.common.containers.RefreshableScreen
 import com.example.androidcookbook.ui.features.newsfeed.NewsfeedCard
 import com.example.androidcookbook.ui.theme.AndroidCookbookTheme
@@ -44,12 +45,15 @@ import com.example.androidcookbook.ui.theme.AndroidCookbookTheme
 @Composable
 fun UserProfileScreen(
     userId: Int,
+    currentUser: User,
+    onEditPost: (Post) -> Unit,
     onPostSeeDetailsClick: (Post) -> Unit,
     modifier: Modifier = Modifier
 ) {
     val userProfileViewModel = hiltViewModel<UserProfileViewModel, UserProfileViewModel.UserProfileViewModelFactory> {
         it.create(userId)
     }
+
     val userProfileUiState = userProfileViewModel.uiState
     RefreshableScreen(
         onRefresh = { userProfileViewModel.refresh() }
@@ -84,6 +88,11 @@ fun UserProfileScreen(
                             ) { post ->
                                 NewsfeedCard(
                                     post = post,
+                                    currentUser = user,
+                                    onEditPost = { onEditPost(post) },
+                                    onDeletePost = {
+                                        userProfileViewModel.deletePost(post)
+                                    },
                                     onSeeDetailsClick = onPostSeeDetailsClick,
 //                                    modifier = Modifier.background(color = Color.White)
                                 )
@@ -250,7 +259,9 @@ fun ProfilePreview() {
     AndroidCookbookTheme(darkTheme = true) {
         UserProfileScreen(
             userId = 0,
-            {}
+            currentUser = User(),
+            onEditPost = {},
+            onPostSeeDetailsClick = {},
         )
     }
 }

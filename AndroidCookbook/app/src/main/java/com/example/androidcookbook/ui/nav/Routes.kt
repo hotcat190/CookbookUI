@@ -44,6 +44,8 @@ object Routes {
     object Search
     @Serializable
     object CreatePost
+    @Serializable
+    data class UpdatePost(val post: Post)
 
     @Serializable
     object DialogDestination

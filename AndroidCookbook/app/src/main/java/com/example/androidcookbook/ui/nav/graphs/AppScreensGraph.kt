@@ -6,6 +6,8 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigation
 import androidx.navigation.toRoute
+import com.example.androidcookbook.domain.usecase.DeletePostUseCase
+import com.example.androidcookbook.ui.CookbookViewModel
 import com.example.androidcookbook.ui.common.containers.RefreshableScreen
 import com.example.androidcookbook.ui.features.aigen.AIGenScreen
 import com.example.androidcookbook.ui.features.aigen.AiScreenTheme
@@ -20,7 +22,7 @@ import com.example.androidcookbook.ui.nav.utils.sharedViewModel
 /**
  * App screens nav graph builder
  */
-fun NavGraphBuilder.appScreens(navController: NavHostController, updateAppBar: () -> Unit) {
+fun NavGraphBuilder.appScreens(navController: NavHostController, updateAppBar: () -> Unit, cookbookViewModel: CookbookViewModel,) {
     navigation<Routes.App> (
         startDestination = Routes.App.Newsfeed
     ) {
@@ -35,33 +37,60 @@ fun NavGraphBuilder.appScreens(navController: NavHostController, updateAppBar: (
                 AIGenScreen()
             }
         }
-        composable<Routes.App.Newsfeed> {
-            updateAppBar()
+        newsfeed(updateAppBar, navController, cookbookViewModel)
 
-            val newsfeedViewModel = sharedViewModel<NewsfeedViewModel>(it, navController, Routes.App)
-            val posts = newsfeedViewModel.posts.collectAsState().value
+        userProfile(updateAppBar, cookbookViewModel, navController)
+    }
+}
 
-            RefreshableScreen(
-                onRefresh = { newsfeedViewModel.refresh() }
-            ) {
-                NewsfeedScreen(
-                    posts = posts,
-                    onSeeDetailsClick = { post ->
-                        navController.navigate(Routes.App.PostDetails(post))
-                    }
-                )
-            }
-        }
+private fun NavGraphBuilder.newsfeed(
+    updateAppBar: () -> Unit,
+    navController: NavHostController,
+    cookbookViewModel: CookbookViewModel,
+) {
+    composable<Routes.App.Newsfeed> {
+        updateAppBar()
 
-        composable<Routes.App.UserProfile> {
-            updateAppBar()
-            val userRoute = it.toRoute<Routes.App.UserProfile>()
-            UserProfileScreen(
-                userId = userRoute.id,
-                onPostSeeDetailsClick = { post ->
+        val newsfeedViewModel = sharedViewModel<NewsfeedViewModel>(it, navController, Routes.App)
+        val posts = newsfeedViewModel.posts.collectAsState().value
+
+        RefreshableScreen(
+            onRefresh = { newsfeedViewModel.refresh() }
+        ) {
+            NewsfeedScreen(
+                posts = posts,
+                currentUser = cookbookViewModel.user.collectAsState().value,
+                onEditPost = { post ->
+                    navController.navigate(Routes.UpdatePost(post))
+                },
+                onDeletePost = { post ->
+                    newsfeedViewModel.deletePost(post)
+                },
+                onSeeDetailsClick = { post ->
                     navController.navigate(Routes.App.PostDetails(post))
                 }
             )
         }
+    }
+}
+
+private fun NavGraphBuilder.userProfile(
+    updateAppBar: () -> Unit,
+    cookbookViewModel: CookbookViewModel,
+    navController: NavHostController,
+) {
+    composable<Routes.App.UserProfile> {
+        updateAppBar()
+        val userRoute = it.toRoute<Routes.App.UserProfile>()
+        UserProfileScreen(
+            userId = userRoute.id,
+            currentUser = cookbookViewModel.user.collectAsState().value,
+            onEditPost = { post ->
+                navController.navigate(Routes.UpdatePost(post))
+            },
+            onPostSeeDetailsClick = { post ->
+                navController.navigate(Routes.App.PostDetails(post))
+            }
+        )
     }
 }

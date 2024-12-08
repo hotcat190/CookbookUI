@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Button
 import androidx.compose.material.ButtonDefaults
@@ -21,11 +22,12 @@ import androidx.compose.material.Checkbox
 import androidx.compose.material.CheckboxDefaults
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Share
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
@@ -35,9 +37,9 @@ import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -51,10 +53,12 @@ import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.example.androidcookbook.R
-import com.example.androidcookbook.domain.model.post.Post
-import com.example.androidcookbook.ui.features.newsfeed.PostHeader
 import com.example.androidcookbook.data.mocks.SamplePosts
+import com.example.androidcookbook.domain.model.post.Post
 import com.example.androidcookbook.ui.common.iconbuttons.LikeButton
+import com.example.androidcookbook.ui.common.utils.apiDateFormatter
+import com.example.androidcookbook.ui.components.post.PostHeader
+import java.time.LocalDate
 
 enum class DetailState {
     Description,
@@ -66,6 +70,9 @@ enum class DetailState {
 fun PostDetailsScreen(
     post: Post,
     isLiked: Boolean,
+    showPostOptions: Boolean,
+    onEditPost: () -> Unit,
+    onDeletePost: () -> Unit,
     onLikedClick: () -> Unit,
     onCommentClick: () -> Unit,
     modifier: Modifier = Modifier,
@@ -81,14 +88,17 @@ fun PostDetailsScreen(
         )
     )
     LazyColumn(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
             .padding(horizontal = 5.dp, vertical = 15.dp),
     ) {
         item {
             PostHeader(
                 author = post.author,
-                createdAt = post.createdAt,
+                createdAt = LocalDate.parse(post.createdAt, apiDateFormatter).toString(),
+                showOptionsButton = showPostOptions,
+                onEditPost = onEditPost,
+                onDeletePost = onDeletePost,
                 modifier = Modifier.padding(start = 15.dp)
             )
             Column(
@@ -108,19 +118,21 @@ fun PostDetailsScreen(
 //                        .clip(RoundedCornerShape(5)),
 //                    contentScale = ContentScale.Crop,
 //                )
-                AsyncImage(
-                    model = ImageRequest.Builder(LocalContext.current)
-                        .data(post.mainImage)
-                        .crossfade(true)
-                        .build(),
-                    contentDescription = null,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(200.dp)
-                        .clip(RoundedCornerShape(5)),
+                if (post.mainImage != null) {
+                    AsyncImage(
+                        model = ImageRequest.Builder(LocalContext.current)
+                            .data(post.mainImage)
+                            .crossfade(true)
+                            .build(),
+                        contentDescription = null,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(200.dp)
+                            .clip(RoundedCornerShape(5)),
 
-                    contentScale = ContentScale.Crop,
-                )
+                        contentScale = ContentScale.Crop,
+                    )
+                }
             }
             Row(
                 modifier = Modifier.fillMaxWidth()
@@ -293,7 +305,8 @@ fun LobsterTextButton(
 fun PostDetailsPreview() {
     PostDetailsScreen(
         SamplePosts.posts[0],
-        false,
-        {}, {}
+        isLiked = false,
+        showPostOptions = true,
+        {}, {}, {}, {}
     )
 }

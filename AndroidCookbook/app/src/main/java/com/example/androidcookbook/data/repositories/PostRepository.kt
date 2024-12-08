@@ -1,6 +1,7 @@
 package com.example.androidcookbook.data.repositories
 
 import com.example.androidcookbook.data.network.PostService
+import com.example.androidcookbook.domain.model.post.Post
 import com.example.androidcookbook.domain.model.post.PostCreateRequest
 import com.example.androidcookbook.domain.model.post.SendCommentRequest
 import javax.inject.Inject
@@ -9,6 +10,10 @@ class PostRepository @Inject constructor(
     private val postService: PostService
 ) {
     suspend fun createPost(post: PostCreateRequest) = postService.createPost(post)
+
+    suspend fun deletePost(postId: Int) = postService.deletePost(postId)
+
+    suspend fun updatePost(postId: Int, post: PostCreateRequest) = postService.updatePost(postId, post)
 
     suspend fun getPost(postId: Int) = postService.getPost(postId)
 

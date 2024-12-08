@@ -6,6 +6,7 @@ import android.util.Log
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -38,6 +39,7 @@ import com.example.androidcookbook.ui.nav.graphs.appScreens
 import com.example.androidcookbook.ui.nav.graphs.authScreens
 import com.example.androidcookbook.ui.nav.graphs.createPost
 import com.example.androidcookbook.ui.nav.graphs.postDetails
+import com.example.androidcookbook.ui.nav.graphs.updatePost
 import com.example.androidcookbook.ui.nav.utils.navigateIfNotOn
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -47,12 +49,12 @@ fun CookbookApp(
     navController: NavHostController = rememberNavController(),
     viewModel: CookbookViewModel = hiltViewModel<CookbookViewModel>(),
 ) {
-    val navBackStackEntry by navController.currentBackStackEntryAsState()
+    val navBackStackEntry = navController.currentBackStackEntryAsState().value
     val currentDestination = navBackStackEntry?.destination
 
-    val uiState by viewModel.uiState.collectAsState()
+    val uiState = viewModel.uiState.collectAsState().value
 
-    val currentUser by viewModel.user.collectAsState()
+    val currentUser = viewModel.user.collectAsState().value
     Log.d("USERID", currentUser.toString())
 
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
@@ -139,7 +141,7 @@ fun CookbookApp(
                 viewModel.updateTopBarState(CookbookUiState.TopBarState.Default)
                 viewModel.updateBottomBarState(CookbookUiState.BottomBarState.Default)
                 viewModel.updateCanNavigateBack(false)
-            })
+            }, cookbookViewModel = viewModel)
             composable<Routes.Search> {
                 val searchViewModel = hiltViewModel<SearchViewModel>()
                 val searchUiState = searchViewModel.uiState.collectAsState().value
@@ -165,8 +167,9 @@ fun CookbookApp(
                 )
             }
             createPost(viewModel, currentUser, navController)
+            updatePost(viewModel, currentUser, navController)
 
-            postDetails(viewModel)
+            postDetails(viewModel, navController)
         }
     }
 }

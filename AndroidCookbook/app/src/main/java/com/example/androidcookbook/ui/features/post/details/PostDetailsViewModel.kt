@@ -1,12 +1,17 @@
 package com.example.androidcookbook.ui.features.post.details
 
+import android.content.Context
 import android.util.Log
+import android.widget.Toast
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.androidcookbook.data.repositories.PostRepository
 import com.example.androidcookbook.domain.model.post.Comment
 import com.example.androidcookbook.domain.model.post.Post
 import com.example.androidcookbook.domain.model.post.SendCommentRequest
+import com.example.androidcookbook.domain.usecase.DeletePostUseCase
+import com.example.androidcookbook.domain.usecase.MakeToastUseCase
 import com.skydoves.sandwich.message
 import com.skydoves.sandwich.onFailure
 import com.skydoves.sandwich.onSuccess
@@ -14,14 +19,18 @@ import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 @HiltViewModel(assistedFactory = PostDetailsViewModel.PostDetailsViewModelFactory::class)
 class PostDetailsViewModel @AssistedInject constructor(
-    private val postRepository: PostRepository,
+    @ApplicationContext private val context: Context,
     @Assisted private val _post: Post,
+    private val postRepository: PostRepository,
+    private val deletePostUseCase: DeletePostUseCase,
+    private val makeToastUseCase: MakeToastUseCase,
 ) : ViewModel() {
 
     @AssistedFactory
@@ -40,8 +49,6 @@ class PostDetailsViewModel @AssistedInject constructor(
     var commentPage: MutableStateFlow<Int> = MutableStateFlow(1)
         private set
     var editCommentState: MutableStateFlow<EditCommentState> = MutableStateFlow(EditCommentState.NotEditing)
-        private set
-    var showToastState: MutableStateFlow<ShowToastState> = MutableStateFlow(ShowToastState.NotShowing)
         private set
 
     init {
@@ -242,9 +249,20 @@ class PostDetailsViewModel @AssistedInject constructor(
 
     private fun showToast(message: String) {
         viewModelScope.launch {
-            showToastState.update { ShowToastState.Showing(message) }
-            kotlinx.coroutines.delay(2000)
-            showToastState.update { ShowToastState.NotShowing }
+            makeToastUseCase(message)
+        }
+    }
+
+    fun deletePost(onSuccessNavigate: () -> Unit) {
+        viewModelScope.launch {
+            val response = deletePostUseCase(_post)
+            response.onSuccess {
+                onSuccessNavigate()
+            }.onFailure {
+                viewModelScope.launch {
+                    makeToastUseCase("Failed to delete post")
+                }
+            }
         }
     }
 }
