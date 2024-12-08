@@ -31,13 +31,17 @@ class PostDetailsViewModel @AssistedInject constructor(
 
     var postUiState: MutableStateFlow<PostUiState> = MutableStateFlow(PostUiState.Loading)
         private set
-    var isLiked: MutableStateFlow<Boolean> = MutableStateFlow(false)
+    var isPostLiked: MutableStateFlow<Boolean> = MutableStateFlow(false)
         private set
     var showBottomCommentSheet: MutableStateFlow<Boolean> = MutableStateFlow(false)
         private set
     var commentsFlow: MutableStateFlow<List<Comment>> = MutableStateFlow(emptyList())
         private set
     var commentPage: MutableStateFlow<Int> = MutableStateFlow(1)
+        private set
+    var editCommentState: MutableStateFlow<EditCommentState> = MutableStateFlow(EditCommentState.NotEditing)
+        private set
+    var showToastState: MutableStateFlow<ShowToastState> = MutableStateFlow(ShowToastState.NotShowing)
         private set
 
     init {
@@ -64,13 +68,14 @@ class PostDetailsViewModel @AssistedInject constructor(
 
     private fun queryPostLike(postId: Int) {
         viewModelScope.launch {
-            val response = postRepository.queryPostLike(postId)
-            response.onSuccess {
-                isLiked.update { true }
-            }.onFailure {
-                isLiked.update { false }
-                Log.d("PostDetails", message())
-            }
+            // TODO: implement query post like
+//            val response = postRepository.queryPostLike(postId)
+//            response.onSuccess {
+//                isPostLiked.update { true }
+//            }.onFailure {
+//                isPostLiked.update { false }
+//                Log.d("PostDetails", message())
+//            }
         }
     }
 
@@ -78,7 +83,10 @@ class PostDetailsViewModel @AssistedInject constructor(
         viewModelScope.launch {
             val response = postRepository.likePost(_post.id)
             response.onSuccess {
-                isLiked.update { true }
+                isPostLiked.update { true }
+            }.onFailure {
+                Log.d("PostDetails", message())
+                showToast("Failed to like post")
             }
         }
     }
@@ -87,18 +95,20 @@ class PostDetailsViewModel @AssistedInject constructor(
         viewModelScope.launch {
             val response = postRepository.unlikePost(_post.id)
             response.onSuccess {
-                isLiked.update { false }
+                isPostLiked.update { false }
+            }.onFailure {
+                Log.d("PostDetails", message())
+                showToast("Failed to unlike post")
             }
         }
     }
 
-    fun toggleLike() {
-        if (isLiked.value) {
+    fun togglePostLike() {
+        if (isPostLiked.value) {
             unlikePost()
         } else {
             likePost()
         }
-        isLiked.update { !it }
     }
 
     private fun getComments(reset: Boolean) {
@@ -114,6 +124,7 @@ class PostDetailsViewModel @AssistedInject constructor(
                 Log.d("PostDetails", data.toString())
             }.onFailure {
                 Log.d("PostDetails", message())
+                showToast("Failed to get comments")
             }
         }
     }
@@ -129,7 +140,111 @@ class PostDetailsViewModel @AssistedInject constructor(
                 Log.d("PostDetails", data.toString())
             }.onFailure {
                 Log.d("PostDetails", message())
+                showToast("Failed to send comment")
             }
+        }
+    }
+
+    fun editComment(content: String) {
+        viewModelScope.launch {
+            val comment = (editCommentState.value as EditCommentState.Editing).comment
+            val response = postRepository.editComment(
+                commentId = comment.id, SendCommentRequest(content)
+            )
+            response.onSuccess {
+                getComments(true)
+                Log.d("PostDetails", data.toString())
+            }.onFailure {
+                Log.d("PostDetails", message())
+                showToast("Failed to edit comment")
+            }
+        }
+    }
+
+    fun deleteComment(comment: Comment) {
+        viewModelScope.launch {
+            val response = postRepository.deleteComment(
+                commentId = comment.id,
+            )
+            response.onSuccess {
+                getComments(true)
+                Log.d("PostDetails", data.toString())
+            }.onFailure {
+                Log.d("PostDetails", message())
+                showToast("Failed to delete comment")
+            }
+        }
+    }
+
+    fun toggleLikeComment(comment: Comment) {
+        viewModelScope.launch {
+            if (comment.isLiked) {
+                unlikeComment(comment)
+            } else {
+                likeComment(comment)
+            }
+        }
+    }
+
+    private fun likeComment(comment: Comment) {
+        viewModelScope.launch {
+            val response = postRepository.likeComment(comment.id)
+            response.onSuccess {
+                // update the target comment isLiked field
+                updateCommentIsLiked(comment, true)
+                Log.d("PostDetails", data.toString())
+            }.onFailure {
+                Log.d("PostDetails", message())
+                showToast("Failed to like comment")
+            }
+        }
+    }
+
+    private fun unlikeComment(comment: Comment) {
+        viewModelScope.launch {
+            val response = postRepository.unlikeComment(comment.id)
+            response.onSuccess {
+                updateCommentIsLiked(comment, false)
+                Log.d("PostDetails", data.toString())
+            }.onFailure {
+                Log.d("PostDetails", message())
+                showToast("Failed to unlike comment")
+            }
+        }
+    }
+
+    private fun updateCommentIsLiked(comment: Comment, isLiked: Boolean) {
+        commentsFlow.update { comments ->
+            comments.map {
+                if (it.id == comment.id) {
+                    it.copy(
+                        isLiked = isLiked,
+                        likes = if (isLiked) it.likes + 1 else it.likes - 1,
+                    )
+                } else {
+                    it
+                }
+            }
+        }
+    }
+
+    fun enterEditCommentState(comment: Comment) {
+        viewModelScope.launch {
+            editCommentState.update { EditCommentState.Editing(comment) }
+        }
+    }
+
+    fun exitEditCommentState() {
+        viewModelScope.launch {
+            editCommentState.update { EditCommentState.NotEditing }
+        }
+    }
+
+    private fun showToast(message: String) {
+        viewModelScope.launch {
+            showToastState.update { ShowToastState.Showing(message) }
+            kotlinx.coroutines.delay(2000)
+            showToastState.update { ShowToastState.NotShowing }
         }
     }
 }

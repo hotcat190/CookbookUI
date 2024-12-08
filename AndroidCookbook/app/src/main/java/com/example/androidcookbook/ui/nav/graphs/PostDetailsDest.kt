@@ -1,10 +1,12 @@
 package com.example.androidcookbook.ui.nav.graphs
 
+import android.widget.Toast
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
@@ -13,9 +15,13 @@ import com.example.androidcookbook.domain.model.post.Post
 import com.example.androidcookbook.ui.CookbookUiState
 import com.example.androidcookbook.ui.CookbookViewModel
 import com.example.androidcookbook.ui.features.post.details.CommentBottomSheet
+import com.example.androidcookbook.ui.features.post.details.CommentBottomSheetTheme
+import com.example.androidcookbook.ui.features.post.details.EditCommentBottomSheet
+import com.example.androidcookbook.ui.features.post.details.EditCommentState
 import com.example.androidcookbook.ui.features.post.details.PostDetailsScreen
 import com.example.androidcookbook.ui.features.post.details.PostDetailsViewModel
 import com.example.androidcookbook.ui.features.post.details.PostUiState
+import com.example.androidcookbook.ui.features.post.details.ShowToastState
 import com.example.androidcookbook.ui.nav.CustomNavTypes
 import com.example.androidcookbook.ui.nav.Routes
 import kotlin.reflect.typeOf
@@ -42,33 +48,67 @@ fun NavGraphBuilder.postDetails(viewModel: CookbookViewModel) {
             is PostUiState.Success -> {
                 PostDetailsScreen(
                     post = postUiState.post,
-                    isLiked = postDetailsViewModel.isLiked.collectAsState().value,
+                    isLiked = postDetailsViewModel.isPostLiked.collectAsState().value,
                     onLikedClick = {
-                        postDetailsViewModel.toggleLike()
+                        postDetailsViewModel.togglePostLike()
                     },
                     onCommentClick = {
                         postDetailsViewModel.updateShowBottomCommentSheet(true)
                     }
                 )
 
-                val sheetState = rememberModalBottomSheetState(
-                    skipPartiallyExpanded = true
-                )
-                val scope = rememberCoroutineScope()
-
                 if (postDetailsViewModel.showBottomCommentSheet.collectAsState().value) {
-                    CommentBottomSheet(
-                        comments = postDetailsViewModel.commentsFlow.collectAsState().value,
-                        user = viewModel.user.collectAsState().value,
-                        onSendComment = { content ->
-                            postDetailsViewModel.sendComment(content)
-                        },
-                        onDismiss = {
-                            postDetailsViewModel.updateShowBottomCommentSheet(false)
-                        },
-                        sheetState = sheetState,
-                        modifier = Modifier
+                    val sheetState = rememberModalBottomSheetState(
+                        skipPartiallyExpanded = true
                     )
+                    val scope = rememberCoroutineScope()
+                    CommentBottomSheetTheme {
+                        CommentBottomSheet(
+                            comments = postDetailsViewModel.commentsFlow.collectAsState().value,
+                            user = viewModel.user.collectAsState().value,
+                            onSendComment = { content ->
+                                postDetailsViewModel.sendComment(content)
+                            },
+                            onEditComment = { comment ->
+                                postDetailsViewModel.enterEditCommentState(comment)
+                            },
+                            onDeleteComment = { comment ->
+                                postDetailsViewModel.deleteComment(comment)
+                            },
+                            onLikeComment = { comment ->
+                                postDetailsViewModel.toggleLikeComment(comment)
+                            },
+                            onDismiss = {
+                                postDetailsViewModel.updateShowBottomCommentSheet(false)
+                            },
+                            sheetState = sheetState,
+                            modifier = Modifier
+                        )
+                    }
+                }
+                when (val editCommentState = postDetailsViewModel.editCommentState.collectAsState().value) {
+                    is EditCommentState.Editing -> {
+                        val sheetState = rememberModalBottomSheetState(
+                            skipPartiallyExpanded = true
+                        )
+                        val scope = rememberCoroutineScope()
+                        CommentBottomSheetTheme {
+                            EditCommentBottomSheet(
+                                comment = editCommentState.comment,
+                                user = viewModel.user.collectAsState().value,
+                                onEditCommentSend = { content ->
+                                    postDetailsViewModel.editComment(content)
+                                    postDetailsViewModel.exitEditCommentState()
+                                },
+                                onDismiss = {
+                                    postDetailsViewModel.exitEditCommentState()
+                                },
+                                sheetState = sheetState,
+                                modifier = Modifier
+                            )
+                        }
+                    }
+                    EditCommentState.NotEditing -> {}
                 }
             }
 
@@ -80,5 +120,14 @@ fun NavGraphBuilder.postDetails(viewModel: CookbookViewModel) {
                 // TODO
             }
         }
+        when (val showToastState = postDetailsViewModel.showToastState.collectAsState().value) {
+            is ShowToastState.Showing -> {
+                val context = LocalContext.current
+                val toast = Toast.makeText(context, showToastState.message, Toast.LENGTH_SHORT)
+                toast.show()
+            }
+            ShowToastState.NotShowing -> {}
+        }
     }
 }
+
