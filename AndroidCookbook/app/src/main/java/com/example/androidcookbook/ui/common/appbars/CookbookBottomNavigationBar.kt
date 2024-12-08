@@ -59,11 +59,11 @@ fun CookbookBottomNavigationBar(
 
         Column {
             HorizontalDivider(
-                thickness = 1.dp,
-                modifier = Modifier
-                    .height(1.dp)
-                    .fillMaxWidth(),
-                color = MaterialTheme.colorScheme.onSurface.copy(0.25F)
+//                thickness = 1.dp,
+//                modifier = Modifier
+//                    .height(1.dp)
+//                    .fillMaxWidth(),
+//                color = MaterialTheme.colorScheme.onSurface.copy(0.25F)
             )
 
             NavigationBar(

@@ -35,6 +35,7 @@ import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
@@ -87,7 +88,8 @@ fun PostDetailsScreen(
         item {
             PostHeader(
                 author = post.author,
-                createdAt = post.createdAt
+                createdAt = post.createdAt,
+                modifier = Modifier.padding(start = 15.dp)
             )
             Column(
                 modifier = Modifier
@@ -112,11 +114,11 @@ fun PostDetailsScreen(
                         .crossfade(true)
                         .build(),
                     contentDescription = null,
-                    modifier =
-                    Modifier
+                    modifier = Modifier
                         .fillMaxWidth()
                         .height(200.dp)
                         .clip(RoundedCornerShape(5)),
+
                     contentScale = ContentScale.Crop,
                 )
             }
@@ -158,7 +160,9 @@ fun PostDetailsScreen(
             }
             Row(
                 horizontalArrangement = Arrangement.SpaceBetween,
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 5.dp)
             ) {
                 LobsterTextButton(
                     onclick = { state = DetailState.Description },

@@ -123,7 +123,10 @@ fun PostHeader(
 }
 
 @Composable
-fun SmallAvatar(author: User) {
+fun SmallAvatar(
+    author: User,
+    modifier: Modifier = Modifier
+) {
     AsyncImage(
         model = ImageRequest.Builder(LocalContext.current)
             .data(author.avatar)
@@ -131,7 +134,7 @@ fun SmallAvatar(author: User) {
             .build(),
 //            imageVector = Icons.Default.AccountCircle,
         contentDescription = "Profile Picture",
-        modifier = Modifier
+        modifier = modifier
             .size(32.dp)
             .clip(CircleShape),
 //            tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.25f),

@@ -21,4 +21,12 @@ class PostRepository @Inject constructor(
     suspend fun getComments(postId: Int, page: Int) = postService.getComments(postId, page)
 
     suspend fun sendComment(postId: Int, request: SendCommentRequest) = postService.sendComment(postId, request)
+
+    suspend fun editComment(commentId: Int, request: SendCommentRequest) = postService.editComment(commentId, request)
+
+    suspend fun deleteComment(commentId: Int) = postService.deleteComment(commentId)
+
+    suspend fun likeComment(commentId: Int) = postService.likeComment(commentId)
+
+    suspend fun unlikeComment(commentId: Int) = postService.unlikeComment(commentId)
 }
