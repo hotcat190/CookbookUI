@@ -36,19 +36,22 @@ fun NewsfeedScreen(
     onEditPost: (Post) -> Unit,
     onDeletePost: (Post) -> Unit,
     onSeeDetailsClick: (Post) -> Unit,
-    modifier: Modifier = Modifier) {
+    modifier: Modifier = Modifier,
+) {
     LazyColumn(
         modifier = modifier
     ) {
         items(
-            posts
+            posts,
+            key = { post -> post.id }
         ) { post ->
             NewsfeedCard(
                 post = post,
                 currentUser = currentUser,
-                onEditPost = { onEditPost (post) },
-                onDeletePost= { onDeletePost(post) },
-                onSeeDetailsClick = onSeeDetailsClick)
+                onEditPost = { onEditPost(post) },
+                onDeletePost = { onDeletePost(post) },
+                onSeeDetailsClick = onSeeDetailsClick
+            )
         }
     }
 }
@@ -60,7 +63,8 @@ fun NewsfeedCard(
     onEditPost: () -> Unit,
     onDeletePost: () -> Unit,
     onSeeDetailsClick: (Post) -> Unit,
-    modifier: Modifier = Modifier) {
+    modifier: Modifier = Modifier,
+) {
     Column(
         modifier = modifier
             .fillMaxWidth()

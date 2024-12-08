@@ -1,10 +1,11 @@
 package com.example.androidcookbook.ui.features.post.details
 
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.LocalIndication
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.indication
 import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.foundation.interaction.PressInteraction
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -38,8 +39,11 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.input.pointer.pointerInteropFilter
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
@@ -91,7 +95,7 @@ fun CommentBottomSheet(
                 items(comments) { comment ->
                     CommentRow(
                         comment = comment,
-                        user = user,
+                        currentUser = user,
                         onDeleteComment = onDeleteComment,
                         onEditComment = onEditComment,
                         onLikeComment = onLikeComment,
@@ -105,10 +109,11 @@ fun CommentBottomSheet(
     }
 }
 
+@OptIn(ExperimentalComposeUiApi::class, ExperimentalFoundationApi::class)
 @Composable
-private fun CommentRow(
+fun CommentRow(
     comment: Comment,
-    user: User,
+    currentUser: User,
     onDeleteComment: (Comment) -> Unit,
     onEditComment: (Comment) -> Unit,
     onLikeComment: (Comment) -> Unit,
@@ -116,9 +121,11 @@ private fun CommentRow(
 ) {
     val interactionSource = remember { MutableInteractionSource() }
     var isContextMenuVisible by remember { mutableStateOf(false) }
-    var pressOffset by remember { mutableStateOf(DpOffset.Zero) }
+//    var pressOffset by remember { mutableStateOf(DpOffset.Zero) }
     var itemHeight by remember { mutableStateOf(0.dp) }
     val localDensity = LocalDensity.current
+
+    var offset by remember { mutableStateOf(Offset.Zero) }
 
     Row(
         modifier = Modifier
@@ -127,118 +134,150 @@ private fun CommentRow(
             .onSizeChanged {
                 itemHeight = with(localDensity) { it.height.toDp() }
             }
+            .pointerInteropFilter {
+                offset = Offset(it.x, it.y)
+                false
+            }
+            .combinedClickable(
+                onClick = {},
+                onLongClick = { isContextMenuVisible = true }
+            )
 
     ) {
-        Row(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(horizontal = 16.dp, vertical = 12.dp)
-                .pointerInput(true) {
-                    detectTapGestures(
-                        onLongPress = {
-                            isContextMenuVisible = true
-                            pressOffset = DpOffset(it.x.toDp(), it.y.toDp())
-                        },
-                        onPress = {
-                            val press = PressInteraction.Press(it)
-                            interactionSource.emit(press)
-                            tryAwaitRelease()
-                            interactionSource.emit(PressInteraction.Release(press))
-                        }
-                    )
-                }
-        ) {
-            SmallAvatar(
-                author = comment.user,
-                modifier = Modifier.padding(top = 4.dp)
-            )
-            Spacer(modifier = Modifier.width(16.dp))
-            Column(
+        Box(contentAlignment = Alignment.TopStart) {
+            Row(
                 modifier = Modifier
-                    .weight(1F)
+                    .fillMaxSize()
+                    .padding(horizontal = 16.dp, vertical = 12.dp)
+//                .pointerInput(true) {
+//                    detectTapGestures(
+//                        onLongPress = {
+//                            isContextMenuVisible = true
+//                            pressOffset = DpOffset(it.x.toDp(), it.y.toDp())
+//                        },
+//                        onPress = {
+//                            val press = PressInteraction.Press(it)
+//                            interactionSource.emit(press)
+//                            tryAwaitRelease()
+//                            interactionSource.emit(PressInteraction.Release(press))
+//                        }
+//                    )
+//                }
             ) {
-                Row(
+                SmallAvatar(
+                    author = comment.user,
+                    modifier = Modifier.padding(top = 4.dp)
+                )
+                Spacer(modifier = Modifier.width(16.dp))
+                Column(
                     modifier = Modifier
+                        .weight(1F)
                 ) {
-                    Text(
-                        text = comment.user.name,
-                        fontWeight = FontWeight.Bold,
-                    )
-                    Spacer(modifier = Modifier.width(8.dp))
+                    Row(
+                        modifier = Modifier
+                    ) {
+                        Text(
+                            text = comment.user.name,
+                            fontWeight = FontWeight.Bold,
+                        )
+                        Spacer(modifier = Modifier.width(8.dp))
 
-                    Text(
-                        text = comment.createdAt,
-                        fontSize = TextUnit(
-                            value = 12f,
-                            type = TextUnitType.Sp,
-                        ),
-                    )
+                        Text(
+                            text = comment.createdAt,
+                            fontSize = TextUnit(
+                                value = 12f,
+                                type = TextUnitType.Sp,
+                            ),
+                        )
+                    }
+                    // Comment Content
+                    Box(
+                        modifier = Modifier.fillMaxSize()
+                    ) {
+                        Text(
+                            text = comment.content, modifier = Modifier.fillMaxSize()
+                        )
+                    }
                 }
-                // Comment Content
-                Box(
-                    modifier = Modifier.fillMaxSize()
+//            Spacer(Modifier.width(8.dp))
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center,
+                    modifier = Modifier.fillMaxHeight()
                 ) {
+                    LikeButton(
+                        isLiked = comment.isLiked,
+                        onLikedClick = {
+                            onLikeComment(comment)
+                        },
+                    )
                     Text(
-                        text = comment.content, modifier = Modifier.fillMaxSize()
+                        text = comment.likes.toString(),
                     )
                 }
             }
-//            Spacer(Modifier.width(8.dp))
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Center,
-                modifier = Modifier.fillMaxHeight()
-            ) {
-                LikeButton(
-                    isLiked = comment.isLiked,
-                    onLikedClick = {
-                        onLikeComment(comment)
-                    },
-                )
-                Text(
-                    text = comment.likes.toString(),
-                )
+            Box {
+                DropdownMenu(
+                    expanded = isContextMenuVisible,
+                    onDismissRequest = { isContextMenuVisible = false },
+//                    offset = pressOffset.copy(
+////                            x = pressOffset.x.coerceAtMost(240.dp),
+//                        y = pressOffset.y - itemHeight
+                    offset = DpOffset(
+                        Density(LocalContext.current).run { offset.x.toDp() },
+                        Density(LocalContext.current).run { offset.y.toDp() },
+                    )
+                ) {
+                    if (currentUser.id == comment.user.id) {
+                        DropdownMenuItem(
+                            text = { Text("Edit") },
+                            onClick = {
+                                isContextMenuVisible = false
+                                onEditComment(comment)
+                            },
+                        )
+                        DropdownMenuItem(
+                            text = { Text("Delete") },
+                            onClick = {
+                                isContextMenuVisible = false
+                                onDeleteComment(comment)
+                            },
+                        )
+                    }
+                }
             }
         }
 
-        DropdownMenu(
-            expanded = isContextMenuVisible,
-            onDismissRequest = { isContextMenuVisible = false },
-            offset = pressOffset.copy(
-//                            x = pressOffset.x.coerceAtMost(240.dp),
-                y = pressOffset.y - itemHeight
-            ),
-        ) {
-            if (user.id == comment.user.id) {
-                DropdownMenuItem(
-                    text = { Text("Edit") },
-                    onClick = {
-                        isContextMenuVisible = false
-                        onEditComment(comment)
-                    },
-                )
-                DropdownMenuItem(
-                    text = { Text("Delete") },
-                    onClick = {
-                        isContextMenuVisible = false
-                        onDeleteComment(comment)
-                    },
-                )
-            }
-//            else {
+//        DropdownMenu(
+//            expanded = isContextMenuVisible,
+//            onDismissRequest = { isContextMenuVisible = false },
+//            offset = pressOffset.copy(
+////                            x = pressOffset.x.coerceAtMost(240.dp),
+//                y = pressOffset.y - itemHeight
+//            ),
+//        ) {
+//            if (currentUser.id == comment.user.id) {
 //                DropdownMenuItem(
-//                    text = { Text("Hide") },
+//                    text = { Text("Edit") },
 //                    onClick = {
 //                        isContextMenuVisible = false
+//                        onEditComment(comment)
+//                    },
+//                )
+//                DropdownMenuItem(
+//                    text = { Text("Delete") },
+//                    onClick = {
+//                        isContextMenuVisible = false
+//                        onDeleteComment(comment)
 //                    },
 //                )
 //            }
-        }
+//        }
     }
 }
 
 @Composable
-private fun WriteCommentRow(
+fun WriteCommentRow(
     user: User,
     onSendComment: (String) -> Unit,
 ) {

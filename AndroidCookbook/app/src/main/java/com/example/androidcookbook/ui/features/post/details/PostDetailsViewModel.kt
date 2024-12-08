@@ -52,7 +52,8 @@ class PostDetailsViewModel @AssistedInject constructor(
         private set
 
     init {
-        getPost()
+//        getPost()
+        postUiState.update { PostUiState.Success(post = _post) }
         queryPostLike(_post.id)
         getComments(false)
     }

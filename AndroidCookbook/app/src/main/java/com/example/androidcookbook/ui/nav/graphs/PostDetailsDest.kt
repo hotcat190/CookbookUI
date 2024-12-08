@@ -47,6 +47,7 @@ fun NavGraphBuilder.postDetails(viewModel: CookbookViewModel, navController: Nav
                 PostDetailsScreen(
                     post = postUiState.post,
                     showPostOptions = (viewModel.user.collectAsState().value.id == postUiState.post.author.id),
+                    comments = postDetailsViewModel.commentsFlow.collectAsState().value,
                     onEditPost = {
                         navController.navigate(Routes.UpdatePost(postUiState.post))
                     },
@@ -64,6 +65,19 @@ fun NavGraphBuilder.postDetails(viewModel: CookbookViewModel, navController: Nav
 
                     onCommentClick = {
                         postDetailsViewModel.updateShowBottomCommentSheet(true)
+                    },
+                    currentUser = viewModel.user.collectAsState().value,
+                    onDeleteComment = { comment ->
+                        postDetailsViewModel.deleteComment(comment)
+                    },
+                    onEditComment = { comment ->
+                        postDetailsViewModel.enterEditCommentState(comment)
+                    },
+                    onLikeComment = { comment ->
+                        postDetailsViewModel.toggleLikeComment(comment)
+                    },
+                    onSendComment = { content ->
+                        postDetailsViewModel.sendComment(content = content)
                     },
                     modifier = Modifier
                 )
