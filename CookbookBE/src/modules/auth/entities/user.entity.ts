@@ -72,7 +72,8 @@ import {
     @Column({ nullable: true })
     avatar: string;
 
-
+    @Column()
+    tokenFCM: string;
 
   }
   

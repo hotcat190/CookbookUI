@@ -35,6 +35,16 @@ export class PostsService {
     }
     return { isLiked: false };
   }
+  async checkLikeComment(commentId: number, userId: number): Promise<any> {
+    const comment = await this.commentsRepository.findOne({ where: { id: commentId }, relations: ['likes'] });
+    if (!comment) {
+      throw new NotFoundException('Bình luận không tồn tại.');
+    }
+    if (comment.likes.some((like) => like.id == userId)) {
+      return { isLiked: true };
+    }
+    return { isLiked: false };
+  }
   async createPost(createPostDto: CreatePostDto, userId: number): Promise<any> {
     const user = await this.usersRepository.findOne({ where: { id: userId } });
     const post = this.postsRepository.create({
@@ -143,7 +153,20 @@ export class PostsService {
     await this.postsRepository.save(post);
     return { message: 'Đã thích bài viết.', totalLike: post.totalLike };
   }
-
+  async likeComment(commentId: number, userId: number): Promise<any> {
+    const comment = await this.commentsRepository.findOne({ where: { id: commentId }, relations: ['likes'] });
+    if (!comment) {
+      throw new NotFoundException('Bình luận không tồn tại.');
+    }
+    console.log(comment);
+    console.log(comment.likes);
+    if (comment.likes.some((like) => like.id === userId)) {
+      throw new BadRequestException('Bạn đã thích bình luận này trước đó.');
+    }
+    comment.likes.push({ id: userId } as User);
+    await this.commentsRepository.save(comment);
+    return { message: 'Đã thích bình luận.' };
+  }
   async unlikePost(postId: number, userId: number): Promise<any> {
     const post = await this.postsRepository
       .createQueryBuilder('post')
@@ -166,6 +189,19 @@ export class PostsService {
   
     await this.postsRepository.save(post);
     return { message: 'Đã bỏ thích bài viết.', totalLike: post.totalLike };
+  }
+  async unlikeComment(commentId: number, userId: number): Promise<any> {
+    const comment = await this.commentsRepository.findOne({ where: { id: commentId }, relations: ['likes'] });
+    if (!comment) {
+      throw new NotFoundException('Bình luận không tồn tại.');
+    }
+    const likeIndex = comment.likes.findIndex((like) => like.id === userId);
+    if (likeIndex === -1) {
+      throw new BadRequestException('Bạn chưa thích bình luận này.');
+    }
+    comment.likes.splice(likeIndex, 1);
+    await this.commentsRepository.save(comment);
+    return { message: 'Đã bỏ thích bình luận.' };
   }
   async searchAll(query: string): Promise<any> {
     const posts = await this.postsRepository.find({
@@ -248,7 +284,18 @@ export class PostsService {
     await this.postsRepository.save(post);
     return { message: 'Thêm bình luận thành công.'};
   }
-
+  async updateComment(commentId: number, createCommentDto: CreateCommentDto, userId: number): Promise<any> {
+    const comment = await this.commentsRepository.findOne({ where: { id: commentId }, relations: ['user'] });
+    if (!comment) {
+      throw new NotFoundException('Bình luận không tồn tại.');
+    }
+    if (comment.user.id !== userId) {
+      throw new ForbiddenException('Bạn không có quyền chỉnh sửa bình luận này.');
+    }
+    comment.content = createCommentDto.content;
+    await this.commentsRepository.save(comment);
+    return { message: 'Chỉnh sửa bình luận thành công.'};
+  }
   async deleteComment(commentId: number, userId: number): Promise<any> {
     const comment = await this.commentsRepository.findOne({ where: { id: commentId }, relations: ['user'] });
     if (!comment) {
@@ -261,6 +308,6 @@ export class PostsService {
 
     return { message: 'Xóa bình luận thành công.' };
   }
-
+  
   
 }

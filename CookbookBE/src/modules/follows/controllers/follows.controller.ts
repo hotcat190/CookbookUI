@@ -46,9 +46,7 @@ export class FollowsController {
     return this.followsService.getFollowing(userId);
   }
   @Get('follow/check/:followerId/:followingId')
-  @ApiOperation({ summary: 'Xem danh sách đang theo dõi' })
-  @ApiResponse({ status: 200, description: 'Danh sách đang theo dõi' })
-  @ApiResponse({ status: 404, description: 'Người dùng không tồn tại' })
+  @ApiOperation({ summary: 'Kiểm tra followerId đã theo dõi followingId chưa' })
   checkFollow(@Param('followerId') followerId: number, @Param('followingId') followingId: number) {
     return this.followsService.checkFollow(followerId,followingId);
   }

@@ -96,9 +96,7 @@ import {
     }
 
     @Get('like/check/:postId/:userId')
-    @ApiOperation({ summary: 'Xem danh sách thích bài viết theo trang (mỗi trang 10, bắt đầu từ trang 1), nextPage true là có trang tiếp theo' })
-    @ApiResponse({ status: 200, description: 'Danh sách người thích bài viết' })
-    @ApiResponse({ status: 404, description: 'Bài viết không tồn tại' })
+    @ApiOperation({ summary: 'Kiểm tra userId đã thích postId hay chưa' })
     checkLike(@Param('postId') postId: number, @Param('userId') userId: number) {
       return this.postsService.checkLike(postId, userId);
     }
@@ -176,7 +174,48 @@ import {
     deleteComment(@Param('commentId') commentId: number, @Request() req) {
       return this.postsService.deleteComment(commentId, req.user.id);
     }
-
+    @ApiBearerAuth()
+    @UseGuards(JwtAuthGuard)
+    @Put('comment/:commentId')
+    @ApiOperation({ summary: 'Chỉnh sửa bình luận' })
+    @ApiResponse({ status: 200, description: 'Cập nhật bình luận thành công' })
+    @ApiResponse({ status: 403, description: 'Không có quyền chỉnh sửa' })
+    @ApiResponse({ status: 404, description: 'Bình luận không tồn tại' })
+    updateComment(
+      @Param('commentId') commentId: number,
+      @Body() createCommentDto: CreateCommentDto,
+      @Request() req,
+    ) {
+      return this.postsService.updateComment(commentId, createCommentDto, req.user.id);
+    }
+    @ApiBearerAuth()
+    @UseGuards(JwtAuthGuard)
+    @Post('comment/like/:commentId')
+    @ApiOperation({ summary: 'Thích bình luận' })
+    @ApiResponse({ status: 200, description: 'Đã thích bình luận' })
+    @ApiResponse({ status: 400, description: 'Đã thích bình luận này trước đó' })
+    @ApiResponse({ status: 404, description: 'Bình luận không tồn tại' })
+    likeComment(@Param('commentId') commentId: number, @Request() req) {
+      return this.postsService.likeComment(commentId, req.user.id);
+    }
+    @ApiBearerAuth()
+    @UseGuards(JwtAuthGuard)
+    @Delete('comment/like/:commentId')
+    @ApiOperation({ summary: 'Bỏ thích bình luận' })
+    @ApiResponse({ status: 200, description: 'Đã bỏ thích bình luận' })
+    @ApiResponse({ status: 400, description: 'Bạn chưa thích bình luận này' })
+    @ApiResponse({ status: 404, description: 'Bình luận không tồn tại' })
+    unlikeComment(@Param('commentId') commentId: number, @Request() req) {
+      return this.postsService.unlikeComment(commentId, req.user.id);
+    }
     
+    @Get('comment/like/check/:commentId/:userId')
+    @ApiOperation({ summary: 'Kiểm tra userId đã thích commentId hay chưa' })
+    @ApiResponse({ status: 200, description: 'Đã thích' })
+    @ApiResponse({ status: 400, description: 'Chưa thích' })
+    @ApiResponse({ status: 404, description: 'Comment không tồn tại' })
+    checkLikeComment(@Param('commentId') commentId: number, @Param('userId') userId: number) {
+      return this.postsService.checkLikeComment(commentId, userId);
+    }
 }
   

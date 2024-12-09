@@ -105,9 +105,7 @@ export class AuthController {
   }
 
   @Delete('favorite/check/:recipeId/:userId')
-  @ApiOperation({ summary: 'Xóa khỏi danh sách yêu thích' })
-  @ApiResponse({ status: 200, description: 'Đã xóa khỏi danh sách yêu thích' })
-  @ApiResponse({ status: 404, description: 'Bài viết không nằm trong danh sách yêu thích' })
+  @ApiOperation({ summary: 'Kiểm tra userId đã favorite recipeId chưa' })
   checkFavorite(@Param('recipeId') postId: number, @Param('userId') userId: number) {
     return this.authService.checkFavorite(postId, userId);
   }
