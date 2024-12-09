@@ -1,17 +1,7 @@
 package com.example.androidcookbook.ui.nav.graphs
 
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyListScope
-import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.style.TextAlign
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
@@ -25,13 +15,10 @@ import com.example.androidcookbook.ui.features.aigen.AIGenScreen
 import com.example.androidcookbook.ui.features.aigen.AiScreenTheme
 import com.example.androidcookbook.ui.features.category.CategoryScreen
 import com.example.androidcookbook.ui.features.category.CategoryViewModel
-import com.example.androidcookbook.ui.features.newsfeed.NewsfeedCard
 import com.example.androidcookbook.ui.features.newsfeed.NewsfeedScreen
 import com.example.androidcookbook.ui.features.newsfeed.NewsfeedViewModel
 import com.example.androidcookbook.ui.features.userprofile.GuestProfile
-import com.example.androidcookbook.ui.features.userprofile.UserInfo
 import com.example.androidcookbook.ui.features.userprofile.UserPostState
-import com.example.androidcookbook.ui.features.userprofile.UserProfileHeader
 import com.example.androidcookbook.ui.features.userprofile.UserProfileScreen
 import com.example.androidcookbook.ui.features.userprofile.UserProfileUiState
 import com.example.androidcookbook.ui.features.userprofile.UserProfileViewModel
@@ -118,7 +105,7 @@ private fun NavGraphBuilder.userProfile(
         updateAppBar()
         val user = it.toRoute<Routes.App.UserProfile>().user
 
-        val userProfileViewModel = hiltViewModel<UserProfileViewModel, UserProfileViewModel.UserProfileViewModelFactory        >(
+        val userProfileViewModel = hiltViewModel<UserProfileViewModel, UserProfileViewModel.UserProfileViewModelFactory>(
 
         ) { factory ->
             factory.create(user)
@@ -162,13 +149,14 @@ private fun NavGraphBuilder.userProfile(
                             }
 
                             is UserPostState.Failure -> item { Text("Failed to fetch user posts.") }
-                            UserPostState.Guest -> item {Text("Login to view your posts.")}
                         }
                     }
                 }
                 UserProfileUiState.Failure -> {
-                    // TODO: FAILURE SCREEN - CURRENTLY IS GUEST SCREEN
-                    GuestProfile()
+                    GuestProfile("Failed to fetch user profile.")
+                }
+                UserProfileUiState.Guest -> {
+                    GuestProfile("Login to see your posts.")
                 }
             }
         }

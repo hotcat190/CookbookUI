@@ -10,9 +10,12 @@ import androidx.compose.ui.Modifier
 import com.example.androidcookbook.domain.model.user.User
 
 @Composable
-fun GuestProfile() {
+fun GuestProfile(
+    text: String,
+    modifier: Modifier = Modifier
+) {
     LazyColumn(
-        modifier = Modifier.fillMaxSize()
+        modifier = modifier.fillMaxSize()
     ) {
         item {
             UserProfileHeader(avatarPath = null)
@@ -23,7 +26,7 @@ fun GuestProfile() {
                 horizontalAlignment = Alignment.CenterHorizontally,
                 modifier = Modifier.fillMaxSize()
             ) {
-                Text("Login to view your posts.")
+                Text(text)
             }
         }
     }

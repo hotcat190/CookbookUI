@@ -1,5 +1,6 @@
 package com.example.androidcookbook.ui.features.userprofile
 
+import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -36,49 +37,53 @@ class UserProfileViewModel @AssistedInject constructor(
 
     init {
 //        getUser(user.id)
-        getUserPosts(user.id)
+        if (user.id != GUEST_ID) {
+            getUserPosts(user.id)
+        }
     }
 
     var isRefreshing: Boolean by mutableStateOf(false)
         private set
 
     var uiState: MutableStateFlow<UserProfileUiState> = MutableStateFlow(
-        if (user.id == GUEST_ID) UserProfileUiState.Success(User())
+        if (user.id == GUEST_ID) UserProfileUiState.Guest
         else UserProfileUiState.Success(user = user)
     )
         private set
 
     var userPostState: MutableStateFlow<UserPostState> = MutableStateFlow(
-        if (user.id == GUEST_ID) UserPostState.Guest
-        else UserPostState.Loading
+        UserPostState.Loading
     )
         private set
 
-    private fun getUser(userId: Int) {
-        viewModelScope.launch {
-            userRepository.getUserProfile(userId = userId)
-                .onSuccess {
-                    uiState.update { UserProfileUiState.Success(user = data) }
-                }
-                .onFailure {
-                    uiState.update { UserProfileUiState.Failure }
-                }
-        }
+    private suspend fun getUser(userId: Int) {
+        uiState.update { UserProfileUiState.Loading }
+        userRepository.getUserProfile(userId = userId)
+            .onSuccess {
+                uiState.update { UserProfileUiState.Success(user = data) }
+            }
+            .onFailure {
+                uiState.update { UserProfileUiState.Failure }
+            }
     }
 
-    fun getUserPosts(userId: Int) {
+    private fun getUserPosts(userId: Int) {
+        userPostState.update { UserPostState.Loading }
         viewModelScope.launch {
             userRepository.getUserPosts(userId)
-                .onSuccess { userPostState.update { UserPostState.Success(data) } }
+                .onSuccess {
+                    userPostState.update { UserPostState.Success(data) }
+                }
                 .onFailure { userPostState.update { UserPostState.Failure } }
         }
     }
 
     fun refresh() {
+        if (user.id == GUEST_ID) return
         viewModelScope.launch {
             isRefreshing = true
-            uiState .update { UserProfileUiState.Loading }
             getUser(userId = user.id)
+            getUserPosts(userId = user.id)
             isRefreshing = false
         }
     }

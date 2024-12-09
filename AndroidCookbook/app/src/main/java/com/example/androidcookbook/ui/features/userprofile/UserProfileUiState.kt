@@ -7,10 +7,10 @@ sealed interface UserProfileUiState {
     data object Loading : UserProfileUiState
     data class Success(val user: User) : UserProfileUiState
     data object Failure: UserProfileUiState
+    data object Guest: UserProfileUiState
 }
 
 sealed interface UserPostState {
-    data object Guest : UserPostState
     data object Loading : UserPostState
     data class Success(val userPosts: List<Post>) : UserPostState
     data object Failure: UserPostState
