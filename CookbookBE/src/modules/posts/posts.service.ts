@@ -18,7 +18,23 @@ export class PostsService {
     @InjectRepository(Comment) private commentsRepository: Repository<Comment>,
     private mailerService: MailerService,
   ) {}
-
+  async checkLike(postId: number, userId: number): Promise<any> {
+    const post = await this.postsRepository
+      .createQueryBuilder('post')
+      .leftJoin('post.likes', 'likes')
+      .select(['post', 'likes.id'])
+      .where('post.id = :id', { id: postId })
+      .getOne();
+    if (!post) {
+      throw new NotFoundException('Bài viết không tồn tại.');
+    }
+    console.log(userId); 
+    console.log(post.likes);
+    if (post.likes.some((like) => like.id == userId)) {
+      return { isLiked: 'true' };
+    }
+    return { isLiked: 'false' };
+  }
   async createPost(createPostDto: CreatePostDto, userId: number): Promise<any> {
     const user = await this.usersRepository.findOne({ where: { id: userId } });
     const post = this.postsRepository.create({
@@ -86,10 +102,10 @@ export class PostsService {
     const itemsPerPage = 10;
     const startIndex = (page - 1) * itemsPerPage;
     if (likes.length > itemsPerPage*page) {
-      return {nextPage: "true", likes: likes.slice(startIndex, startIndex + itemsPerPage).map(like => new ReponseUserDto(like))};
+      return {nextPage: true, likes: likes.slice(startIndex, startIndex + itemsPerPage).map(like => new ReponseUserDto(like))};
     }
     else{
-      return {nextPage: "false", likes: likes.slice(startIndex, startIndex + itemsPerPage).map(like => new ReponseUserDto(like))};
+      return {nextPage: false, likes: likes.slice(startIndex, startIndex + itemsPerPage).map(like => new ReponseUserDto(like))};
     }
   }
   async getComments(postId: number, page: number): Promise<any> {
@@ -100,10 +116,10 @@ export class PostsService {
     const itemsPerPage = 10;
     const startIndex = (page - 1) * itemsPerPage;
     if (comments.length > itemsPerPage*page) {
-      return {nextPage: "true", comments: comments.slice(startIndex, startIndex + itemsPerPage).map(comment => new FullReponseCommentDto(comment))};
+      return {nextPage: true, comments: comments.slice(startIndex, startIndex + itemsPerPage).map(comment => new FullReponseCommentDto(comment))};
     }
     else{
-      return {nextPage: "false", comments: comments.slice(startIndex, startIndex + itemsPerPage).map(comment => new FullReponseCommentDto(comment))};
+      return {nextPage: false, comments: comments.slice(startIndex, startIndex + itemsPerPage).map(comment => new FullReponseCommentDto(comment))};
     }
   }
   async likePost(postId: number, userId: number): Promise<any> {
@@ -183,10 +199,10 @@ export class PostsService {
     const itemsPerPage = 10;
     const startIndex = (page - 1) * itemsPerPage;
     if (posts.length > itemsPerPage*page) {
-      return {nextPage: "true", posts: posts.slice(startIndex, startIndex + itemsPerPage).map(post => new LiteReponsePostDto(post))};
+      return {nextPage: true, posts: posts.slice(startIndex, startIndex + itemsPerPage).map(post => new LiteReponsePostDto(post))};
     }
     else{
-      return {nextPage: "false", posts: posts.slice(startIndex, startIndex + itemsPerPage).map(post => new LiteReponsePostDto(post))};
+      return {nextPage: false, posts: posts.slice(startIndex, startIndex + itemsPerPage).map(post => new LiteReponsePostDto(post))};
     }
   }
   async getNewsfeed(userId: number, limit: number): Promise<any> {
