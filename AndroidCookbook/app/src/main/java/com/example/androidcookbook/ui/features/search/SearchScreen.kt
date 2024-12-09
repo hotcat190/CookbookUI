@@ -12,10 +12,16 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.TabRowDefaults
+import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Tab
+import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -46,12 +52,15 @@ fun SearchScreen(
     onBackButtonClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-
+    val pagerState = rememberPagerState(
+        pageCount = { 2 }
+    )
     BackHandler {
         when (searchUiState.currentScreen) {
-            SearchScreenState.Food -> onBackButtonClick()
+            SearchScreenState.Food -> viewModel.ChangeScreenState(SearchScreenState.Waiting)
             SearchScreenState.Posts -> viewModel.ChangeScreenState(SearchScreenState.Food)
             SearchScreenState.Detail -> viewModel.ChangeScreenState(SearchScreenState.Posts)
+            SearchScreenState.Waiting -> onBackButtonClick()
         }
     }
     if (searchUiState.fail) {
@@ -66,19 +75,57 @@ fun SearchScreen(
         )
     } else {
         when (searchUiState.currentScreen) {
+            SearchScreenState.Waiting -> {
+
+            }
             SearchScreenState.Food -> {
-                LazyColumn(
-                    modifier = Modifier.padding(horizontal = 20.dp, vertical = 10.dp),
-                    verticalArrangement = Arrangement.spacedBy(10.dp)
-                ) {
-                    items(searchUiState.resultList) { item ->
-                        ResultCardTheme {
-                            ResultCard(
-                                onClick = {
-                                    viewModel.ChangeScreenState(SearchScreenState.Posts)
-                                },
-                                recipe = item
+                Column {
+                    TabRow(
+                        selectedTabIndex = pagerState.currentPage,
+                        modifier = Modifier.weight(1f),
+                        indicator = {
+                            tabPositions ->
+                            TabRowDefaults.Indicator(
+                                modifier = Modifier.tabIndicatorOffset(
+                                    currentTabPosition = tabPositions[pagerState.currentPage]
+                                )
                             )
+                        }
+                    ) {
+                        SearchTab.values().forEach {
+                            Tab(
+                                selected = pagerState.currentPage == it.ordinal,
+                                onClick = {
+                                    pagerState.requestScrollToPage(it.ordinal)
+                                          },
+                                text = { Text(text = it.name) }
+                            )
+                        }
+                    }
+                    HorizontalPager(
+                        state = pagerState,
+                        modifier = Modifier.weight(12f),
+                        verticalAlignment = Alignment.Top
+                    ) {
+                        LazyColumn(
+                            modifier = Modifier.padding(horizontal = 20.dp, vertical = 10.dp),
+                            verticalArrangement = Arrangement.spacedBy(10.dp)
+                        ) {
+                            when (it) {
+                                0 -> {}
+                                1 -> {
+                                    items(searchUiState.resultList) { item ->
+                                        ResultCardTheme {
+                                            ResultCard(
+                                                onClick = {
+                                                    viewModel.ChangeScreenState(SearchScreenState.Posts)
+                                                },
+                                                recipe = item
+                                            )
+                                        }
+                                    }
+                                }
+                            }
                         }
                     }
                 }
@@ -87,12 +134,13 @@ fun SearchScreen(
                 NewsfeedScreen(
                     posts = SamplePosts.posts,
                     onSeeDetailsClick = {
+                        viewModel.ChangeCurrentPost(it)
                         viewModel.ChangeScreenState(SearchScreenState.Detail)
                     }
                 )
             }
             SearchScreenState.Detail -> {
-                PostDetailsScreen(Post(), false, {}) //TODO
+                PostDetailsScreen(searchUiState.currentPost, false, {}) //TODO
             }
         }
 

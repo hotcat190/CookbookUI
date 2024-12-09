@@ -3,6 +3,7 @@ package com.example.androidcookbook.ui.features.search
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.androidcookbook.data.repositories.SearchRepository
+import com.example.androidcookbook.domain.model.post.Post
 import com.example.androidcookbook.domain.model.recipe.Recipe
 import com.example.androidcookbook.domain.model.recipe.RecipeList
 import com.skydoves.sandwich.ApiResponse
@@ -47,6 +48,14 @@ class SearchViewModel @Inject constructor(
         _uiState.update {
             it.copy(
                 currentScreen = screen
+            )
+        }
+    }
+
+    fun ChangeCurrentPost(post: Post) {
+        _uiState.update {
+            it.copy(
+                currentPost = post
             )
         }
     }
