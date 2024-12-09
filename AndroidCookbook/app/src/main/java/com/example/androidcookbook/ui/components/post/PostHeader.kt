@@ -1,14 +1,20 @@
 package com.example.androidcookbook.ui.components.post
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
@@ -22,13 +28,14 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.androidcookbook.domain.model.user.User
-import com.example.androidcookbook.ui.common.utils.apiDateFormatter
 import com.example.androidcookbook.ui.theme.AndroidCookbookTheme
-import java.time.LocalDate
 
 @Composable
 fun PostHeader(
@@ -54,21 +61,33 @@ fun PostHeader(
         )
         Spacer(modifier = Modifier.width(8.dp)) // Spacing between icon and username
         Column {
-            Text(
-                text = author.name,
-                fontSize = 19.sp,
-                style = MaterialTheme.typography.labelMedium,
-                color = MaterialTheme.colorScheme.onSurface,
+            val roundedCornerShape = RoundedCornerShape(45)
+            val leftPad = 4.dp
+            Box (
                 modifier = Modifier
+                    .background(
+                        color = Color.Transparent,
+                        shape = roundedCornerShape
+                    )
+                    .clip(roundedCornerShape)
                     .clickable {
                         onUserClick(author)
                     }
-            )
+            ) {
+                Text(
+                    text = author.name,
+                    fontSize = 19.sp,
+                    style = MaterialTheme.typography.labelMedium,
+                    color = MaterialTheme.colorScheme.onSurface,
+                    modifier = Modifier.padding(horizontal = leftPad)
+                )
+            }
             Text(
                 text = createdAt ?: "",
                 fontSize = 12.sp,
                 style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.4f)
+                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.4f),
+                modifier = Modifier.padding(start = leftPad)
             )
         }
         Spacer(Modifier.weight(1F))
@@ -119,7 +138,7 @@ fun PostHeaderPreview() {
         ) {
             PostHeader(
                 author = User(),
-                createdAt = "2024-01-01T00:00:00.000Z",
+                createdAt = "2024-01-01",
                 showOptionsButton = true,
                 onDeletePost = {},
                 onEditPost = {},
