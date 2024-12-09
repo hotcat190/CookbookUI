@@ -19,6 +19,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.androidcookbook.ui.features.auth.theme.SignLayoutTheme
 import com.example.androidcookbook.ui.theme.AndroidCookbookTheme
 
 @Composable
@@ -29,7 +30,6 @@ fun SignButton(
     Button(
         onClick = onClick,
         modifier = Modifier
-            .width(145.dp)
             .height(50.dp),
         colors = ButtonDefaults.buttonColors(MaterialTheme.colorScheme.secondary),
         shape = RoundedCornerShape(size = 12.dp)
@@ -55,7 +55,7 @@ fun SignButton(
 @Preview
 @Composable
 private fun SignButtonPreview() {
-    AndroidCookbookTheme {
+    SignLayoutTheme {
         SignButton({}, "Sign In")
     }
 }

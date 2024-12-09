@@ -145,7 +145,7 @@ private fun RowScope.UserProfileNavigationBarItem(
             Icon(
                 painter = painterResource(R.drawable.icon_user_profile),
                 contentDescription = "User Profile",
-                tint = Color(0xFF0D1114)
+//                tint = Color(0xFF0D1114)
             )
         },
 //        label = {
@@ -174,7 +174,7 @@ private fun RowScope.NewsfeedNavigationBarItem(
                 painter = painterResource(R.drawable.home),
                 contentDescription = "Newsfeed",
                 modifier = Modifier,
-                tint = Color(0xFF0D1114)
+//                tint = Color(0xFF0D1114)
 
             )
         },
@@ -204,7 +204,7 @@ private fun RowScope.AiChatNavigationBarItem(
                 painter = painterResource(R.drawable.ai_gen_light_mode),
                 contentDescription = "Chat",
                 modifier = Modifier.scale(1.2F),
-                tint = Color(0xFF0D1114)
+//                tint = Color(0xFF0D1114)
 
             )
         },
@@ -233,7 +233,7 @@ private fun RowScope.CategoryNavigationBarItem(
             Icon(
                 painter = painterResource(R.drawable.icon_category),
                 contentDescription = "Home",
-                tint = Color(0xFF0D1114)
+//                tint = Color(0xFF0D1114)
 
             )
         },

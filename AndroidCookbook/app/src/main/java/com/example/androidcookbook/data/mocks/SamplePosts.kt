@@ -9,13 +9,20 @@ object SamplePosts {
         repeat(10) {
             add(
                 Post(
-                    id = 0,
-                    author = User(),
+                    id = it,
+                    author = User(
+                        id = 1,
+                        name = "Ly Duc",
+                        avatar = null,
+                        bio = "I like suffering",
+                        totalFollowers = 0,
+                        totalFollowing = 0
+                    ),
                     title = "Shrimp salad cooking :)",
                     description = "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard.",
                     cookTime = "",
                     mainImage = null,
-                    createdAt = "01/28/2024",
+                    createdAt = "2024-01-28T00:00:00.000Z",
                     totalView = 0,
                     totalLike = 0,
                     totalComment = 0,

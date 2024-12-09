@@ -41,7 +41,7 @@ val LightSignLayout = lightColorScheme(
 
 val DarkTitle = Color(217, 231, 242)
 val DarkText = Color(217, 231, 242)
-val DarkButtonColor = Color(201, 230, 255)
+val DarkButtonColor = Color(64, 120, 170)
 val DarkClickableText = Color(134, 147, 95)
 val DarkBackground = Color(25, 87, 135)
 val DarkOval = Color(26, 54, 76)

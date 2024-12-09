@@ -225,7 +225,14 @@ fun UserInfo(
 fun ProfilePreview() {
     AndroidCookbookTheme(darkTheme = true) {
         UserProfileScreen(
-            user = User(),
+            user = User(
+                1,
+                bio = "I like suffering",
+                "Ly Duc",
+                null,
+                0,
+                1
+            ),
             content = {
                 userPostPortion(
                     userPosts = SamplePosts.posts,
@@ -258,7 +265,8 @@ fun UserInfoPreview() {
             "Ly Duc",
             null,
             0,
-            1)
+            1
+            )
         )
     }
 }
