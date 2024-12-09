@@ -25,20 +25,36 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.toRoute
+import com.example.androidcookbook.domain.model.post.Post
 import com.example.androidcookbook.ui.common.appbars.AppBarTheme
 import com.example.androidcookbook.ui.common.appbars.CookbookAppBarDefault
 import com.example.androidcookbook.ui.common.appbars.CookbookBottomNavigationBar
 import com.example.androidcookbook.ui.common.appbars.SearchBar
 import com.example.androidcookbook.ui.features.auth.theme.SignLayoutTheme
+import com.example.androidcookbook.ui.features.post.create.AddIngredientDialog
+import com.example.androidcookbook.ui.features.post.create.AddStepDialog
+import com.example.androidcookbook.ui.features.post.create.CreatePostScreen
+import com.example.androidcookbook.ui.features.post.create.CreatePostViewModel
+import com.example.androidcookbook.ui.features.post.create.UpdateIngredientDialog
+import com.example.androidcookbook.ui.features.post.create.UpdateIngredientDialogState
+import com.example.androidcookbook.ui.features.post.create.UpdateStepDialog
+import com.example.androidcookbook.ui.features.post.create.UpdateStepDialogState
+import com.example.androidcookbook.ui.features.post.details.PostDetailsScreen
+import com.example.androidcookbook.ui.features.post.details.PostDetailsViewModel
+import com.example.androidcookbook.ui.features.post.details.PostUiState
 import com.example.androidcookbook.ui.features.search.SearchScreen
 import com.example.androidcookbook.ui.features.search.SearchViewModel
+import com.example.androidcookbook.ui.nav.CustomNavTypes
 import com.example.androidcookbook.ui.nav.Routes
+import com.example.androidcookbook.ui.nav.graphs.AppEntryPoint
 import com.example.androidcookbook.ui.nav.graphs.appScreens
 import com.example.androidcookbook.ui.nav.graphs.authScreens
 import com.example.androidcookbook.ui.nav.dest.createPost
 import com.example.androidcookbook.ui.nav.dest.postDetails
 import com.example.androidcookbook.ui.nav.dest.updatePost
 import com.example.androidcookbook.ui.nav.utils.navigateIfNotOn
+import kotlin.reflect.typeOf
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -71,6 +87,7 @@ fun CookbookApp(
                         )
                     }
                 }
+
                 is CookbookUiState.TopBarState.Custom -> (uiState.topBarState as CookbookUiState.TopBarState.Custom).topAppBar.invoke()
                 is CookbookUiState.TopBarState.Default -> {
                     AppBarTheme {
@@ -87,12 +104,16 @@ fun CookbookApp(
                                 navController.navigateIfNotOn(Routes.CreatePost)
                             },
                             onMenuButtonClick = {
-                                //TODO: Add menu button
+
                             },
                             onBackButtonClick = {
                                 navController.navigateUp()
                             },
-                            scrollBehavior = scrollBehavior
+                            scrollBehavior = scrollBehavior,
+                            onLogoutClick = {
+                                viewModel.logout()
+                                navController.navigateIfNotOn(Routes.Auth)
+                            }
                         )
                     }
                 }
@@ -125,16 +146,23 @@ fun CookbookApp(
     ) { innerPadding ->
         NavHost(
             navController = navController,
-            startDestination = Routes.Auth,
+            startDestination = "check_auth",
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding),
         ) {
+
+            composable("check_auth") {
+                AppEntryPoint(navController = navController)
+            }
+
+
+
             authScreens(navController = navController, updateAppBar = {
                 viewModel.updateTopBarState(CookbookUiState.TopBarState.Auth)
                 viewModel.updateBottomBarState(CookbookUiState.BottomBarState.NoBottomBar)
-            }, updateUser = { response ->
-                viewModel.updateUser(response)
+            }, updateUser = { response,username,password ->
+                viewModel.updateUser(response,username,password)
             })
             appScreens(navController = navController, updateAppBar = {
                 viewModel.updateTopBarState(CookbookUiState.TopBarState.Default)
@@ -165,16 +193,23 @@ fun CookbookApp(
                     }
                 )
             }
+
+
             createPost(viewModel, currentUser, navController)
             updatePost(viewModel, currentUser, navController)
 
             postDetails(viewModel, navController)
+
         }
     }
 }
 
 @Composable
-private fun updateSystemBarColors(statusBarColor: Int, navigationBarColor: Int, darkTheme: Boolean = isSystemInDarkTheme()) {
+private fun updateSystemBarColors(
+    statusBarColor: Int,
+    navigationBarColor: Int,
+    darkTheme: Boolean = isSystemInDarkTheme()
+) {
     val view = LocalView.current
 
     if (!view.isInEditMode) {
@@ -183,7 +218,8 @@ private fun updateSystemBarColors(statusBarColor: Int, navigationBarColor: Int, 
             window.statusBarColor = statusBarColor
             window.navigationBarColor = navigationBarColor
             WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = !darkTheme
-            WindowCompat.getInsetsController(window, view).isAppearanceLightNavigationBars = !darkTheme
+            WindowCompat.getInsetsController(window, view).isAppearanceLightNavigationBars =
+                !darkTheme
         }
     }
 }
