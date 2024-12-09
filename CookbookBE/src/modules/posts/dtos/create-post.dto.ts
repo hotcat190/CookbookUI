@@ -248,6 +248,7 @@ export class FullReponseCommentDto{
       this.content = comment.content;
       this.user = new ReponseUserDto(comment.user);
       this.createdAt = comment.createdAt;
+      this.totalLike = comment.totalLike;
     }
   }
   nextPage: boolean;
@@ -265,4 +266,6 @@ export class FullReponseCommentDto{
   @IsNotEmpty()
   createdAt: Date
 
+  @IsOptional()
+  totalLike?: number;
 }
