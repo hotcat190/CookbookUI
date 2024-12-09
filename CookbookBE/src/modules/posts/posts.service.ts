@@ -31,9 +31,9 @@ export class PostsService {
     console.log(userId); 
     console.log(post.likes);
     if (post.likes.some((like) => like.id == userId)) {
-      return { isLiked: 'true' };
+      return { isLiked: true };
     }
-    return { isLiked: 'false' };
+    return { isLiked: false };
   }
   async createPost(createPostDto: CreatePostDto, userId: number): Promise<any> {
     const user = await this.usersRepository.findOne({ where: { id: userId } });
