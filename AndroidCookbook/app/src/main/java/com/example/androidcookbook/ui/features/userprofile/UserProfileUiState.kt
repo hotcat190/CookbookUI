@@ -14,4 +14,5 @@ sealed interface UserPostState {
     data object Loading : UserPostState
     data class Success(val userPosts: List<Post>) : UserPostState
     data object Failure: UserPostState
+    data object Guest: UserPostState
 }

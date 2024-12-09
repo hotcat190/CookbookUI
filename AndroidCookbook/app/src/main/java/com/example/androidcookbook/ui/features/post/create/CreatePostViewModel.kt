@@ -22,6 +22,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import okhttp3.MultipartBody
 
 @HiltViewModel(assistedFactory = CreatePostViewModel.CreatePostViewModelFactory::class)
 class CreatePostViewModel @AssistedInject constructor(
@@ -131,12 +132,18 @@ class CreatePostViewModel @AssistedInject constructor(
 
     private suspend fun uploadImage(): String? {
         var mainImage: String? = null
-        val imageRequestBody = postImageUri.value?.let { createImageRequestBody(it) }
+        var imageRequestBody: MultipartBody.Part? = null
+        postImageUri.value?.let { createImageRequestBody.invoke(it) }?.onSuccess {
+            imageRequestBody = data
+        }
         val imageResponse = imageRequestBody?.let { uploadRepository.uploadImage(it) }
         imageResponse?.onSuccess {
             mainImage = data.imageURL
         }?.onFailure {
             Log.e("CreatePostViewModel", message())
+            viewModelScope.launch {
+                makeToastUseCase("Failed to upload image, your post might be missing the image")
+            }
         }
         return mainImage
     }
@@ -158,7 +165,7 @@ class CreatePostViewModel @AssistedInject constructor(
                 onSuccessNavigate(data.post)
             }.onFailure {
                 viewModelScope.launch {
-                    makeToastUseCase(message())
+                    makeToastUseCase("Failed to create post")
                 }
             }
         }
@@ -182,7 +189,7 @@ class CreatePostViewModel @AssistedInject constructor(
                 onSuccessNavigate(data.post)
             }.onFailure {
                 viewModelScope.launch {
-                    makeToastUseCase(message())
+                    makeToastUseCase("Failed to update post")
                 }
             }
         }

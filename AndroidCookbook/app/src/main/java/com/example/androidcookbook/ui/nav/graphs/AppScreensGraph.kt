@@ -1,7 +1,11 @@
 package com.example.androidcookbook.ui.nav.graphs
 
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Text
 import androidx.compose.runtime.collectAsState
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
@@ -128,7 +132,14 @@ private fun NavGraphBuilder.userProfile(
                         user = userProfileUiState.user,
                     ) {
                         when (userPostState) {
-                            is UserPostState.Loading -> item { Text("Loading user posts") }
+                            is UserPostState.Loading -> item {
+                                Column(
+                                    horizontalAlignment = Alignment.CenterHorizontally,
+                                    modifier = Modifier.fillMaxSize()
+                                ) {
+                                    Text("Loading user posts")
+                                }
+                            }
                             is UserPostState.Success -> {
                                 userPostPortion(
                                     userPosts = userPostState.userPosts,
@@ -148,7 +159,23 @@ private fun NavGraphBuilder.userProfile(
                                 )
                             }
 
-                            is UserPostState.Failure -> item { Text("Failed to fetch user posts.") }
+                            is UserPostState.Failure -> item {
+                                Column(
+                                    horizontalAlignment = Alignment.CenterHorizontally,
+                                    modifier = Modifier.fillMaxSize()
+                                ) {
+                                    Text("Failed to fetch user posts.")
+                                }
+                            }
+
+                            UserPostState.Guest -> item {
+                                Column(
+                                    horizontalAlignment = Alignment.CenterHorizontally,
+                                    modifier = Modifier.fillMaxSize()
+                                ) {
+                                    Text("Login to see your posts.")
+                                }
+                            }
                         }
                     }
                 }

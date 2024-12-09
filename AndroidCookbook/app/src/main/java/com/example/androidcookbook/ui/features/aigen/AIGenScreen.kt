@@ -195,9 +195,9 @@ fun TakingInputScreen(
 
                 val body = uri?.let { createImageRequestBody(context, it) }
 
-                val result = body?.let { viewModel.uploadImage(it) }
+                val responseResult = body?.let { viewModel.uploadImage(it) }
 
-                if (result != null) {
+                if (responseResult != null) {
                     Log.d("Upload", "Upload successful")
                     viewModel.uploadResponse.value?.ingredients?.forEach { ingredient ->
                         viewModel.addIngredient(ingredient)

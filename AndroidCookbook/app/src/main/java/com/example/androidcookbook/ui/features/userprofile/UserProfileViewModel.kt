@@ -1,6 +1,5 @@
 package com.example.androidcookbook.ui.features.userprofile
 
-import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -35,13 +34,6 @@ class UserProfileViewModel @AssistedInject constructor(
         fun create(user: User): UserProfileViewModel
     }
 
-    init {
-//        getUser(user.id)
-        if (user.id != GUEST_ID) {
-            getUserPosts(user.id)
-        }
-    }
-
     var isRefreshing: Boolean by mutableStateOf(false)
         private set
 
@@ -52,15 +44,26 @@ class UserProfileViewModel @AssistedInject constructor(
         private set
 
     var userPostState: MutableStateFlow<UserPostState> = MutableStateFlow(
-        UserPostState.Loading
+        if (user.id == GUEST_ID) UserPostState.Guest
+        else UserPostState.Loading
     )
-        private set
+
+    init {
+        viewModelScope.launch {
+            getUserPosts(userId = user.id)
+        }
+    }
 
     private suspend fun getUser(userId: Int) {
+        if (user.id == GUEST_ID) {
+            uiState.update { UserProfileUiState.Guest }
+            return
+        }
         uiState.update { UserProfileUiState.Loading }
         userRepository.getUserProfile(userId = userId)
             .onSuccess {
                 uiState.update { UserProfileUiState.Success(user = data) }
+                getUserPosts(userId)
             }
             .onFailure {
                 uiState.update { UserProfileUiState.Failure }
@@ -68,6 +71,10 @@ class UserProfileViewModel @AssistedInject constructor(
     }
 
     private fun getUserPosts(userId: Int) {
+        if (user.id == GUEST_ID) {
+            userPostState.update { UserPostState.Guest }
+            return
+        }
         userPostState.update { UserPostState.Loading }
         viewModelScope.launch {
             userRepository.getUserPosts(userId)
@@ -83,7 +90,6 @@ class UserProfileViewModel @AssistedInject constructor(
         viewModelScope.launch {
             isRefreshing = true
             getUser(userId = user.id)
-            getUserPosts(userId = user.id)
             isRefreshing = false
         }
     }
