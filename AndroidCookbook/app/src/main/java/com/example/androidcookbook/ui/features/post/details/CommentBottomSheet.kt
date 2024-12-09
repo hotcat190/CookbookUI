@@ -1,31 +1,33 @@
 package com.example.androidcookbook.ui.features.post.details
 
-import android.annotation.SuppressLint
-import android.util.Log
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.LocalIndication
-import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.indication
 import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.foundation.interaction.PressInteraction
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.text.KeyboardActions
-import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.Send
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.SheetState
 import androidx.compose.material3.SheetValue
@@ -37,14 +39,15 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.input.pointer.pointerInteropFilter
 import androidx.compose.ui.layout.onSizeChanged
-import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.DpOffset
@@ -54,8 +57,10 @@ import androidx.compose.ui.unit.dp
 import com.example.androidcookbook.domain.model.post.Comment
 import com.example.androidcookbook.domain.model.user.User
 import com.example.androidcookbook.ui.common.iconbuttons.LikeButton
-import com.example.androidcookbook.ui.features.newsfeed.SmallAvatar
+import com.example.androidcookbook.ui.common.utils.apiDateFormatter
+import com.example.androidcookbook.ui.components.post.SmallAvatar
 import com.example.androidcookbook.ui.theme.transparentTextFieldColors
+import java.time.LocalDate
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -63,6 +68,10 @@ fun CommentBottomSheet(
     comments: List<Comment>,
     user: User,
     onSendComment: (String) -> Unit,
+    onDeleteComment: (Comment) -> Unit,
+    onEditComment: (Comment) -> Unit,
+    onLikeComment: (Comment) -> Unit,
+    onUserClick: (User) -> Unit,
     onDismiss: () -> Unit,
     sheetState: SheetState,
     modifier: Modifier,
@@ -86,150 +95,239 @@ fun CommentBottomSheet(
             )
             LazyColumn {
                 items(comments) { comment ->
-                    val interactionSource = remember { MutableInteractionSource() }
-                    var isContextMenuVisible by remember { mutableStateOf(false) }
-                    var pressOffset by remember { mutableStateOf(DpOffset.Zero) }
-                    var itemHeight by remember { mutableStateOf(0.dp) }
-                    val localDensity = LocalDensity.current
-                    val dropDownItemsSelf = listOf("Edit", "Delete")
-                    val dropDownItemsOther = listOf("Hide")
-
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .indication(interactionSource, LocalIndication.current)
-                            .onSizeChanged {
-                                itemHeight = with(localDensity) { it.height.toDp() }
-                            }
-
-                    ) {
-                        Row (
-                            modifier = Modifier
-                                .fillMaxSize()
-                                .padding(horizontal = 16.dp, vertical = 12.dp)
-                                .pointerInput(true) {
-                                    detectTapGestures(
-                                        onLongPress = {
-                                            isContextMenuVisible = true
-                                            pressOffset = DpOffset(it.x.toDp(), it.y.toDp())
-                                        },
-                                        onPress = {
-                                            val press = PressInteraction.Press(it)
-                                            interactionSource.emit(press)
-                                            tryAwaitRelease()
-                                            interactionSource.emit(PressInteraction.Release(press))
-                                        }
-                                    )
-                                }
-                        ) {
-                            SmallAvatar(author = comment.user)
-                            Spacer(modifier = Modifier.width(8.dp))
-                            Column(
-                                modifier = Modifier.weight(1F)
-                            ) {
-                                Row(
-                                    modifier = modifier
-                                ) {
-                                    Text(
-                                        text = comment.user.name,
-                                        fontWeight = FontWeight.Bold,
-                                    )
-                                    Spacer(modifier = Modifier.width(8.dp))
-
-                                    Text(
-                                        text = comment.createdAt,
-                                        fontSize = TextUnit(
-                                            value = 12f,
-                                            type = TextUnitType.Sp,
-                                        ),
-                                    )
-                                }
-                                // Comment Content
-                                Box(
-                                    modifier = modifier.fillMaxSize()
-                                ) {
-                                    Text(
-                                        text = comment.content, modifier = Modifier.fillMaxSize()
-                                    )
-                                }
-                            }
-                            Column(
-                                horizontalAlignment = Alignment.CenterHorizontally,
-                            ) {
-                                LikeButton(
-                                    isLiked = comment.isLiked,
-                                    onLikedClick = {},
-                                )
-                                Text(
-                                    text = comment.likes.toString(),
-                                )
-                            }
-                        }
-
-                        DropdownMenu(
-                            expanded = isContextMenuVisible,
-                            onDismissRequest = { isContextMenuVisible = false },
-                            offset = pressOffset.copy(
-//                            x = pressOffset.x.coerceAtMost(240.dp),
-                                y = pressOffset.y - itemHeight
-                            ),
-                        ) {
-                            if (user.id == comment.user.id) {
-                                dropDownItemsSelf.forEach { item ->
-                                    DropdownMenuItem(
-                                        text = { Text(item) },
-                                        onClick = {
-                                            isContextMenuVisible = false
-                                        },
-                                    )
-                                }
-                            } else {
-                                dropDownItemsOther.forEach { item ->
-                                    DropdownMenuItem(
-                                        text = { Text(item) },
-                                        onClick = {
-                                            isContextMenuVisible = false
-                                        },
-                                    )
-                                }
-                            }
-                        }
-                    }
+                    CommentRow(
+                        comment = comment,
+                        currentUser = user,
+                        onDeleteComment = onDeleteComment,
+                        onEditComment = onEditComment,
+                        onLikeComment = onLikeComment,
+                        onUserClick = onUserClick,
+                    )
                 }
             }
         }
         HorizontalDivider()
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 8.dp)
-        ) {
-            var commentContent by remember { mutableStateOf("") }
 
-            SmallAvatar(user)
-            Spacer(Modifier.width(8.dp))
-            TextField(
-                value = commentContent,
-                onValueChange = { commentContent = it },
-                keyboardOptions = KeyboardOptions(
-                    imeAction = ImeAction.Send
-                ),
-                keyboardActions = KeyboardActions(onSend = {
-                    onSendComment(commentContent)
-                    commentContent = ""
-                }),
-                placeholder = {
-                    Text("Write a comment...")
-                },
-                colors = transparentTextFieldColors(),
-                modifier = Modifier.fillMaxWidth()
+        WriteCommentRow(user, onUserClick, onSendComment)
+    }
+}
+
+@OptIn(ExperimentalComposeUiApi::class, ExperimentalFoundationApi::class)
+@Composable
+fun CommentRow(
+    comment: Comment,
+    currentUser: User,
+    onDeleteComment: (Comment) -> Unit,
+    onEditComment: (Comment) -> Unit,
+    onLikeComment: (Comment) -> Unit,
+    onUserClick: (User) -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    val interactionSource = remember { MutableInteractionSource() }
+    var isContextMenuVisible by remember { mutableStateOf(false) }
+//    var pressOffset by remember { mutableStateOf(DpOffset.Zero) }
+    var itemHeight by remember { mutableStateOf(0.dp) }
+    val localDensity = LocalDensity.current
+
+    var offset by remember { mutableStateOf(Offset.Zero) }
+
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .indication(interactionSource, LocalIndication.current)
+            .onSizeChanged {
+                itemHeight = with(localDensity) { it.height.toDp() }
+            }
+            .pointerInteropFilter {
+                offset = Offset(it.x, it.y)
+                false
+            }
+            .combinedClickable(
+                onClick = {},
+                onLongClick = { isContextMenuVisible = true }
+            )
+
+    ) {
+        Box(contentAlignment = Alignment.TopStart) {
+            Row(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(horizontal = 16.dp, vertical = 12.dp)
+//                .pointerInput(true) {
+//                    detectTapGestures(
+//                        onLongPress = {
+//                            isContextMenuVisible = true
+//                            pressOffset = DpOffset(it.x.toDp(), it.y.toDp())
+//                        },
+//                        onPress = {
+//                            val press = PressInteraction.Press(it)
+//                            interactionSource.emit(press)
+//                            tryAwaitRelease()
+//                            interactionSource.emit(PressInteraction.Release(press))
+//                        }
+//                    )
+//                }
+            ) {
+                SmallAvatar(
+                    author = comment.user,
+                    onUserClick = onUserClick,
+                    modifier = Modifier.padding(top = 4.dp)
+                )
+                Spacer(modifier = Modifier.width(16.dp))
+                Column(
+                    modifier = Modifier
+                        .weight(1F)
+                ) {
+                    Row(
+                        modifier = Modifier
+                    ) {
+                        Text(
+                            text = comment.user.name,
+                            fontWeight = FontWeight.Bold,
+                            modifier = Modifier
+                                .clickable { onUserClick(comment.user) }
+                        )
+                        Spacer(modifier = Modifier.width(8.dp))
+
+                        Text(
+                            text = LocalDate.parse(comment.createdAt, apiDateFormatter).toString(),
+                            fontSize = TextUnit(
+                                value = 12f,
+                                type = TextUnitType.Sp,
+                            ),
+                        )
+                    }
+                    // Comment Content
+                    Box(
+                        modifier = Modifier.fillMaxSize()
+                    ) {
+                        Text(
+                            text = comment.content, modifier = Modifier.fillMaxSize()
+                        )
+                    }
+                }
+//            Spacer(Modifier.width(8.dp))
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center,
+                    modifier = Modifier.fillMaxHeight()
+                ) {
+                    LikeButton(
+                        isLiked = comment.isLiked,
+                        onLikedClick = {
+                            onLikeComment(comment)
+                        },
+                    )
+                    Text(
+                        text = comment.likes.toString(),
+                    )
+                }
+            }
+            Box {
+                DropdownMenu(
+                    expanded = isContextMenuVisible,
+                    onDismissRequest = { isContextMenuVisible = false },
+//                    offset = pressOffset.copy(
+////                            x = pressOffset.x.coerceAtMost(240.dp),
+//                        y = pressOffset.y - itemHeight
+                    offset = DpOffset(
+                        Density(LocalContext.current).run { offset.x.toDp() },
+                        Density(LocalContext.current).run { offset.y.toDp() },
+                    )
+                ) {
+                    if (currentUser.id == comment.user.id) {
+                        DropdownMenuItem(
+                            text = { Text("Edit") },
+                            onClick = {
+                                isContextMenuVisible = false
+                                onEditComment(comment)
+                            },
+                        )
+                        DropdownMenuItem(
+                            text = { Text("Delete") },
+                            onClick = {
+                                isContextMenuVisible = false
+                                onDeleteComment(comment)
+                            },
+                        )
+                    }
+                }
+            }
+        }
+
+//        DropdownMenu(
+//            expanded = isContextMenuVisible,
+//            onDismissRequest = { isContextMenuVisible = false },
+//            offset = pressOffset.copy(
+////                            x = pressOffset.x.coerceAtMost(240.dp),
+//                y = pressOffset.y - itemHeight
+//            ),
+//        ) {
+//            if (currentUser.id == comment.user.id) {
+//                DropdownMenuItem(
+//                    text = { Text("Edit") },
+//                    onClick = {
+//                        isContextMenuVisible = false
+//                        onEditComment(comment)
+//                    },
+//                )
+//                DropdownMenuItem(
+//                    text = { Text("Delete") },
+//                    onClick = {
+//                        isContextMenuVisible = false
+//                        onDeleteComment(comment)
+//                    },
+//                )
+//            }
+//        }
+    }
+}
+
+@Composable
+fun WriteCommentRow(
+    user: User,
+    onUserClick: (User) -> Unit,
+    onSendComment: (String) -> Unit,
+) {
+    val focusManager = LocalFocusManager.current
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 8.dp)
+    ) {
+        var commentContent by remember { mutableStateOf("") }
+
+        SmallAvatar(
+            author = user,
+            onUserClick = onUserClick,
+        )
+        Spacer(Modifier.width(8.dp))
+        TextField(
+            value = commentContent,
+            onValueChange = { commentContent = it },
+            placeholder = {
+                Text("Write a comment...")
+            },
+            colors = transparentTextFieldColors(),
+            modifier = Modifier.weight(1F)
+        )
+        IconButton(
+            onClick = {
+                onSendComment(commentContent)
+                commentContent = ""
+                focusManager.clearFocus()
+            }
+        ) {
+            Icon(
+                imageVector = Icons.AutoMirrored.Filled.Send,
+                contentDescription = "Send",
+                tint = MaterialTheme.colorScheme.primary,
             )
         }
     }
 }
 
-@SuppressLint("CoroutineCreationDuringComposition")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 @Preview
@@ -255,17 +353,19 @@ fun CommentBottomSheetPreview() {
                 content = "Lorem sit amet.",
             ),
             Comment(
-                content = "Lorem sit amet, small consectetur adipiscing elit, small, Lorem sit amet, small consectetur adipiscing elit, small,",
+                content = "Lorem sit amet, small consectetur adipiscing elit, lorem sit amet, small consectetur adipiscing elit, small,",
             ),
         ), user = User(
             id = 1,
             name = "Username",
-        ), onSendComment = {}, onDismiss = {}, sheetState = SheetState(
+        ), onSendComment = {}, {}, {}, {}, onDismiss = {}, sheetState = SheetState(
             skipPartiallyExpanded = true,
             density = Density(LocalContext.current),
             initialValue = SheetValue.Expanded,
             confirmValueChange = { true },
-        ), modifier = Modifier
+        ),
+            onUserClick = {},
+            modifier = Modifier
         )
     }
 }

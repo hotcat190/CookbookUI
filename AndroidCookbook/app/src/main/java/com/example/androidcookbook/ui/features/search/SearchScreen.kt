@@ -18,6 +18,7 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
@@ -84,15 +85,15 @@ fun SearchScreen(
                 }
             }
             SearchScreenState.Posts -> {
-                NewsfeedScreen(
-                    posts = SamplePosts.posts,
-                    onSeeDetailsClick = {
-                        viewModel.ChangeScreenState(SearchScreenState.Detail)
-                    }
-                )
+//                NewsfeedScreen(
+//                    posts = SamplePosts.posts,
+//                    onSeeDetailsClick = {
+//                        viewModel.ChangeScreenState(SearchScreenState.Detail)
+//                    }
+//                )
             }
             SearchScreenState.Detail -> {
-                PostDetailsScreen(Post(), false, {}, {}) //TODO
+//                PostDetailsScreen(Post(), false, {}, {}) //TODO
             }
         }
 

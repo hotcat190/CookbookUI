@@ -13,7 +13,6 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.input.nestedscroll.nestedScroll
@@ -51,8 +50,9 @@ import com.example.androidcookbook.ui.nav.Routes
 import com.example.androidcookbook.ui.nav.graphs.AppEntryPoint
 import com.example.androidcookbook.ui.nav.graphs.appScreens
 import com.example.androidcookbook.ui.nav.graphs.authScreens
-import com.example.androidcookbook.ui.nav.graphs.createPost
-import com.example.androidcookbook.ui.nav.graphs.postDetails
+import com.example.androidcookbook.ui.nav.dest.createPost
+import com.example.androidcookbook.ui.nav.dest.postDetails
+import com.example.androidcookbook.ui.nav.dest.updatePost
 import com.example.androidcookbook.ui.nav.utils.navigateIfNotOn
 import kotlin.reflect.typeOf
 
@@ -63,12 +63,12 @@ fun CookbookApp(
     navController: NavHostController = rememberNavController(),
     viewModel: CookbookViewModel = hiltViewModel<CookbookViewModel>(),
 ) {
-    val navBackStackEntry by navController.currentBackStackEntryAsState()
+    val navBackStackEntry = navController.currentBackStackEntryAsState().value
     val currentDestination = navBackStackEntry?.destination
 
-    val uiState by viewModel.uiState.collectAsState()
+    val uiState = viewModel.uiState.collectAsState().value
 
-    val currentUser by viewModel.user.collectAsState()
+    val currentUser = viewModel.user.collectAsState().value
     Log.d("USERID", currentUser.toString())
 
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
@@ -133,11 +133,12 @@ fun CookbookApp(
                         navController.navigateIfNotOn(Routes.App.Newsfeed)
                     },
                     onUserProfileClick = {
-                        navController.navigateIfNotOn(Routes.App.UserProfile(currentUser.id))
+                        navController.navigateIfNotOn(Routes.App.UserProfile(currentUser))
                     },
                     onCreatePostClick = {
                         navController.navigateIfNotOn(Routes.CreatePost)
                     },
+                    currentUser = currentUser,
                     currentDestination = currentDestination
                 )
             }
@@ -167,7 +168,7 @@ fun CookbookApp(
                 viewModel.updateTopBarState(CookbookUiState.TopBarState.Default)
                 viewModel.updateBottomBarState(CookbookUiState.BottomBarState.Default)
                 viewModel.updateCanNavigateBack(false)
-            })
+            }, cookbookViewModel = viewModel)
             composable<Routes.Search> {
                 val searchViewModel = hiltViewModel<SearchViewModel>()
                 val searchUiState = searchViewModel.uiState.collectAsState().value
@@ -195,8 +196,9 @@ fun CookbookApp(
 
 
             createPost(viewModel, currentUser, navController)
+            updatePost(viewModel, currentUser, navController)
 
-            postDetails(viewModel)
+            postDetails(viewModel, navController)
 
         }
     }

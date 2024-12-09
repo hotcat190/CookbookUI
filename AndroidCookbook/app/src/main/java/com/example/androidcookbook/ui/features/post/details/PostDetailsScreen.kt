@@ -7,24 +7,33 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Button
 import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.Checkbox
 import androidx.compose.material.CheckboxDefaults
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Bookmark
+import androidx.compose.material.icons.outlined.BookmarkAdd
+import androidx.compose.material.icons.outlined.BookmarkBorder
 import androidx.compose.material.icons.outlined.Share
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
@@ -50,10 +59,14 @@ import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.example.androidcookbook.R
-import com.example.androidcookbook.domain.model.post.Post
-import com.example.androidcookbook.ui.features.newsfeed.PostHeader
 import com.example.androidcookbook.data.mocks.SamplePosts
+import com.example.androidcookbook.domain.model.post.Comment
+import com.example.androidcookbook.domain.model.post.Post
+import com.example.androidcookbook.domain.model.user.User
 import com.example.androidcookbook.ui.common.iconbuttons.LikeButton
+import com.example.androidcookbook.ui.common.utils.apiDateFormatter
+import com.example.androidcookbook.ui.components.post.PostHeader
+import java.time.LocalDate
 
 enum class DetailState {
     Description,
@@ -64,12 +77,23 @@ enum class DetailState {
 @Composable
 fun PostDetailsScreen(
     post: Post,
+    currentUser: User,
+    comments: List<Comment>,
+    onDeleteComment: (Comment) -> Unit,
+    onEditComment: (Comment) -> Unit,
+    onLikeComment: (Comment) -> Unit,
+    showPostOptions: Boolean,
+    onEditPost: () -> Unit,
+    onDeletePost: () -> Unit,
     isLiked: Boolean,
     onLikedClick: () -> Unit,
+    isBookmarked: Boolean,
+    onBookmarkClick: () -> Unit,
     onCommentClick: () -> Unit,
+    onSendComment: (String) -> Unit,
+    onUserClick: (User) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    var state by remember { mutableStateOf(DetailState.Description) }
     val checkedStates: SnapshotStateList<Boolean> = remember {
         mutableStateListOf<Boolean>()
     }
@@ -79,105 +103,225 @@ fun PostDetailsScreen(
             init = {false}
         )
     )
-    LazyColumn(
+    Column(
+        modifier = modifier
+    ) {
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = Modifier
+                .fillMaxSize()
+                .weight(1F),
+        ) {
+            LazyColumn(
+                modifier = modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 5.dp, vertical = 15.dp),
+            ) {
+                item {
+                    PostDetailsInfo(
+                        post,
+                        showPostOptions,
+                        onEditPost,
+                        onDeletePost,
+                        isLiked,
+                        onLikedClick,
+                        isBookmarked,
+                        onBookmarkClick,
+                        onCommentClick,
+                        onUserClick,
+                        checkedStates,
+                    )
+                }
+                items(
+                    comments,
+                    key = { comment -> comment.id }
+                ) { comment ->
+                    CommentRow(comment, currentUser, onDeleteComment, onEditComment, onLikeComment, onUserClick)
+                }
+
+            }
+        }
+        WriteCommentRow(
+            user = currentUser,
+            onUserClick = onUserClick,
+            onSendComment = onSendComment,
+        )
+    }
+
+}
+
+@Composable
+private fun PostDetailsInfo(
+    post: Post,
+    showPostOptions: Boolean,
+    onEditPost: () -> Unit,
+    onDeletePost: () -> Unit,
+    isLiked: Boolean,
+    onLikedClick: () -> Unit,
+    isBookmarked: Boolean,
+    onBookmarkClick: () -> Unit,
+    onCommentClick: () -> Unit,
+    onUserClick: (User) -> Unit,
+    checkedStates: SnapshotStateList<Boolean>,
+    modifier: Modifier = Modifier
+) {
+    var state by remember { mutableStateOf(DetailState.Description) }
+    PostHeader(
+        author = post.author,
+        createdAt = LocalDate.parse(post.createdAt, apiDateFormatter).toString(),
+        showOptionsButton = showPostOptions,
+        onEditPost = onEditPost,
+        onDeletePost = onDeletePost,
+        onUserClick = onUserClick,
+        modifier = Modifier.padding(start = 15.dp)
+    )
+    Column(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 5.dp, vertical = 15.dp),
+            .wrapContentHeight()
+            .padding(15.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        item {
-            PostHeader(
-                author = post.author,
-                createdAt = post.createdAt
-            )
-            Column(
+        if (post.mainImage != null) {
+            AsyncImage(
+                model = ImageRequest.Builder(LocalContext.current)
+                    .data(post.mainImage)
+                    .crossfade(true)
+                    .build(),
+                contentDescription = null,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .wrapContentHeight()
-                    .padding(15.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-//                Image(
-//                    painter = painterResource(id = R.drawable.image_4),
-//                    contentDescription = null,
-//                    modifier =
-//                    Modifier
-//                        .fillMaxWidth()
-//                        .height(200.dp)
-//                        .clip(RoundedCornerShape(5)),
-//                    contentScale = ContentScale.Crop,
-//                )
-                AsyncImage(
-                    model = ImageRequest.Builder(LocalContext.current)
-                        .data(post.mainImage)
-                        .crossfade(true)
-                        .build(),
-                    contentDescription = null,
-                    modifier =
-                    Modifier
-                        .fillMaxWidth()
-                        .height(200.dp)
-                        .clip(RoundedCornerShape(5)),
-                    contentScale = ContentScale.Crop,
+                    .height(200.dp)
+                    .clip(RoundedCornerShape(5)),
+
+                contentScale = ContentScale.Crop,
+            )
+        }
+    }
+    Row(
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        // Like button
+        LikeButton(isLiked, onLikedClick)
+
+        // Chat button
+        IconButton(onClick = onCommentClick) {
+            if (isSystemInDarkTheme()) {
+
+                Image(
+                    painter = painterResource(R.drawable.comment_icon_dark_theme),
+                    modifier = Modifier.size(21.dp),
+
+                    contentDescription = "Comment icon"
+                )
+
+            } else {
+
+                Image(
+                    painter = painterResource(R.drawable.comment_icon_light_theme),
+                    modifier = Modifier.size(21.dp),
+                    contentDescription = "Comment icon",
+                    alpha = 0.75F,
                 )
             }
-            Row(
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                // Like button
-                LikeButton(isLiked, onLikedClick)
+        }
+        Spacer(modifier = Modifier.weight(1f))
 
-                // Chat button
-                IconButton(onClick = onCommentClick) {
-                    if (isSystemInDarkTheme()) {
+        // Bookmark button
+        IconButton(onClick = onBookmarkClick) {
+            Icon(
+                imageVector = if (isBookmarked) {
+                    Icons.Outlined.Bookmark
+                } else {
+                    Icons.Outlined.BookmarkBorder
+                },
+                contentDescription = "Bookmark",
+                tint = MaterialTheme.colorScheme.secondary
+            )
+        }
 
-                        Image(
-                            painter = painterResource(R.drawable.comment_icon_dark_theme),
-                            modifier = Modifier.size(21.dp),
+        // Share button
+        OutlinedIconButton(
+            icon = Icons.Outlined.Share,
+            onclick = {
 
-                            contentDescription = "Comment icon"
+            }
+        )
+    }
+    Row(
+        horizontalArrangement = Arrangement.SpaceBetween,
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 5.dp)
+    ) {
+        LobsterTextButton(
+            onclick = { state = DetailState.Description },
+            text = "Description"
+        )
+        LobsterTextButton(onclick = { state = DetailState.Ingredient }, text = "Ingredient")
+        LobsterTextButton(onclick = { state = DetailState.Recipe }, text = "Recipe")
+    }
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .wrapContentHeight()
+            .padding(horizontal = 16.dp, vertical = 16.dp)
+            .heightIn(max = 400.dp)
+    ) {
+        Column(
+            modifier = Modifier
+                .verticalScroll(rememberScrollState())
+        ) {
+            when (state) {
+                DetailState.Description -> {
+                    Text(
+                        text = post.description,
+                        style = TextStyle(
+                            fontSize = 24.sp,
+                            fontWeight = FontWeight(400),
+                            color = MaterialTheme.colorScheme.secondary,
                         )
+                    )
+                }
 
-                    } else {
+                DetailState.Ingredient -> {
+                    checkedStates.forEachIndexed { index, checked ->
+                        val ingredientText: String =
+                            post.ingredient?.get(index)?.name + " " + post.ingredient?.get(index)?.quantity
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween
+                        ) {
+                            val bulletColor = MaterialTheme.colorScheme.secondary
+                            Canvas(modifier = Modifier.size(12.dp)) {
+                                drawCircle(bulletColor)
+                            }
+                            Text(
+                                text = ingredientText,
+                                fontSize = 20.sp,
+                                color = MaterialTheme.colorScheme.secondary
+                            )
+                            Checkbox(
+                                checked = checked,
+                                onCheckedChange = { isChecked ->
+                                    checkedStates[index] = isChecked
+                                },
+                                colors = CheckboxDefaults.colors(
 
-                        Image(
-                            painter = painterResource(R.drawable.comment_icon_light_theme),
-                            modifier = Modifier.size(21.dp),
-                            contentDescription = "Comment icon"
-                        )
+                                    checkmarkColor = MaterialTheme.colorScheme.secondary,
+                                    uncheckedColor = MaterialTheme.colorScheme.secondary,
+                                    checkedColor = Color(101, 85, 143)
+                                )
+                            )
+                        }
                     }
                 }
-                Spacer(modifier = Modifier.weight(1f))
 
-                // Share button
-                OutlinedIconButton(
-                    icon = Icons.Outlined.Share,
-                    onclick = {
-
-                    }
-                )
-            }
-            Row(
-                horizontalArrangement = Arrangement.SpaceBetween,
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                LobsterTextButton(
-                    onclick = { state = DetailState.Description },
-                    text = "Description"
-                )
-                LobsterTextButton(onclick = { state = DetailState.Ingredient }, text = "Ingredient")
-                LobsterTextButton(onclick = { state = DetailState.Recipe }, text = "Recipe")
-            }
-            Spacer(modifier = Modifier.height(20.dp))
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .wrapContentHeight()
-                    .padding(horizontal = 40.dp)
-            ) {
-                when (state) {
-                    DetailState.Description -> {
+                DetailState.Recipe -> {
+                    post.steps?.forEachIndexed { index, stepText ->
                         Text(
-                            text = post.description,
+                            text = "${index + 1}. $stepText\n",
                             style = TextStyle(
                                 fontSize = 24.sp,
                                 fontWeight = FontWeight(400),
@@ -186,53 +330,6 @@ fun PostDetailsScreen(
                         )
                     }
 
-                    DetailState.Ingredient -> {
-                        checkedStates.forEachIndexed { index, checked ->
-                            val ingredientText: String
-                                = post.ingredient?.get(index)?.name + " " + post.ingredient?.get(index)?.quantity
-                            Row(
-                                verticalAlignment = Alignment.CenterVertically,
-                                modifier = Modifier.fillMaxWidth(),
-                                horizontalArrangement = Arrangement.SpaceBetween
-                            ) {
-                                val bulletColor = MaterialTheme.colorScheme.secondary
-                                Canvas(modifier = Modifier.size(12.dp)) {
-                                    drawCircle(bulletColor)
-                                }
-                                Text(
-                                    text = ingredientText,
-                                    fontSize = 20.sp,
-                                    color = MaterialTheme.colorScheme.secondary
-                                )
-                                Checkbox(
-                                    checked = checked,
-                                    onCheckedChange = { isChecked ->
-                                        checkedStates[index] = isChecked
-                                    },
-                                    colors = CheckboxDefaults.colors(
-
-                                        checkmarkColor = MaterialTheme.colorScheme.secondary,
-                                        uncheckedColor = MaterialTheme.colorScheme.secondary,
-                                        checkedColor = Color(101, 85, 143)
-                                    )
-                                )
-                            }
-                        }
-                    }
-
-                    DetailState.Recipe -> {
-                        post.steps?.forEachIndexed {index, stepText ->
-                            Text(
-                                text = "${index+1}. $stepText\n",
-                                style = TextStyle(
-                                    fontSize = 24.sp,
-                                    fontWeight = FontWeight(400),
-                                    color = MaterialTheme.colorScheme.secondary,
-                                )
-                            )
-                        }
-
-                    }
                 }
             }
         }
@@ -289,7 +386,20 @@ fun LobsterTextButton(
 fun PostDetailsPreview() {
     PostDetailsScreen(
         SamplePosts.posts[0],
-        false,
-        {}, {}
+        currentUser = User(),
+        showPostOptions = true,
+        comments = listOf(),
+        onDeletePost = {},
+        onEditPost = {},
+        onEditComment = {},
+        onLikeComment = {},
+        onCommentClick = {},
+        onDeleteComment = {},
+        onSendComment = {},
+        isLiked = false,
+        onLikedClick = {},
+        isBookmarked = false,
+        onBookmarkClick = {},
+        onUserClick = {}
     )
 }

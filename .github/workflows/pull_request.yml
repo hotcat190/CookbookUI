@@ -38,7 +38,40 @@ jobs:
 
       - name: Build
         run: |
-          ./gradlew clean testDebug
+          ./gradlew assemble
+  
+  unit-test:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: 'AndroidCookbook'
+          sparse-checkout-cone-mode: false
+
+      - name: Move mobile app files to root
+        run: |
+          ls -lah
+          shopt -s dotglob
+          mv AndroidCookbook/* .
+          rm -rf AndroidCookbook
+          ls -lah
+          - name: Setup JDK
+      - uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: |
+            8
+            11
+            21
+          cache: 'gradle'
+
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+        
+      - name: Run unit tests
+        run: |
+          ./gradlew test
 
   ui-testing:
     runs-on: ubuntu-24.04
