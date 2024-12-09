@@ -4,10 +4,16 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.RowScope
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.asPaddingValues
+import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.navigationBars
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.windowInsetsBottomHeight
 import androidx.compose.material.LocalContentAlpha
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
@@ -62,7 +68,10 @@ fun CookbookBottomNavigationBar(
 
             NavigationBar(
                 containerColor = Color.Transparent,
-                modifier = Modifier.heightIn(max = 50.dp),
+                modifier = Modifier
+                    .padding(WindowInsets.navigationBars.asPaddingValues())
+                    .consumeWindowInsets(WindowInsets.navigationBars.asPaddingValues())
+                    .heightIn(max = 50.dp),
             ) {
                 NewsfeedNavigationBarItem(currentDestination, onNewsfeedClick, colors)
 

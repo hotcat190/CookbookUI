@@ -24,8 +24,6 @@ import androidx.compose.material.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Favorite
-import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material.icons.outlined.Share
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -55,6 +53,7 @@ import com.example.androidcookbook.R
 import com.example.androidcookbook.domain.model.post.Post
 import com.example.androidcookbook.ui.features.newsfeed.PostHeader
 import com.example.androidcookbook.data.mocks.SamplePosts
+import com.example.androidcookbook.ui.common.iconbuttons.LikeButton
 
 enum class DetailState {
     Description,
@@ -67,6 +66,7 @@ fun PostDetailsScreen(
     post: Post,
     isLiked: Boolean,
     onLikedClick: () -> Unit,
+    onCommentClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     var state by remember { mutableStateOf(DetailState.Description) }
@@ -124,19 +124,10 @@ fun PostDetailsScreen(
                 modifier = Modifier.fillMaxWidth()
             ) {
                 // Like button
-                OutlinedIconButton(
-                    icon = (
-                        if (isLiked) {
-                            Icons.Filled.Favorite
-                        } else {
-                            Icons.Outlined.FavoriteBorder
-                        }
-                    ),
-                    onclick = onLikedClick
-                )
+                LikeButton(isLiked, onLikedClick)
 
                 // Chat button
-                IconButton(onClick = {}) {
+                IconButton(onClick = onCommentClick) {
                     if (isSystemInDarkTheme()) {
 
                         Image(
@@ -158,9 +149,12 @@ fun PostDetailsScreen(
                 Spacer(modifier = Modifier.weight(1f))
 
                 // Share button
-                OutlinedIconButton(icon = Icons.Outlined.Share) {
+                OutlinedIconButton(
+                    icon = Icons.Outlined.Share,
+                    onclick = {
 
-                }
+                    }
+                )
             }
             Row(
                 horizontalArrangement = Arrangement.SpaceBetween,
@@ -293,5 +287,9 @@ fun LobsterTextButton(
 @Preview(showBackground = true)
 @Composable
 fun PostDetailsPreview() {
-    PostDetailsScreen(SamplePosts.posts[0], false, {})
+    PostDetailsScreen(
+        SamplePosts.posts[0],
+        false,
+        {}, {}
+    )
 }
