@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Text
@@ -35,92 +36,67 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.example.androidcookbook.R
+import com.example.androidcookbook.data.mocks.SamplePosts
 import com.example.androidcookbook.domain.model.post.Post
+import com.example.androidcookbook.domain.model.user.GUEST_ID
 import com.example.androidcookbook.domain.model.user.User
+import com.example.androidcookbook.domain.usecase.DeletePostUseCase
 import com.example.androidcookbook.ui.common.containers.RefreshableScreen
 import com.example.androidcookbook.ui.features.newsfeed.NewsfeedCard
 import com.example.androidcookbook.ui.theme.AndroidCookbookTheme
 
 @Composable
 fun UserProfileScreen(
-    userId: Int,
-    onPostSeeDetailsClick: (Post) -> Unit,
-    modifier: Modifier = Modifier
+    user: User,
+    modifier: Modifier = Modifier,
+    content: LazyListScope.() -> Unit,
 ) {
-    val userProfileViewModel = hiltViewModel<UserProfileViewModel, UserProfileViewModel.UserProfileViewModelFactory> {
-        it.create(userId)
-    }
-    val userProfileUiState = userProfileViewModel.uiState
-    RefreshableScreen(
-        onRefresh = { userProfileViewModel.refresh() }
+    LazyColumn(
+        modifier = Modifier.fillMaxSize(),
+        verticalArrangement = Arrangement.spacedBy(10.dp)
     ) {
-        when (userProfileUiState) {
-            is UserProfileUiState.Guest -> {
-                Text(
-                    "Loading"
-                )
+        item {
+            Column (
+                Modifier
+                    .padding(bottom = 10.dp)
+            ) {
+                UserProfileHeader(avatarPath = user.avatar)
+                UserInfo(user)
             }
-            is UserProfileUiState.Success -> {
-                val user = userProfileUiState.user
-                LazyColumn(
-                    modifier = Modifier.fillMaxSize(),
-                    verticalArrangement = Arrangement.spacedBy(10.dp)
-                ) {
-                    item {
-                        Column (
-                            Modifier
-//                                .background(color = MaterialTheme.colorScheme.surface)
-                                .padding(bottom = 10.dp)
-                        ) {
-                            UserProfileHeader(avatarPath = user.avatar)
-                            UserInfo(user)
-                        }
-                    }
-                    when (userProfileViewModel.userPostState) {
-                        is UserPostState.Guest -> item { Text("Loading user posts") }
-                        is UserPostState.Success -> {
-                            items(
-                                (userProfileViewModel.userPostState as UserPostState.Success).userPosts
-                            ) { post ->
-                                NewsfeedCard(
-                                    post = post,
-                                    onSeeDetailsClick = onPostSeeDetailsClick,
-//                                    modifier = Modifier.background(color = Color.White)
-                                )
-                            }
-                            if ((userProfileViewModel.userPostState as UserPostState.Success).userPosts.isEmpty()) {
-                                item {
-                                    Text(
-                                        text = "No posts at the moment.",
-                                        textAlign = TextAlign.Center,
-                                        modifier = Modifier.fillMaxWidth()
-                                    )
-                                }
-                            }
-                        }
-                        is UserPostState.Failure -> item { Text("Failed to fetch user posts.") }
-                    }
-                }
-            }
+        }
+        content()
+    }
 
-            UserProfileUiState.Failure -> {
-                LazyColumn(
-                    modifier = Modifier.fillMaxSize()
-                ) {
-                    item {
-                        UserProfileHeader(avatarPath = null)
-                        UserInfo(User())
-                    }
-                    item {
-                        Column(
-                            horizontalAlignment = Alignment.CenterHorizontally,
-                            modifier = Modifier.fillMaxSize()
-                        ) {
-                            Text("Login to view your posts.")
-                        }
-                    }
-                }
-            }
+}
+
+fun LazyListScope.userPostPortion(
+    userPosts: List<Post>,
+    user: User,
+    onEditPost: (Post) -> Unit,
+    onDeletePost: (Post) -> Unit,
+    onPostSeeDetailsClick: (Post) -> Unit,
+    onUserClick: (User) -> Unit,
+) {
+    items(
+        items = userPosts,
+        key = { post -> post.id }
+    ) { post ->
+        NewsfeedCard(
+            post = post,
+            currentUser = user,
+            onEditPost = { onEditPost(post) },
+            onDeletePost = { onDeletePost(post) },
+            onSeeDetailsClick = onPostSeeDetailsClick,
+            onUserClick = onUserClick,
+        )
+    }
+    if (userPosts.isEmpty()) {
+        item {
+            Text(
+                text = "No posts at the moment.",
+                textAlign = TextAlign.Center,
+                modifier = Modifier.fillMaxWidth()
+            )
         }
     }
 }
@@ -201,13 +177,13 @@ fun UserInfo(
             )
         )
         Text(
-            text = user?.bio?:"Món ngon nóng hổi, vừa thổi vừa ăn",
+            text = user.bio,
             style = TextStyle(
                 fontSize = 12.sp,
                 fontWeight = FontWeight(400),
             )
         )
-        if (user.id == 0) {
+        if (user.id == GUEST_ID) {
             return@Column
         }
         Row {
@@ -249,8 +225,17 @@ fun UserInfo(
 fun ProfilePreview() {
     AndroidCookbookTheme(darkTheme = true) {
         UserProfileScreen(
-            userId = 0,
-            {}
+            user = User(),
+            content = {
+                userPostPortion(
+                    userPosts = SamplePosts.posts,
+                    user = User(),
+                    onEditPost = {},
+                    onDeletePost = {},
+                    onPostSeeDetailsClick = {},
+                    onUserClick = {},
+                )
+            }
         )
     }
 }

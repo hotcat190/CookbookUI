@@ -7,7 +7,8 @@ import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 
-val LightColorScheme = lightColorScheme()
+val LightColorScheme = lightColorScheme(
+)
 
 val DarkColorScheme = darkColorScheme()
 
