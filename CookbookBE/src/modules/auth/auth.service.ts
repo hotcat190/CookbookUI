@@ -252,10 +252,10 @@ export class AuthService {
     const itemsPerPage = 10;
     const startIndex = (page - 1) * itemsPerPage;
     if (users.length > itemsPerPage*page) {
-      return {nextPage: "true", users: users.slice(startIndex, startIndex + itemsPerPage).map(user => new ReponseUserProfileDto(user, user.followers.length, user.following.length))};
+      return {nextPage: true, users: users.slice(startIndex, startIndex + itemsPerPage).map(user => new ReponseUserProfileDto(user, user.followers.length, user.following.length))};
     }
     else{
-      return {nextPage: "false", users: users.slice(startIndex, startIndex + itemsPerPage).map(user => new ReponseUserProfileDto(user, user.followers.length, user.following.length))};
+      return {nextPage: false, users: users.slice(startIndex, startIndex + itemsPerPage).map(user => new ReponseUserProfileDto(user, user.followers.length, user.following.length))};
     }
   }
   async searchUserByName(name: string, page: number): Promise<any> {
@@ -269,10 +269,10 @@ export class AuthService {
     const itemsPerPage = 10;
     const startIndex = (page - 1) * itemsPerPage;
     if (users.length > itemsPerPage*page) {
-      return {nextPage: "true", users: users.slice(startIndex, startIndex + itemsPerPage).map(user => new ReponseUserProfileDto(user, user.followers.length, user.following.length))};
+      return {nextPage: true, users: users.slice(startIndex, startIndex + itemsPerPage).map(user => new ReponseUserProfileDto(user, user.followers.length, user.following.length))};
     }
     else{
-      return {nextPage: "false", users: users.slice(startIndex, startIndex + itemsPerPage).map(user => new ReponseUserProfileDto(user, user.followers.length, user.following.length))};
+      return {nextPage: false, users: users.slice(startIndex, startIndex + itemsPerPage).map(user => new ReponseUserProfileDto(user, user.followers.length, user.following.length))};
     }
   }
   async addToFavorites(postId: any, userId: number): Promise<any> {
@@ -312,10 +312,10 @@ export class AuthService {
     if (!user) {
       throw new NotFoundException('User not found');
     }
-    console.log(user.favorites)
-    const favoriteIndex = user.favorites.findIndex((fav) => fav.id === postId);
+    
+    const favoriteIndex = user.favorites.findIndex((fav) => fav.id == postId);
 
-    if (favoriteIndex === -1) {
+    if (favoriteIndex == -1) {
       throw new NotFoundException('Bài viết không nằm trong danh sách yêu thích của bạn.');
     }
     user.favorites.splice(favoriteIndex, 1);
@@ -337,11 +337,27 @@ export class AuthService {
     const itemsPerPage = 10;
     const startIndex = (page - 1) * itemsPerPage;
     if (favorites.length > itemsPerPage*page) {
-      return {nextPage: "true", favorites: favorites.slice(startIndex, startIndex + itemsPerPage).map(fav => new LiteReponsePostDto(fav))};
+      return {nextPage: true, favorites: favorites.slice(startIndex, startIndex + itemsPerPage).map(fav => new LiteReponsePostDto(fav))};
     }
     else{
-      return {nextPage: "false", favorites: favorites.slice(startIndex, startIndex + itemsPerPage).map(fav => new LiteReponsePostDto(fav))};
+      return {nextPage: false, favorites: favorites.slice(startIndex, startIndex + itemsPerPage).map(fav => new LiteReponsePostDto(fav))};
     }
+  }
+  async checkFavorite(postId: number, userId: number): Promise<any> {
+    const user = await this.usersRepository.createQueryBuilder('user')
+      .leftJoinAndSelect('user.favorites', 'favorites')
+      .where('user.id = :userId', { userId })
+      .select(['user.id', 'favorites.id'])
+      .getOne();
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+    const favoritePostIds = user.favorites.map((fav) => fav.id);
+    if (favoritePostIds.some((fav) => fav == postId)) {
+      return { isFavorited: true };
+    }
+    return { isFavorited: false };
+
   }
   /*
   async uploadImage(file: Express.Multer.File): Promise<any> {

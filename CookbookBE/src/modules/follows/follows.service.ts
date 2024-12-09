@@ -87,4 +87,13 @@ export class FollowsService {
     });
     return !!follow;
   }
+  async checkFollow(followerId: number, followingId: number): Promise<any> {
+    const follow = await this.followsRepository.findOne({
+      where: { follower: { id: followerId }, following: { id: followingId } },
+    });
+    if (!follow) {
+      return { isFollowed: false };
+    }
+    return { isFollowed: true };
+  }
 }

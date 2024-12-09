@@ -94,7 +94,15 @@ import {
     deletePost(@Param('postId') postId: number, @Request() req) {
       return this.postsService.deletePost(postId, req.user.id);
     }
-  
+
+    @Get('like/check/:postId/:userId')
+    @ApiOperation({ summary: 'Xem danh sách thích bài viết theo trang (mỗi trang 10, bắt đầu từ trang 1), nextPage true là có trang tiếp theo' })
+    @ApiResponse({ status: 200, description: 'Danh sách người thích bài viết' })
+    @ApiResponse({ status: 404, description: 'Bài viết không tồn tại' })
+    checkLike(@Param('postId') postId: number, @Param('userId') userId: number) {
+      return this.postsService.checkLike(postId, userId);
+    }
+
     @Get('posts/:postId')
     @ApiOperation({ summary: 'Xem bài viết chi tiết' })
     @ApiResponse({ status: 200, description: 'Thông tin chi tiết của bài viết' })
