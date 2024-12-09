@@ -3,6 +3,7 @@ package com.example.androidcookbook.ui.common.appbars
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.asPaddingValues
@@ -33,7 +34,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.fragment.app.FragmentManager.BackStackEntry
 import androidx.navigation.NavDestination
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.rememberNavController
 import com.example.androidcookbook.R
 import com.example.androidcookbook.domain.model.user.User
 import com.example.androidcookbook.ui.nav.Routes
@@ -260,6 +264,34 @@ fun NavBarPreview() {
 @Composable
 fun NavBarDarkPreview() {
     AppBarTheme(darkTheme = true) {
-        CookbookBottomNavigationBar({}, {}, {}, {}, {}, currentUser = User())
+        CookbookBottomNavigationBar(
+            {}, {}, {}, {}, {}, currentUser = User()
+        )
+    }
+}
+
+@Preview
+@Composable
+fun NavBarItemPreview() {
+    AppBarTheme(darkTheme = true) {
+        Row {
+            NavigationBarItem(
+                selected = true,
+                onClick = { },
+                icon = {
+                    Box(
+                        modifier = Modifier.size(24.dp)
+                    ) {
+                        Icon(
+                            painter = painterResource(R.drawable.home),
+                            contentDescription = "Newsfeed",
+                            modifier = Modifier,
+                        )
+                    }
+                },
+//        label = label,
+                alwaysShowLabel = false,
+            )
+        }
     }
 }

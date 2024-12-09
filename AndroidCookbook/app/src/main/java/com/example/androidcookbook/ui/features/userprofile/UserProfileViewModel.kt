@@ -48,6 +48,8 @@ class UserProfileViewModel @AssistedInject constructor(
         else UserPostState.Loading
     )
 
+
+
     init {
         viewModelScope.launch {
             getUserPosts(userId = user.id)

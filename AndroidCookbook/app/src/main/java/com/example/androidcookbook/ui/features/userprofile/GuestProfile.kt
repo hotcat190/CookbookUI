@@ -18,8 +18,12 @@ fun GuestProfile(
         modifier = modifier.fillMaxSize()
     ) {
         item {
-            UserProfileHeader(avatarPath = null)
-            UserInfo(User())
+            UserProfileHeader(
+                bannerPath = null,
+                avatarPath = null,
+                headerButton = {},
+            )
+            UserInfo(User(), {}, {})
         }
         item {
             Column(

@@ -1,4 +1,4 @@
-package com.example.androidcookbook.ui.nav.dest
+package com.example.androidcookbook.ui.nav.dest.post
 
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue

@@ -67,6 +67,8 @@ class AuthViewModel @Inject constructor(
             }.onException {
                 when (throwable) {
                     is SocketTimeoutException -> _uiState.update { it.copy(dialogMessage = "Request timed out.\n Please try again.") }
+                    is java.net.UnknownHostException -> _uiState.update { it.copy(openDialog = true, dialogMessage = "Could not establish a connection, please check your internet connection") }
+                    else -> _uiState.update { it.copy(openDialog = true, dialogMessage = "An error occurred") }
                 }
             }
         }
@@ -87,6 +89,8 @@ class AuthViewModel @Inject constructor(
             }.onException {
                 when (throwable) {
                     is SocketTimeoutException -> _uiState.update { it.copy(openDialog = true, dialogMessage = "Request timed out.\n Please try again.") }
+                    is java.net.UnknownHostException -> _uiState.update { it.copy(openDialog = true, dialogMessage = "Could not establish a connection, please check your internet connection") }
+                    else -> _uiState.update { it.copy(openDialog = true, dialogMessage = "An error occurred") }
                 }
             }
         }

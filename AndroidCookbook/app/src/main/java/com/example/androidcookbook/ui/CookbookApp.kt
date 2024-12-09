@@ -30,14 +30,17 @@ import com.example.androidcookbook.ui.common.appbars.CookbookAppBarDefault
 import com.example.androidcookbook.ui.common.appbars.CookbookBottomNavigationBar
 import com.example.androidcookbook.ui.common.appbars.SearchBar
 import com.example.androidcookbook.ui.features.auth.theme.SignLayoutTheme
+import com.example.androidcookbook.ui.nav.dest.follow
 import com.example.androidcookbook.ui.features.search.SearchScreen
 import com.example.androidcookbook.ui.features.search.SearchViewModel
 import com.example.androidcookbook.ui.nav.Routes
+import com.example.androidcookbook.ui.nav.dest.post.createPost
+import com.example.androidcookbook.ui.nav.dest.post.postDetails
+import com.example.androidcookbook.ui.nav.dest.post.updatePost
+import com.example.androidcookbook.ui.nav.dest.profile.editProfile
+import com.example.androidcookbook.ui.nav.dest.profile.otherProfile
 import com.example.androidcookbook.ui.nav.graphs.appScreens
 import com.example.androidcookbook.ui.nav.graphs.authScreens
-import com.example.androidcookbook.ui.nav.dest.createPost
-import com.example.androidcookbook.ui.nav.dest.postDetails
-import com.example.androidcookbook.ui.nav.dest.updatePost
 import com.example.androidcookbook.ui.nav.utils.navigateIfNotOn
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -96,30 +99,36 @@ fun CookbookApp(
                         )
                     }
                 }
+
+                CookbookUiState.TopBarState.NoTopBar -> {}
             }
         },
         bottomBar = {
             when (uiState.bottomBarState) {
                 is CookbookUiState.BottomBarState.NoBottomBar -> {}
-                is CookbookUiState.BottomBarState.Default -> CookbookBottomNavigationBar(
-                    onCategoryClick = {
-                        navController.navigateIfNotOn(Routes.App.Category)
-                    },
-                    onAiChatClick = {
-                        navController.navigateIfNotOn(Routes.App.AIChef)
-                    },
-                    onNewsfeedClick = {
-                        navController.navigateIfNotOn(Routes.App.Newsfeed)
-                    },
-                    onUserProfileClick = {
-                        navController.navigateIfNotOn(Routes.App.UserProfile(currentUser))
-                    },
-                    onCreatePostClick = {
-                        navController.navigateIfNotOn(Routes.CreatePost)
-                    },
-                    currentUser = currentUser,
-                    currentDestination = currentDestination
-                )
+                is CookbookUiState.BottomBarState.Default -> {
+                    AppBarTheme{
+                        CookbookBottomNavigationBar(
+                            onCategoryClick = {
+                                navController.navigateIfNotOn(Routes.App.Category)
+                            },
+                            onAiChatClick = {
+                                navController.navigateIfNotOn(Routes.App.AIChef)
+                            },
+                            onNewsfeedClick = {
+                                navController.navigateIfNotOn(Routes.App.Newsfeed)
+                            },
+                            onUserProfileClick = {
+                                navController.navigateIfNotOn(Routes.App.UserProfile(currentUser))
+                            },
+                            onCreatePostClick = {
+                                navController.navigateIfNotOn(Routes.CreatePost)
+                            },
+                            currentUser = currentUser,
+                            currentDestination = currentDestination
+                        )
+                    }
+                }
             }
         }
     ) { innerPadding ->
@@ -169,6 +178,12 @@ fun CookbookApp(
             updatePost(viewModel, currentUser, navController)
 
             postDetails(viewModel, navController)
+
+            editProfile(viewModel, currentUser, navController)
+
+            otherProfile(viewModel, currentUser, navController)
+
+            follow(viewModel, navController)
         }
     }
 }

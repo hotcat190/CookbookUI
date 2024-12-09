@@ -1,0 +1,146 @@
+package com.example.androidcookbook.ui.nav.dest.profile
+
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.Text
+import androidx.compose.runtime.collectAsState
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavGraphBuilder
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.composable
+import androidx.navigation.toRoute
+import com.example.androidcookbook.domain.model.user.User
+import com.example.androidcookbook.ui.CookbookViewModel
+import com.example.androidcookbook.ui.common.containers.RefreshableScreen
+import com.example.androidcookbook.ui.features.follow.FollowListScreenType
+import com.example.androidcookbook.ui.features.userprofile.GuestProfile
+import com.example.androidcookbook.ui.features.userprofile.UserPostState
+import com.example.androidcookbook.ui.features.userprofile.UserProfileScreen
+import com.example.androidcookbook.ui.features.userprofile.UserProfileUiState
+import com.example.androidcookbook.ui.features.userprofile.UserProfileViewModel
+import com.example.androidcookbook.ui.features.userprofile.components.EditProfileButton
+import com.example.androidcookbook.ui.features.userprofile.components.FollowButton
+import com.example.androidcookbook.ui.features.userprofile.userPostPortion
+import com.example.androidcookbook.ui.nav.CustomNavTypes
+import com.example.androidcookbook.ui.nav.Routes
+import com.example.androidcookbook.ui.nav.utils.navigateIfNotOn
+import com.example.androidcookbook.ui.nav.utils.navigateToProfile
+import kotlin.reflect.typeOf
+
+fun NavGraphBuilder.userProfile(
+    updateAppBar: () -> Unit,
+    cookbookViewModel: CookbookViewModel,
+    navController: NavHostController,
+) {
+    composable<Routes.App.UserProfile>(
+        typeMap = mapOf(
+            typeOf<User>() to CustomNavTypes.UserType
+        )
+    ) {
+        updateAppBar()
+        val user = it.toRoute<Routes.App.UserProfile>().user
+
+        val userProfileViewModel =
+            hiltViewModel<UserProfileViewModel, UserProfileViewModel.UserProfileViewModelFactory>(
+
+            ) { factory ->
+                factory.create(user)
+            }
+
+        val userProfileUiState = userProfileViewModel.uiState.collectAsState().value
+
+        RefreshableScreen(
+            onRefresh = { userProfileViewModel.refresh() }
+        ) {
+            when (userProfileUiState) {
+                is UserProfileUiState.Loading -> {
+                    Text(
+                        "Loading"
+                    )
+                }
+
+                is UserProfileUiState.Success -> {
+                    val userPostState = userProfileViewModel.userPostState.collectAsState().value
+                    UserProfileScreen(
+                        user = userProfileUiState.user,
+                        headerButton = {
+                            EditProfileButton(
+                                onEditProfileClick = {
+                                    navController.navigate(Routes.EditProfile)
+                                }
+                            )
+                        },
+                        onFollowersClick = {
+                            navController.navigateIfNotOn(
+                                Routes.Follow(userProfileUiState.user, FollowListScreenType.Followers)
+                            )
+                        },
+                        onFollowingClick = {
+                            navController.navigateIfNotOn(
+                                Routes.Follow(userProfileUiState.user, FollowListScreenType.Following)
+                            )
+                        },
+                    ) {
+                        when (userPostState) {
+                            is UserPostState.Loading -> item {
+                                Column(
+                                    horizontalAlignment = Alignment.CenterHorizontally,
+                                    modifier = Modifier.fillMaxSize()
+                                ) {
+                                    Text("Loading user posts")
+                                }
+                            }
+
+                            is UserPostState.Success -> {
+                                userPostPortion(
+                                    userPosts = userPostState.userPosts,
+                                    onEditPost = { post ->
+                                        navController.navigate(Routes.UpdatePost(post))
+                                    },
+                                    onDeletePost = { post ->
+                                        userProfileViewModel.deletePost(post)
+                                    },
+                                    onPostSeeDetailsClick = { post ->
+                                        navController.navigate(Routes.App.PostDetails(post))
+                                    },
+                                    onUserClick = { user ->
+                                        navController.navigateToProfile(cookbookViewModel.user.value, user)
+                                    },
+                                    currentUser = userProfileUiState.user,
+                                )
+                            }
+
+                            is UserPostState.Failure -> item {
+                                Column(
+                                    horizontalAlignment = Alignment.CenterHorizontally,
+                                    modifier = Modifier.fillMaxSize()
+                                ) {
+                                    Text("Failed to fetch user posts.")
+                                }
+                            }
+
+                            UserPostState.Guest -> item {
+                                Column(
+                                    horizontalAlignment = Alignment.CenterHorizontally,
+                                    modifier = Modifier.fillMaxSize()
+                                ) {
+                                    Text("Login to see your posts.")
+                                }
+                            }
+                        }
+                    }
+                }
+
+                UserProfileUiState.Failure -> {
+                    GuestProfile("Failed to fetch user profile.")
+                }
+
+                UserProfileUiState.Guest -> {
+                    GuestProfile("Login to see your posts.")
+                }
+            }
+        }
+    }
+}

@@ -11,6 +11,7 @@ data class User(
     val bio: String = "",
     val name: String = "Guest",
     val avatar: String? = null,
+    val banner: String? = null,
     val totalFollowers: Int = 0,
     val totalFollowing: Int = 0,
 )

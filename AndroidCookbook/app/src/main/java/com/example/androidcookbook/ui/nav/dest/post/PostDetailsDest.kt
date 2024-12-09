@@ -1,4 +1,4 @@
-package com.example.androidcookbook.ui.nav.dest
+package com.example.androidcookbook.ui.nav.dest.post
 
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.rememberModalBottomSheetState
@@ -22,6 +22,7 @@ import com.example.androidcookbook.ui.features.post.details.PostDetailsViewModel
 import com.example.androidcookbook.ui.features.post.details.PostUiState
 import com.example.androidcookbook.ui.nav.CustomNavTypes
 import com.example.androidcookbook.ui.nav.Routes
+import com.example.androidcookbook.ui.nav.utils.navigateToProfile
 import kotlin.reflect.typeOf
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -83,7 +84,7 @@ fun NavGraphBuilder.postDetails(viewModel: CookbookViewModel, navController: Nav
                         postDetailsViewModel.togglePostBookmark()
                     },
                     onUserClick = { user ->
-                        navController.navigate(Routes.App.UserProfile(user))
+                        navController.navigateToProfile(viewModel.user.value, user)
                     },
                     modifier = Modifier
                 )

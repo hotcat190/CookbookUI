@@ -10,6 +10,7 @@ data class CookbookUiState (
     sealed interface TopBarState {
         data object Default : TopBarState
         data object Auth : TopBarState
+        data object NoTopBar : TopBarState
         data class Custom(val topAppBar: @Composable () -> Unit) : TopBarState
     }
 
