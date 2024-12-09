@@ -27,6 +27,8 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.Checkbox
+import androidx.compose.material.CheckboxDefaults
 import androidx.compose.material3.Button
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.IconButton
@@ -39,7 +41,10 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -61,13 +66,17 @@ import coil.compose.rememberAsyncImagePainter
 import com.example.androidcookbook.R
 import com.example.androidcookbook.domain.model.aigen.AiRecipe
 import com.example.androidcookbook.domain.usecase.createImageRequestBody
+import com.example.androidcookbook.ui.components.aigen.AiUploadResultScreen
 import com.example.androidcookbook.ui.components.aigen.CookingLoadingAnimation
 import com.example.androidcookbook.ui.components.aigen.CookingTimeInput
+import com.example.androidcookbook.ui.components.aigen.DashedLine
 import com.example.androidcookbook.ui.components.aigen.IngredientsInput
 import com.example.androidcookbook.ui.components.aigen.LoadingTextWithEllipsis
 import com.example.androidcookbook.ui.components.aigen.MealTitleInput
+import com.example.androidcookbook.ui.components.aigen.NoteInput
 import com.example.androidcookbook.ui.components.aigen.PortionInput
 import com.example.androidcookbook.ui.components.aigen.ServedAsInput
+import com.example.androidcookbook.ui.components.aigen.setAnimation
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -124,7 +133,7 @@ fun AIGenScreen(modifier: Modifier = Modifier) {
             item {
                 setAnimation()
             }
-        } else if (uiState.isDone) {
+        } else if (uiState.isDoneUploadingImage) {
             item {
                 AiUploadResultScreen(
                     modifier = Modifier
@@ -137,14 +146,23 @@ fun AIGenScreen(modifier: Modifier = Modifier) {
                     viewModel = aiGenViewModel
                 )
             }
+        } else if (uiState.isDone) {
+            item {
+
+                FinalResultScreen(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(horizontal = 12.dp),
+                    result = aiGenViewModel.getImageInforJson()
+                )
+            }
         }
 
-        if (uiState.isTakingInput) {
+        if (uiState.isTakingInput || uiState.isDoneUploadingImage) {
             item {
                 Button(
                     onClick = {
-
-
+                        aiGenViewModel.updateIsDone()
                     },
                     colors = ButtonColors(
                         containerColor = MaterialTheme.colorScheme.secondary,
@@ -165,21 +183,23 @@ fun AIGenScreen(modifier: Modifier = Modifier) {
 }
 
 @Composable
-fun setAnimation() {
-    Column(
-        verticalArrangement = Arrangement.SpaceBetween,
-        horizontalAlignment = Alignment.CenterHorizontally,
+fun FinalResultScreen(modifier: Modifier = Modifier, result: String) {
+    Box(
+        modifier = modifier
+    ) {
 
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(color = MaterialTheme.colorScheme.surfaceContainer)
+                .border(width = 1.dp, color = Color(0xFF7F5346))
+                .padding(top = 24.dp, bottom = 12.dp, start = 24.dp, end = 24.dp),
         ) {
-        Spacer(modifier = Modifier.size(200.dp))
-
-
-        CookingLoadingAnimation()
-        LoadingTextWithEllipsis()
-
-
+            Text(text = result, color = MaterialTheme.colorScheme.outline)
+        }
     }
 }
+
 
 @SuppressLint("StateFlowValueCalledInComposition")
 @OptIn(ExperimentalMaterialApi::class)
@@ -216,7 +236,7 @@ fun TakingInputScreen(
                 } else {
                     Log.d("Upload", "Upload failed.")
                 }
-                viewModel.updateIsDone()
+                viewModel.updateIsDoneUploadingImage()
             }
 
         }
@@ -330,196 +350,6 @@ fun TakingInputScreen(
     }
 }
 
-@Composable
-fun AiUploadResultScreen(
-    modifier: Modifier = Modifier,
-    result: AiRecipe?,
-    imageUri: Uri?,
-    uiState: AIGenUiState,
-    viewModel: AiGenViewModel,
-) {
-    Box(
-        modifier = modifier
-    ) {
-
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(color = MaterialTheme.colorScheme.surfaceContainer)
-                .border(width = 1.dp, color = Color(0xFF7F5346))
-                .padding(top = 24.dp, bottom = 12.dp, start = 24.dp, end = 24.dp),
-        ) {
-
-            Text(
-                text = "Recipe Details",
-                fontFamily = FontFamily(Font(R.font.playfairdisplay_regular)),
-                fontSize = 24.sp,
-                color = MaterialTheme.colorScheme.outline,
-                modifier = Modifier.padding(bottom = 16.dp)
-            )
-
-            if (result != null) {
-                Text(
-                    text = "Ingredients:",
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 20.sp,
-                    color = MaterialTheme.colorScheme.outline
-                )
-                Spacer(modifier = Modifier.size(8.dp))
-
-
-
-                IngredientsInput(
-                    ingredients = uiState.ingredients,
-                    onIngredientNameChange = { index, it ->
-                        viewModel.updateIngredientName(
-                            index,
-                            it
-                        )
-                    },
-                    onIngredientQuantityChange = { index, it ->
-                        viewModel.updateIngredientQuantity(
-                            index,
-                            it
-                        )
-                    },
-                    onDeleteIngredient = { viewModel.deleteIngredient(it) },
-                    addIngredient = { viewModel.addEmptyIngredient() })
-
-                Text(
-                    text = "Recipes:",
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 20.sp,
-                    color = MaterialTheme.colorScheme.outline
-                )
-
-                result.recipes.forEach { recipe ->
-
-
-                    Spacer(modifier = Modifier.size(8.dp))
-
-                    Text(
-                        text = "- ${recipe}",
-                        fontSize = 16.sp,
-                        color = MaterialTheme.colorScheme.outline
-                    )
-                    Spacer(modifier = Modifier.weight(1f))
-
-                }
-            } else {
-
-                Text(
-                    text = "No ingredients available",
-                    color = MaterialTheme.colorScheme.error,
-                    fontSize = 16.sp,
-                    modifier = Modifier.padding(vertical = 8.dp)
-                )
-            }
-
-            Spacer(modifier = Modifier.size(16.dp))
-
-            if (imageUri != null) {
-                Image(
-                    painter = rememberAsyncImagePainter(imageUri),
-                    contentDescription = null,
-                    contentScale = ContentScale.Crop,
-                    modifier = Modifier
-                        .aspectRatio(1.5f)
-                        .border(
-                            1.dp,
-                            MaterialTheme.colorScheme.outline,
-                            shape = RoundedCornerShape(8.dp)
-                        )
-                        .clip(RoundedCornerShape(8.dp))
-                )
-
-            }
-        }
-    }
-}
-
-
-@Composable
-fun NoteInput(modifier: Modifier = Modifier, note: String, onNoteChange: (String) -> Unit) {
-
-
-    Column(modifier = Modifier.padding(bottom = 4.dp)) {
-
-        Text(
-            text = "*Note",
-            fontFamily = FontFamily(Font(R.font.nunito_regular)),
-            fontWeight = FontWeight.Bold,
-            color = MaterialTheme.colorScheme.outline
-        )
-        TextField(
-            modifier = Modifier
-                .fillMaxWidth()
-                .heightIn(min = 128.dp),
-            value = note,
-            onValueChange = onNoteChange,
-            placeholder = {
-                Text(
-                    "Tell us what you want about this dish...",
-
-                    fontFamily = FontFamily(Font(R.font.nunito_regular)),
-                    modifier = Modifier.fillMaxWidth(),
-                    color = Color(0xFFFFFFFF).copy(alpha = 0.75f),
-                    fontSize = 14.sp
-
-                )
-            },
-            colors = TextFieldDefaults.textFieldColors(
-                focusedIndicatorColor = Color.Transparent,
-                unfocusedIndicatorColor = Color.Transparent,
-                cursorColor = Color.White,
-                textColor = Color.White,
-                backgroundColor = Color(0xFF4A4A4A)
-            ),
-            shape = RoundedCornerShape(4.dp),
-
-            )
-    }
-
-}
-
-
-@Composable
-fun DashedLine(
-    color: Color = Color.Gray,
-    dashWidth: Float = 10f,
-    dashGap: Float = 10f,
-    strokeWidth: Float = 2f
-) {
-    Canvas(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(1.dp) // Adjust height for thickness
-    ) {
-        drawLine(
-            color = color,
-            start = androidx.compose.ui.geometry.Offset(0f, size.height / 2),
-            end = androidx.compose.ui.geometry.Offset(size.width, size.height / 2),
-            strokeWidth = strokeWidth,
-            pathEffect = PathEffect.dashPathEffect(floatArrayOf(dashWidth, dashGap), 0f)
-        )
-    }
-}
-
-
-fun getFileFromUri(context: android.content.Context, uri: Uri?): File? {
-    return try {
-        val inputStream =
-            uri?.let { context.contentResolver.openInputStream(it) } ?: return null
-        val tempFile = File.createTempFile("upload", ".jpg", context.cacheDir)
-        tempFile.outputStream().use { output ->
-            inputStream.copyTo(output)
-        }
-        tempFile
-    } catch (e: Exception) {
-        e.printStackTrace()
-        null
-    }
-}
 
 @Composable
 @Preview

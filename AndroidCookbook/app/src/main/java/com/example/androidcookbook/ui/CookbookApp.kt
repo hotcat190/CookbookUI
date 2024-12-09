@@ -48,6 +48,7 @@ import com.example.androidcookbook.ui.features.search.SearchScreen
 import com.example.androidcookbook.ui.features.search.SearchViewModel
 import com.example.androidcookbook.ui.nav.CustomNavTypes
 import com.example.androidcookbook.ui.nav.Routes
+import com.example.androidcookbook.ui.nav.graphs.AppEntryPoint
 import com.example.androidcookbook.ui.nav.graphs.appScreens
 import com.example.androidcookbook.ui.nav.graphs.authScreens
 import com.example.androidcookbook.ui.nav.utils.navigateIfNotOn
@@ -84,6 +85,7 @@ fun CookbookApp(
                         )
                     }
                 }
+
                 is CookbookUiState.TopBarState.Custom -> (uiState.topBarState as CookbookUiState.TopBarState.Custom).topAppBar.invoke()
                 is CookbookUiState.TopBarState.Default -> {
                     AppBarTheme {
@@ -100,12 +102,16 @@ fun CookbookApp(
                                 navController.navigateIfNotOn(Routes.CreatePost)
                             },
                             onMenuButtonClick = {
-                                //TODO: Add menu button
+
                             },
                             onBackButtonClick = {
                                 navController.navigateUp()
                             },
-                            scrollBehavior = scrollBehavior
+                            scrollBehavior = scrollBehavior,
+                            onLogoutClick = {
+                                viewModel.logout()
+                                navController.navigateIfNotOn(Routes.Auth)
+                            }
                         )
                     }
                 }
@@ -137,16 +143,23 @@ fun CookbookApp(
     ) { innerPadding ->
         NavHost(
             navController = navController,
-            startDestination = Routes.Auth,
+            startDestination = "check_auth",
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding),
         ) {
+
+            composable("check_auth") {
+                AppEntryPoint(navController = navController)
+            }
+
+
+
             authScreens(navController = navController, updateAppBar = {
                 viewModel.updateTopBarState(CookbookUiState.TopBarState.Auth)
                 viewModel.updateBottomBarState(CookbookUiState.BottomBarState.NoBottomBar)
-            }, updateUser = { response ->
-                viewModel.updateUser(response)
+            }, updateUser = { response,username,password ->
+                viewModel.updateUser(response,username,password)
             })
             appScreens(navController = navController, updateAppBar = {
                 viewModel.updateTopBarState(CookbookUiState.TopBarState.Default)
@@ -255,7 +268,8 @@ fun CookbookApp(
                         }
                     )
                 }
-                when (val updateStepDialogState = createPostViewModel.updateStepDialogState.collectAsState().value) {
+                when (val updateStepDialogState =
+                    createPostViewModel.updateStepDialogState.collectAsState().value) {
                     is UpdateStepDialogState.Open -> {
                         UpdateStepDialog(
                             step = updateStepDialogState.step,
@@ -268,14 +282,19 @@ fun CookbookApp(
                             }
                         )
                     }
+
                     UpdateStepDialogState.Closed -> {}
                 }
-                when (val updateIngredientDialogState = createPostViewModel.updateIngredientDialogState.collectAsState().value) {
+                when (val updateIngredientDialogState =
+                    createPostViewModel.updateIngredientDialogState.collectAsState().value) {
                     is UpdateIngredientDialogState.Open -> {
                         UpdateIngredientDialog(
                             ingredient = updateIngredientDialogState.ingredient,
                             onUpdateIngredient = {
-                                createPostViewModel.updateIngredient(updateIngredientDialogState.index, it)
+                                createPostViewModel.updateIngredient(
+                                    updateIngredientDialogState.index,
+                                    it
+                                )
                                 createPostViewModel.closeDialog()
                             },
                             onDismissRequest = {
@@ -283,6 +302,7 @@ fun CookbookApp(
                             }
                         )
                     }
+
                     UpdateIngredientDialogState.Closed -> {}
                 }
             }
@@ -298,9 +318,10 @@ fun CookbookApp(
 
                 val postRoute = it.toRoute<Routes.App.PostDetails>()
 
-                val postDetailsViewModel = hiltViewModel<PostDetailsViewModel, PostDetailsViewModel.PostDetailsViewModelFactory> { factory ->
-                    factory.create(postRoute.post)
-                }
+                val postDetailsViewModel =
+                    hiltViewModel<PostDetailsViewModel, PostDetailsViewModel.PostDetailsViewModelFactory> { factory ->
+                        factory.create(postRoute.post)
+                    }
 
                 when (val postUiState = postDetailsViewModel.postUiState.collectAsState().value) {
                     is PostUiState.Success -> {
@@ -312,9 +333,11 @@ fun CookbookApp(
                             }
                         )
                     }
+
                     is PostUiState.Error -> {
                         // TODO
                     }
+
                     is PostUiState.Loading -> {
                         // TODO
                     }
@@ -325,7 +348,11 @@ fun CookbookApp(
 }
 
 @Composable
-private fun updateSystemBarColors(statusBarColor: Int, navigationBarColor: Int, darkTheme: Boolean = isSystemInDarkTheme()) {
+private fun updateSystemBarColors(
+    statusBarColor: Int,
+    navigationBarColor: Int,
+    darkTheme: Boolean = isSystemInDarkTheme()
+) {
     val view = LocalView.current
 
     if (!view.isInEditMode) {
@@ -334,7 +361,8 @@ private fun updateSystemBarColors(statusBarColor: Int, navigationBarColor: Int, 
             window.statusBarColor = statusBarColor
             window.navigationBarColor = navigationBarColor
             WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = !darkTheme
-            WindowCompat.getInsetsController(window, view).isAppearanceLightNavigationBars = !darkTheme
+            WindowCompat.getInsetsController(window, view).isAppearanceLightNavigationBars =
+                !darkTheme
         }
     }
 }
