@@ -66,13 +66,13 @@ import {
     @Column({ nullable: true, length: 500 })
     bio: string;
 
-    @Column({ default: 'Tôi dại dột', length: 30 })
+    @Column({ default: 'Ham ăn', length: 30 })
     name: string;
 
     @Column({ nullable: true })
     avatar: string;
 
-    @Column()
+    @Column({ nullable: true })
     tokenFCM: string;
 
   }

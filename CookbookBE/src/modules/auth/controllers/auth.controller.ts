@@ -66,6 +66,7 @@ export class AuthController {
   resetPassword(@Body() resetPassword2Dto: ResetPassword2Dto) {
     return this.authService.resetPassword(resetPassword2Dto);
   }
+  
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
   @Post('auth/change-password')
@@ -73,6 +74,21 @@ export class AuthController {
   @ApiResponse({ status: 200, description: 'Đổi mật khẩu thành công' })
   changePassword(@Request1() req, @Body() changePasswordDto: ChangePasswordDto) {
     return this.authService.changePassword(req.user.id, changePasswordDto);
+  }
+
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
+  @Get('auth/logout')
+  @ApiOperation({ summary: 'Đăng xuất' })
+  logout(@Request1() req) {
+    return this.authService.logout(req.user.id);
+  }
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
+  @Post('auth/set-token')
+  @ApiOperation({ summary: 'Set tokenFCM' })
+  setTokenFCM(@Request1() req, @Body() tokenFCM: string) {
+    return this.authService.setTokenFCM(tokenFCM, req.user.id);
   }
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
@@ -143,6 +159,7 @@ export class AuthController {
   async searchUserByName(@Param('name') name: string, @Param('page') page: number) {
     return this.authService.searchUserByName(name, page);
   }
+  
   /*
   @Post('profile/uploadImage')
   @UseInterceptors(

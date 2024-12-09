@@ -18,6 +18,7 @@ import { ChangePasswordDto } from './dtos/change-password.dto';
 import { v2 as cloudinary } from 'cloudinary';
 import { Readable } from 'stream';
 import * as fileType from 'file-type';
+import { randomInt } from 'crypto';
 
 @Injectable()
 export class AuthService {
@@ -41,8 +42,10 @@ export class AuthService {
   async register(registerDto: RegisterDto, baseUrl: string): Promise<any> {
     
     try {
-      const { username, email, password } = registerDto;
-
+      let { username, email, password, name } = registerDto;
+      if(name === null || name === undefined){
+        name = "Ham ăn " + randomInt(10000, 99999);
+      }
       const existingUser = await this.usersRepository.findOne({ where: [{ email }, { username }] });
 
       if (existingUser?.isActive) {
@@ -57,6 +60,7 @@ export class AuthService {
       const user = this.usersRepository.create({
         username,
         email,
+        name,
         password: hashedPassword,
         isActive: false,
         verificationToken: uuidv4(),
@@ -66,18 +70,19 @@ export class AuthService {
       const url = `${baseUrl}/auth/verify-email?token=${user.verificationToken}`;
       await this.mailerService.sendVerificationEmail(user.username, user.email, user.verificationToken, baseUrl);
 
-      return { message: 'Đăng ký thành công. Vui lòng kiểm tra email để xác thực.', url: url };
+      return { message: 'Đăng ký thành công. Vui lòng kiểm tra email để xác thực.'};
     } 
     catch (error) {
       if (error instanceof BadRequestException) {
       throw error;
       }
+      console.log(error);
       throw new BadRequestException('Có lỗi xảy ra trong quá trình đăng ký.');
     }
   }
 
   async login(loginDto: LoginDto): Promise<any> {
-    const { username, password } = loginDto;
+    const { username, password, tokenFCM } = loginDto;
     const user = await this.usersRepository.findOne({ where: { username } });
 
     if (!user) {
@@ -95,7 +100,11 @@ export class AuthService {
 
     const payload = { sub: user.id, username: user.username, roles: user.roles };
     const token = this.jwtService.sign(payload);
-
+    
+    if(tokenFCM !== null && tokenFCM !== undefined){
+      user.tokenFCM = tokenFCM;
+      await this.usersRepository.save(user);
+    }
     return { access_token: token, message: 'Đăng nhập thành công', user: new ReponseUserDto(user) };
   }
 
@@ -359,6 +368,24 @@ export class AuthService {
     return { isFavorited: false };
 
   }
+  async setTokenFCM(tokenFCM: string, userId: number): Promise<any> {
+    const user = await this.usersRepository.findOne({ where: { id: userId } });
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+    user.tokenFCM = tokenFCM;
+    await this.usersRepository.save(user);
+    return { message: 'Đã cập nhật tokenFCM.' };
+  }
+  async logout(userId: number): Promise<any> {
+    const user = await this.usersRepository.findOne({ where: { id: userId } });
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+    user.tokenFCM = null;
+    await this.usersRepository.save(user);
+    return { message: 'Đã đăng xuất.' };
+  }
   /*
   async uploadImage(file: Express.Multer.File): Promise<any> {
     try {
@@ -495,5 +522,6 @@ export class AuthService {
     }
 
   }
+  
 }
 
