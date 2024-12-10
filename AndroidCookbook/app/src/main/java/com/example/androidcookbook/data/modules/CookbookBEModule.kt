@@ -31,8 +31,8 @@ import javax.inject.Singleton
 @InstallIn(SingletonComponent::class)
 object CookbookBEModule {
 
-    private const val COOKBOOK_BE = "https://cookbook-f98z.onrender.com/"
-
+    //    private const val COOKBOOK_BE = "https://cookbook-f98z.onrender.com/"
+    private const val COOKBOOK_BE = "https://octopus-app-lvf9o.ondigitalocean.app/"
     private val loggingInterceptor = HttpLoggingInterceptor().apply {
         level = HttpLoggingInterceptor.Level.BODY
     }
@@ -44,7 +44,7 @@ object CookbookBEModule {
     @Provides
     @Singleton
     fun provideOkHttpClient(accessTokenProvider: AccessTokenProvider) = OkHttpClient.Builder()
-        .addInterceptor{ chain ->
+        .addInterceptor { chain ->
             val token = accessTokenProvider.accessToken.value
             val request = chain.request().newBuilder()
                 .apply {
