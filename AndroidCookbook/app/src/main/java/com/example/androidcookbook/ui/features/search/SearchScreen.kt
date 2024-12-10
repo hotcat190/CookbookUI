@@ -1,5 +1,6 @@
 package com.example.androidcookbook.ui.features.search
 
+import android.util.Log
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
@@ -14,6 +15,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.pager.HorizontalPager
@@ -31,6 +33,8 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.ComposeCompilerApi
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -65,7 +69,7 @@ fun SearchScreen(
     modifier: Modifier = Modifier,
 ) {
     val pagerState = rememberPagerState(
-        pageCount = { 2 }
+        pageCount = { 3 }
     )
     BackHandler {
         when (searchUiState.currentScreen) {
@@ -120,7 +124,7 @@ fun SearchScreen(
                         verticalAlignment = Alignment.Top
                     ) {
                         val state = rememberLazyListState()
-                        val isAtBottom = !state.canScrollForward
+                        val isAtBottom = state.isAtBottom()
                         LazyColumn(
                             state = state,
                             modifier = Modifier
@@ -141,28 +145,42 @@ fun SearchScreen(
                                     }
                                 }
                                 1 -> {
-                                    if (!searchUiState.postTabState.isFail) {
+                                    if (searchUiState.postTabState.state != TabState.Idle) {
                                         items(searchUiState.postTabState.result){
                                             PostCard(it) { }
                                             LaunchedEffect(isAtBottom) {
-                                                if (isAtBottom && searchUiState.postTabState.nextPage) {
-                                                    viewModel.searchPost()
+
+                                                if (isAtBottom) {
+                                                    Log.d("BOTTOM", "SearchScreen: Bottom Reached")
+                                                    if (searchUiState.postTabState.state == TabState.Succeed && searchUiState.postTabState.nextPage) {
+                                                        viewModel.searchPost()
+                                                    }
                                                 }
                                             }
                                         }
                                     } else {
                                         viewModel.searchPost()
+                                        item {
+                                            Text(text = searchUiState.postTabState.messageStr)
+                                        }
                                     }
                                 }
                                 2 -> {
-                                    items(searchUiState.resultList) { item ->
-                                        ResultCardTheme {
-                                            ResultCard(
-                                                onClick = {
-                                                    viewModel.ChangeScreenState(SearchScreenState.Posts)
-                                                },
-                                                recipe = item
-                                            )
+                                    if (searchUiState.foodTabState.state != TabState.Idle) {
+                                        items(searchUiState.foodTabState.result) { item ->
+                                            ResultCardTheme {
+                                                ResultCard(
+                                                    onClick = {
+                                                        viewModel.ChangeScreenState(SearchScreenState.Posts)
+                                                    },
+                                                    recipe = item
+                                                )
+                                            }
+                                        }
+                                    } else {
+                                        viewModel.searchFood()
+                                        item {
+                                            Text(text = searchUiState.foodTabState.messageStr)
                                         }
                                     }
                                 }
@@ -186,6 +204,25 @@ fun SearchScreen(
         }
 
     }
+}
+
+@Composable
+private fun LazyListState.isAtBottom(): Boolean {
+
+    return remember(this) {
+        derivedStateOf {
+            val visibleItemsInfo = layoutInfo.visibleItemsInfo
+            if (layoutInfo.totalItemsCount == 0) {
+                false
+            } else {
+                val lastVisibleItem = visibleItemsInfo.last()
+                val viewportHeight = layoutInfo.viewportEndOffset + layoutInfo.viewportStartOffset
+
+                (lastVisibleItem.index + 1 == layoutInfo.totalItemsCount &&
+                        lastVisibleItem.offset + lastVisibleItem.size <= viewportHeight)
+            }
+        }
+    }.value
 }
 
 @Preview

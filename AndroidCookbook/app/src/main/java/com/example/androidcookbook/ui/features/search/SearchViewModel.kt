@@ -30,35 +30,62 @@ class SearchViewModel @Inject constructor(
     private val _uiState = MutableStateFlow(SearchUiState())
     val uiState: StateFlow<SearchUiState> = _uiState.asStateFlow()
 
-    fun search(searchQuery: String) {
+    fun searchFood() {
+        _uiState.update {
+            it.copy(
+                foodTabState = SearchTabUiState(
+                    state = TabState.Waiting,
+                    messageStr = "Please wait"
+                )
+            )
+        }
         viewModelScope.launch {
-            val response: ApiResponse<RecipeList?> = searchRepository.search(searchQuery)
+            val response: ApiResponse<RecipeList?> = searchRepository.search(_uiState.value.searchQuery)
             response.onSuccess {
                 val meals = data?.meals
                 if (meals != null) {
                     _uiState.update {
-                        it.copy(result = meals.toString(), resultList = meals, fail = false, searchQuery = searchQuery)
+                        it.copy(
+                            foodTabState = SearchTabUiState(
+                                result = meals,
+                                state = TabState.Succeed,
+                                messageStr = "Search successfully"
+                            )
+                        )
                     }
-                    ChangeScreenState(SearchScreenState.Food)
                 } else {
-                    _uiState.update { it.copy(result = "No meals found", fail = true) }
+                    _uiState.update {
+                        it.copy(
+                            foodTabState = SearchTabUiState(
+                                state = TabState.Failed,
+                                messageStr = "Found nothing"
+                            )
+                        )
+                    }
                 }
             }.onFailure {
-                _uiState.update { it.copy(result = "Failed to fetch data", fail = true) }
+                _uiState.update {
+                    it.copy(
+                        foodTabState = SearchTabUiState(
+                            state = TabState.Failed,
+                            messageStr = "Failed to fetch data"
+                        )
+                    )
+                }
             }
         }
     }
 
     fun searchAll(query: String) {
+        _uiState.update {
+            it.copy(
+                postTabState = SearchTabUiState(),
+                userTabState = SearchTabUiState(),
+                foodTabState = SearchTabUiState()
+            )
+        }
         viewModelScope.launch {
             val response: ApiResponse<SearchAll> = allSearcherRepository.searchAll(query)
-            _uiState.update {
-                it.copy(
-                    postTabState = SearchTabUiState(),
-                    userTabState = SearchTabUiState(),
-                    foodTabState = SearchTabUiState()
-                )
-            }
             response.onSuccess {
                 val result = data
                 if (result != null) {
@@ -76,6 +103,17 @@ class SearchViewModel @Inject constructor(
     }
 
     fun searchPost() {
+        _uiState.update {
+            it.copy(
+                postTabState = SearchTabUiState(
+                    state = TabState.Waiting,
+                    messageStr = "Please wait",
+                    result = it.postTabState.result,
+                    currentPage = it.postTabState.currentPage,
+                    nextPage = it.postTabState.nextPage
+                )
+            )
+        }
         viewModelScope.launch {
             val response: ApiResponse<SearchPost> = allSearcherRepository
                 .searchPosts(
@@ -89,8 +127,9 @@ class SearchViewModel @Inject constructor(
                             postTabState = SearchTabUiState(
                                 currentPage = it.postTabState.currentPage + 1,
                                 result = it.postTabState.result + data.posts,
-                                isFail = false,
-                                messageStr = "Search successfully"
+                                state = TabState.Succeed,
+                                messageStr = "Search successfully",
+                                nextPage = data.nextPage
                             )
                         )
                     }
@@ -99,7 +138,7 @@ class SearchViewModel @Inject constructor(
                     _uiState.update {
                         it.copy(
                             postTabState = SearchTabUiState(
-                                isFail = true,
+                                state = TabState.Failed,
                                 messageStr = "Couldn't find any posts"
                             )
                         )
@@ -109,7 +148,7 @@ class SearchViewModel @Inject constructor(
                 _uiState.update {
                     it.copy(
                         postTabState = SearchTabUiState(
-                            isFail = true,
+                            state = TabState.Failed,
                             messageStr = "Search failed"
                         )
                     )
