@@ -39,6 +39,7 @@ import com.example.androidcookbook.ui.nav.dest.post.postDetails
 import com.example.androidcookbook.ui.nav.dest.post.updatePost
 import com.example.androidcookbook.ui.nav.dest.profile.editProfile
 import com.example.androidcookbook.ui.nav.dest.profile.otherProfile
+import com.example.androidcookbook.ui.nav.graphs.AppEntryPoint
 import com.example.androidcookbook.ui.nav.graphs.appScreens
 import com.example.androidcookbook.ui.nav.graphs.authScreens
 import com.example.androidcookbook.ui.nav.utils.navigateIfNotOn
@@ -90,12 +91,16 @@ fun CookbookApp(
                                 navController.navigateIfNotOn(Routes.CreatePost)
                             },
                             onMenuButtonClick = {
-                                //TODO: Add menu button
+
                             },
                             onBackButtonClick = {
                                 navController.navigateUp()
                             },
-                            scrollBehavior = scrollBehavior
+                            scrollBehavior = scrollBehavior,
+                            onLogoutClick = {
+                                viewModel.logout()
+                                navController.navigateIfNotOn(Routes.Auth)
+                            }
                         )
                     }
                 }
@@ -134,16 +139,23 @@ fun CookbookApp(
     ) { innerPadding ->
         NavHost(
             navController = navController,
-            startDestination = Routes.Auth,
+            startDestination = "check_auth",
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding),
         ) {
+
+            composable("check_auth") {
+                AppEntryPoint(navController = navController)
+            }
+
+
+
             authScreens(navController = navController, updateAppBar = {
                 viewModel.updateTopBarState(CookbookUiState.TopBarState.Auth)
                 viewModel.updateBottomBarState(CookbookUiState.BottomBarState.NoBottomBar)
-            }, updateUser = { response ->
-                viewModel.updateUser(response)
+            }, updateUser = { response,username,password ->
+                viewModel.updateUser(response,username,password)
             })
             appScreens(navController = navController, cookbookViewModel = viewModel)
             composable<Routes.Search> {
@@ -185,7 +197,11 @@ fun CookbookApp(
 }
 
 @Composable
-private fun updateSystemBarColors(statusBarColor: Int, navigationBarColor: Int, darkTheme: Boolean = isSystemInDarkTheme()) {
+private fun updateSystemBarColors(
+    statusBarColor: Int,
+    navigationBarColor: Int,
+    darkTheme: Boolean = isSystemInDarkTheme()
+) {
     val view = LocalView.current
 
     if (!view.isInEditMode) {

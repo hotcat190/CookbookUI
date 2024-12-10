@@ -3,7 +3,7 @@ package com.example.androidcookbook.domain.model.user
 import com.google.gson.annotations.SerializedName
 import kotlinx.serialization.Serializable
 
-const val GUEST_ID = -1
+const val GUEST_ID = 0
 
 @Serializable
 data class User(

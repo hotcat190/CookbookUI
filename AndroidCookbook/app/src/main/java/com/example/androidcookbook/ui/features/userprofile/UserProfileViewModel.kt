@@ -52,6 +52,7 @@ class UserProfileViewModel @AssistedInject constructor(
 
     init {
         viewModelScope.launch {
+            getUser(userId = user.id)
             getUserPosts(userId = user.id)
         }
     }
