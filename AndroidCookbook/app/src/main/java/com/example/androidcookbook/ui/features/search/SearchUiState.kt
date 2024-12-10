@@ -4,6 +4,7 @@ import androidx.compose.foundation.pager.PagerState
 import com.example.androidcookbook.data.mocks.SamplePosts
 import com.example.androidcookbook.domain.model.post.Post
 import com.example.androidcookbook.domain.model.recipe.Recipe
+import com.example.androidcookbook.domain.model.search.SearchAll
 
 enum class SearchScreenState {
     Food,
@@ -24,4 +25,5 @@ data class SearchUiState(
     val fail: Boolean = false,
     val currentScreen: SearchScreenState = SearchScreenState.Waiting,
     val currentPost: Post = SamplePosts.posts[0],
+    val searchALlResults: SearchAll = SearchAll()
 )
