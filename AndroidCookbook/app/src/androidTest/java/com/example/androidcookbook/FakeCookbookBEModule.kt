@@ -3,12 +3,14 @@ package com.example.androidcookbook
 import com.example.androidcookbook.data.modules.CookbookBEModule
 import com.example.androidcookbook.data.modules.CookbookBEModule.CookbookRetrofit
 import com.example.androidcookbook.data.network.AiGenService
+import com.example.androidcookbook.data.network.AllSearcherService
 import com.example.androidcookbook.data.network.AuthService
 import com.example.androidcookbook.data.network.NewsfeedService
 import com.example.androidcookbook.data.network.PostService
 import com.example.androidcookbook.data.network.UploadService
 import com.example.androidcookbook.data.network.UserService
 import com.example.androidcookbook.data.repositories.AiGenRepository
+import com.example.androidcookbook.data.repositories.AllSearcherRepository
 import com.example.androidcookbook.data.repositories.AuthRepository
 import com.example.androidcookbook.data.repositories.NewsfeedRepository
 import com.example.androidcookbook.data.repositories.PostRepository
@@ -90,4 +92,14 @@ class FakeCookbookBEModule {
     @Singleton
     fun provideUploadRepository(uploadService: UploadService): UploadRepository =
         UploadRepository(uploadService)
+
+    @Provides
+    @Singleton
+    fun provideAllSearcherService(): AllSearcherService =
+        mockk(relaxed = true)
+
+    @Provides
+    @Singleton
+    fun provideAllSearcherRepository(allSearcherService: AllSearcherService): AllSearcherRepository =
+        AllSearcherRepository(allSearcherService)
 }

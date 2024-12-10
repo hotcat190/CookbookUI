@@ -123,7 +123,7 @@ jobs:
         run: chmod +x gradlew
 
       - name: Assemble tests
-        run: ./gradlew build assembleAndroidTest
+        run: ./gradlew assembleAndroidTest
 
       - name: Enable KVM group perms
         run: |
