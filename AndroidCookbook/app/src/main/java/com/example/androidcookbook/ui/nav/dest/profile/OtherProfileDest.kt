@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Text
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -24,7 +25,8 @@ import com.example.androidcookbook.ui.features.userprofile.UserPostState
 import com.example.androidcookbook.ui.features.userprofile.UserProfileScreen
 import com.example.androidcookbook.ui.features.userprofile.UserProfileUiState
 import com.example.androidcookbook.ui.features.userprofile.UserProfileViewModel
-import com.example.androidcookbook.ui.features.userprofile.components.FollowButton
+import com.example.androidcookbook.ui.features.follow.FollowButton
+import com.example.androidcookbook.ui.features.follow.FollowButtonState
 import com.example.androidcookbook.ui.features.userprofile.userPostPortion
 import com.example.androidcookbook.ui.nav.CustomNavTypes
 import com.example.androidcookbook.ui.nav.Routes
@@ -58,10 +60,22 @@ fun NavGraphBuilder.otherProfile(
                 factory.create(user)
             }
 
+        val followViewModel = sharedViewModel<FollowViewModel, FollowViewModel.FollowViewModelFactory>(
+            it, navController, Routes.OtherProfile(user)
+        ) { factory ->
+            factory.create(
+                currentUser,
+                user,
+            )
+        }
+
         val userProfileUiState = userProfileViewModel.uiState.collectAsState().value
 
         RefreshableScreen(
-            onRefresh = { userProfileViewModel.refresh() }
+            onRefresh = {
+                userProfileViewModel.refresh()
+                followViewModel.refresh()
+            }
         ) {
             when (userProfileUiState) {
                 is UserProfileUiState.Loading -> {
@@ -75,14 +89,7 @@ fun NavGraphBuilder.otherProfile(
 
                     Log.d("UserProfileViewModelOwner", "LocalViewModelStoreOwner: ${LocalViewModelStoreOwner.current}")
 
-                    val followViewModel = sharedViewModel<FollowViewModel, FollowViewModel.FollowViewModelFactory>(
-                        it, navController, Routes.OtherProfile(user)
-                    ) { factory ->
-                        factory.create(
-                            currentUser,
-                            user,
-                        )
-                    }
+
                     val isFollowing = followViewModel.isFollowing.collectAsState().value
                     UserProfileScreen(
                         user = userProfileUiState.user,
@@ -91,9 +98,14 @@ fun NavGraphBuilder.otherProfile(
                                 onFollowButtonClick = {
                                     followViewModel.toggleFollow(userProfileUiState.user)
                                 },
-                                isFollowing = isFollowing
+                                followButtonState = (
+                                    if (isFollowing) FollowButtonState.Following
+                                    else FollowButtonState.Follow
+                                )
                             )
                         },
+                        followersCount = followViewModel.followers.collectAsState().value.size,
+                        followingCount = followViewModel.following.collectAsState().value.size,
                         onFollowersClick = {
                             navController.navigateIfNotOn(
                                 Routes.Follow(userProfileUiState.user, FollowListScreenType.Followers)

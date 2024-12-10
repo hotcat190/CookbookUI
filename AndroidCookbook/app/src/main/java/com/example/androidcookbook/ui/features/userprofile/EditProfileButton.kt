@@ -1,4 +1,4 @@
-package com.example.androidcookbook.ui.features.userprofile.components
+package com.example.androidcookbook.ui.features.userprofile
 
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -7,7 +7,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import com.example.androidcookbook.ui.features.userprofile.UserProfileHeader
 import com.example.androidcookbook.ui.theme.AndroidCookbookTheme
 
 @Composable

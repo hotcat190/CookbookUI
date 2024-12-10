@@ -33,6 +33,8 @@ class FollowViewModel @AssistedInject constructor(
     private val _following = MutableStateFlow<List<User>>(emptyList())
     val following: StateFlow<List<User>> = _following
 
+    var currentUserFollowing = MutableStateFlow<List<User>>(emptyList())
+
     @AssistedFactory
     interface FollowViewModelFactory {
         fun create(
@@ -42,9 +44,14 @@ class FollowViewModel @AssistedInject constructor(
     }
 
     init {
+        refresh()
+    }
+
+    fun refresh() {
+        getCurrentUserFollowing()
         viewModelScope.launch {
-            getFollowers(targetUser)
-            getFollowing(targetUser)
+            getFollowers()
+            getFollowing()
         }
     }
 
@@ -56,11 +63,13 @@ class FollowViewModel @AssistedInject constructor(
         }
     }
 
-    private fun unfollowUser(user: User) {
+    fun unfollowUser(user: User) {
         viewModelScope.launch {
             userRepository.unfollowUser(user.id)
                 .onSuccess {
                     _isFollowing.update { false }
+                    currentUserFollowing.update { it.toMutableList().apply { remove(user) }}
+                    _followers.update { it.toMutableList().apply { remove(user) }}
                 }
                 .onFailure {
                     viewModelScope.launch {
@@ -75,6 +84,8 @@ class FollowViewModel @AssistedInject constructor(
             val response = userRepository.followUser(user.id)
             response.onSuccess {
                     _isFollowing.update { true }
+                    currentUserFollowing.update { it.toMutableList().apply { add(user) }}
+                    _followers.update { it.toMutableList().apply { add(user) }}
                 }
                 .onFailure {
                     viewModelScope.launch {
@@ -84,9 +95,9 @@ class FollowViewModel @AssistedInject constructor(
         }
     }
 
-    private fun getFollowers(user: User) {
+    private fun getFollowers() {
         viewModelScope.launch {
-            val response = userRepository.getUserFollowers(user.id)
+            val response = userRepository.getUserFollowers(targetUser.id)
             response.onSuccess {
                     _followers.update { data.followers }
                     _isFollowing.update { checkFollowing() }
@@ -99,9 +110,9 @@ class FollowViewModel @AssistedInject constructor(
         }
     }
 
-    private fun getFollowing(user: User) {
+    private fun getFollowing() {
         viewModelScope.launch {
-            userRepository.getUserFollowing(user.id)
+            userRepository.getUserFollowing(targetUser.id)
                 .onSuccess {
                     _following.update { data.following }
                 }
@@ -113,11 +124,25 @@ class FollowViewModel @AssistedInject constructor(
         }
     }
 
+    private fun getCurrentUserFollowing() {
+        viewModelScope.launch {
+            userRepository.getUserFollowing(currentUser.id)
+                .onSuccess {
+                    currentUserFollowing.update { data.following }
+                }
+                .onFailure {
+                    viewModelScope.launch {
+                        makeToastUseCase("Failed to get current user following, incorrect info might be displayed")
+                    }
+                }
+        }
+    }
+
     private fun checkFollowing(): Boolean {
         return followers.value.find { it.id == currentUser.id } != null
     }
 
-    fun checkFollowing(user: User): Boolean {
-        return followers.value.find { it.id == user.id } != null
+    fun isCurrentUserFollowing(user: User): Boolean {
+        return currentUserFollowing.value.find { it.id == user.id } != null
     }
 }

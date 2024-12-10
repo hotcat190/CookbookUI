@@ -18,7 +18,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -43,13 +42,16 @@ import com.example.androidcookbook.domain.model.post.Post
 import com.example.androidcookbook.domain.model.user.GUEST_ID
 import com.example.androidcookbook.domain.model.user.User
 import com.example.androidcookbook.ui.features.newsfeed.NewsfeedCard
-import com.example.androidcookbook.ui.features.userprofile.components.FollowButton
+import com.example.androidcookbook.ui.features.follow.FollowButton
+import com.example.androidcookbook.ui.features.follow.FollowButtonState
 import com.example.androidcookbook.ui.theme.AndroidCookbookTheme
 
 @Composable
 fun UserProfileScreen(
     user: User,
     headerButton: @Composable () -> Unit,
+    followersCount: Int,
+    followingCount: Int,
     onFollowersClick: () -> Unit,
     onFollowingClick: () -> Unit,
     modifier: Modifier = Modifier,
@@ -69,7 +71,10 @@ fun UserProfileScreen(
                     bannerPath = user.banner,
                     headerButton = headerButton,
                 )
-                UserInfo(user,
+                UserInfo(
+                    user,
+                    followersCount,
+                    followingCount,
                     onFollowersClick = onFollowersClick,
                     onFollowingClick = onFollowingClick,
                 )
@@ -137,7 +142,7 @@ fun UserProfileHeader(
     }
 }
 
-private const val isFollowingPreview = false
+private val isFollowingPreview = FollowButtonState.Follow
 
 @Composable
 private fun UserBanner(
@@ -185,6 +190,8 @@ private fun UserAvatar(avatarPath: String?) {
 @Composable
 fun UserInfo(
     user: User,
+    followersCount: Int,
+    followingCount: Int,
     onFollowersClick: () -> Unit,
     onFollowingClick: () -> Unit,
     modifier: Modifier = Modifier,
@@ -214,7 +221,7 @@ fun UserInfo(
                     }
             ) {
                 Text(
-                    text = user.totalFollowers.toString(),
+                    text = followersCount.toString(),
                     style = TextStyle(
                         fontSize = 14.sp,
                         fontWeight = FontWeight(700),
@@ -236,7 +243,7 @@ fun UserInfo(
                     .clickable { onFollowingClick() }
             ) {
                 Text(
-                    text = user.totalFollowing.toString(),
+                    text = followingCount.toString(),
                     style = TextStyle(
                         fontSize = 14.sp,
                         fontWeight = FontWeight(700),
@@ -244,7 +251,7 @@ fun UserInfo(
                     color = MaterialTheme.colorScheme.onSurface,
                 )
                 Text(
-                    text = " followings",
+                    text = " following",
                     style = TextStyle(
                         fontSize = 14.sp,
                         fontWeight = FontWeight(400),
@@ -283,8 +290,10 @@ fun ProfileDarkPreview() {
             ),
             headerButton = {
 //                EditProfileButton(onEditProfileClick = {})
-                FollowButton(onFollowButtonClick = {}, isFollowing = isFollowingPreview)
+                FollowButton(onFollowButtonClick = {}, followButtonState = isFollowingPreview)
             },
+            followersCount = 0,
+            followingCount = 1,
             onFollowersClick = {},
             onFollowingClick = {},
             content = {
@@ -317,8 +326,10 @@ fun ProfilePreview() {
             ),
             headerButton = {
 //                EditProfileButton(onEditProfileClick = {})
-                FollowButton(onFollowButtonClick = {}, isFollowing = isFollowingPreview)
+                FollowButton(onFollowButtonClick = {}, followButtonState = isFollowingPreview)
             },
+            followersCount = 0,
+            followingCount = 1,
             onFollowersClick = {},
             onFollowingClick = {},
             content = {
@@ -344,7 +355,7 @@ fun AvtPreview() {
             bannerPath = null,
             headerButton = {
 //                EditProfileButton(onEditProfileClick = {})
-                FollowButton(onFollowButtonClick = {}, isFollowing = isFollowingPreview)
+                FollowButton(onFollowButtonClick = {}, followButtonState = isFollowingPreview)
             },
         )
     }
@@ -361,9 +372,9 @@ fun UserInfoPreview() {
                 "Ly Duc",
                 null,
                 null,
-                0,
-                1,
-                ),
+            ),
+            followersCount = 0,
+            followingCount = 1,
             onFollowersClick = {},
             onFollowingClick = {},
         )

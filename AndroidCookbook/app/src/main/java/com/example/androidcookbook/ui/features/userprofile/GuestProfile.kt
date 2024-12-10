@@ -23,7 +23,7 @@ fun GuestProfile(
                 avatarPath = null,
                 headerButton = {},
             )
-            UserInfo(User(), {}, {})
+            UserInfo(User(), 0, 0, {}, {})
         }
         item {
             Column(

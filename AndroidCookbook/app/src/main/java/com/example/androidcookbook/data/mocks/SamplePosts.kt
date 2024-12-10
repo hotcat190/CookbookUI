@@ -13,7 +13,7 @@ object SampleUser {
                     id = GUEST_ID + it,
                     name = "Ly Duc",
                     avatar = null,
-                    bio = if (it % 2 == 0) "I like suffering" else "I like suffering\nand eating and drinking and playing video games",
+                    bio = if (it % 2 == 0) "I like suffering I like suffering I like sufferingI like sufferingI like sufferingI like sufferingI like suffering" else "I like suffering\nand eating and drinking and playing video games",
                     totalFollowers = 0,
                     totalFollowing = 1
                 )

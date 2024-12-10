@@ -3,6 +3,7 @@ package com.example.androidcookbook.ui.nav.dest.profile
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Text
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -16,18 +17,19 @@ import com.example.androidcookbook.ui.CookbookUiState
 import com.example.androidcookbook.ui.CookbookViewModel
 import com.example.androidcookbook.ui.common.containers.RefreshableScreen
 import com.example.androidcookbook.ui.features.follow.FollowListScreenType
+import com.example.androidcookbook.ui.features.follow.FollowViewModel
 import com.example.androidcookbook.ui.features.userprofile.GuestProfile
 import com.example.androidcookbook.ui.features.userprofile.UserPostState
 import com.example.androidcookbook.ui.features.userprofile.UserProfileScreen
 import com.example.androidcookbook.ui.features.userprofile.UserProfileUiState
 import com.example.androidcookbook.ui.features.userprofile.UserProfileViewModel
-import com.example.androidcookbook.ui.features.userprofile.components.EditProfileButton
-import com.example.androidcookbook.ui.features.userprofile.components.FollowButton
+import com.example.androidcookbook.ui.features.userprofile.EditProfileButton
 import com.example.androidcookbook.ui.features.userprofile.userPostPortion
 import com.example.androidcookbook.ui.nav.CustomNavTypes
 import com.example.androidcookbook.ui.nav.Routes
 import com.example.androidcookbook.ui.nav.utils.navigateIfNotOn
 import com.example.androidcookbook.ui.nav.utils.navigateToProfile
+import com.example.androidcookbook.ui.nav.utils.sharedViewModel
 import kotlin.reflect.typeOf
 
 fun NavGraphBuilder.userProfile(
@@ -52,9 +54,17 @@ fun NavGraphBuilder.userProfile(
             }
 
         val userProfileUiState = userProfileViewModel.uiState.collectAsState().value
+        val followViewModel = sharedViewModel<FollowViewModel, FollowViewModel.FollowViewModelFactory>(
+            it, navController, Routes.App.UserProfile(user)
+        ) { factory ->
+            factory.create(user, user)
+        }
 
         RefreshableScreen(
-            onRefresh = { userProfileViewModel.refresh() }
+            onRefresh = {
+                userProfileViewModel.refresh()
+                followViewModel.refresh()
+            }
         ) {
             when (userProfileUiState) {
                 is UserProfileUiState.Loading -> {
@@ -65,6 +75,7 @@ fun NavGraphBuilder.userProfile(
 
                 is UserProfileUiState.Success -> {
                     val userPostState = userProfileViewModel.userPostState.collectAsState().value
+
                     UserProfileScreen(
                         user = userProfileUiState.user,
                         headerButton = {
@@ -74,6 +85,8 @@ fun NavGraphBuilder.userProfile(
                                 }
                             )
                         },
+                        followersCount = followViewModel.followers.collectAsState().value.size,
+                        followingCount = followViewModel.following.collectAsState().value.size,
                         onFollowersClick = {
                             navController.navigateIfNotOn(
                                 Routes.Follow(userProfileUiState.user, FollowListScreenType.Followers)
