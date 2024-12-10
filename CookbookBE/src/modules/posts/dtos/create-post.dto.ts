@@ -249,6 +249,7 @@ export class FullReponseCommentDto{
       this.user = new ReponseUserDto(comment.user);
       this.createdAt = comment.createdAt;
       this.totalLike = comment.totalLike;
+      this.isLiked = comment.isLiked;
     }
   }
   nextPage: boolean;
@@ -268,4 +269,7 @@ export class FullReponseCommentDto{
 
   @IsOptional()
   totalLike?: number;
+
+  @IsOptional()
+  isLiked?: boolean;
 }
