@@ -5,6 +5,8 @@ import { Notification } from './entities/notification.entity';
 import { Repository } from 'typeorm';
 import { User } from '../auth/entities/user.entity';
 import { MailerService } from '../mailer/mailer.service';
+import { NotiDto } from './dtos/notification.dto';
+import * as admin from "firebase-admin";
 
 @Injectable()
 export class NotificationsService {
@@ -66,5 +68,30 @@ export class NotificationsService {
 
     await this.notificationsRepository.save(notification);
 
+  }
+  async sendNoti(notiDto: NotiDto): Promise<any> {
+    try {
+      console.log('sendNoti', notiDto);
+      const user = await this.usersRepository.findOne({ where: { id: notiDto.userId } });
+      const token = user.tokenFCM;
+      const title = notiDto.title;
+      const body = notiDto.body;
+
+      const response = await admin.messaging().send({
+        token,
+        notification: {
+          title,
+          body,
+        },
+        data : {
+          data1 : "abc",
+          data2 : "123"
+        }
+      });
+      console.log('Successfully sent message:', response);
+      return response;
+    } catch (error) {
+      throw error;
+    }
   }
 }

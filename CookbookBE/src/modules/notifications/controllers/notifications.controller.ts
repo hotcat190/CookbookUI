@@ -1,12 +1,11 @@
 // src/modules/notifications/controllers/notifications.controller.ts
-import { Controller, Get, Put, Delete, Param, UseGuards, Request, Body } from '@nestjs/common';
+import { Controller, Get, Put, Delete, Param, UseGuards, Request, Body, Post } from '@nestjs/common';
 import { NotificationsService } from '../notifications.service';
 import { JwtAuthGuard } from '../../../common/guards/jwt-auth.guard';
 import { ApiTags, ApiBearerAuth, ApiOperation, ApiResponse } from '@nestjs/swagger';
+import { NotiDto } from '../dtos/notification.dto';
 
 @ApiTags('notifications')
-@ApiBearerAuth()
-@UseGuards(JwtAuthGuard)
 @Controller('notifications')
 export class NotificationsController {
   constructor(private readonly notificationsService: NotificationsService) {}
@@ -41,4 +40,12 @@ export class NotificationsController {
   updateSettings(@Body() settings: any, @Request() req) {
     return this.notificationsService.updateSettings(req.user.id, settings);
   }
+
+  @Post('sendNoti')
+  @ApiOperation({ summary: 'Gửi thông báo' })
+  sendNotification(@Body() notiDto: NotiDto) {
+    console.log(notiDto);
+    return this.notificationsService.sendNoti(notiDto);
+  }
+
 }
