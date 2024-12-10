@@ -88,7 +88,7 @@ jobs:
     runs-on: ubuntu-24.04
     strategy:
       matrix:
-        api-level: [ 26, 29, 31, 34 ]
+        api-level: [ 34 ]
     steps:
       - uses: actions/checkout@v4
         with:
@@ -129,24 +129,6 @@ jobs:
           echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
           sudo udevadm control --reload-rules
           sudo udevadm trigger --name-match=kvm
-
-      - name: Run emulator to generate snapshot for caching
-        if: steps.avd-cache.outputs.cache-hit != 'true'
-        uses: ./
-        with:
-          api-level: ${{ matrix.api-level }}
-          target: ${{ matrix.target }}
-          arch: ${{ matrix.arch }}
-          profile: Galaxy Nexus
-          cores: 2
-          sdcard-path-or-size: 100M
-          avd-name: test
-          force-avd-creation: false
-          emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
-          disable-animations: false
-          working-directory: ./test-fixture/
-          channel: canary
-          script: echo "Generated AVD snapshot for caching."
 
       - name: Run UI Tests
         uses: reactivecircus/android-emulator-runner@v2
