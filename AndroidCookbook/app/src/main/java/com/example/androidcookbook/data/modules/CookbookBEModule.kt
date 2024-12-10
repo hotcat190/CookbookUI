@@ -43,7 +43,7 @@ object CookbookBEModule {
     @Provides
     @Singleton
     fun provideOkHttpClient(accessTokenProvider: AccessTokenProvider) = OkHttpClient.Builder()
-        .addInterceptor{ chain ->
+        .addInterceptor { chain ->
             val token = accessTokenProvider.accessToken.value
             val request = chain.request().newBuilder()
                 .apply {
