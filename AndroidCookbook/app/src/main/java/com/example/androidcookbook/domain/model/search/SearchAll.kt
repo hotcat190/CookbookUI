@@ -8,3 +8,8 @@ data class SearchAll(
     val posts: List<Post> = SamplePosts.posts,
     val users: List<User> = listOf(User())
 )
+
+data class SearchPost(
+    val nextPage: Boolean = true,
+    val posts: List<Post> = SamplePosts.posts
+)

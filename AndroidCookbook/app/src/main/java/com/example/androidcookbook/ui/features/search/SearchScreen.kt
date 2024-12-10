@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
@@ -29,6 +30,7 @@ import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.ComposeCompilerApi
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -117,7 +119,10 @@ fun SearchScreen(
                         modifier = Modifier.weight(12f),
                         verticalAlignment = Alignment.Top
                     ) {
+                        val state = rememberLazyListState()
+                        val isAtBottom = !state.canScrollForward
                         LazyColumn(
+                            state = state,
                             modifier = Modifier
                                 .padding(horizontal = 10.dp, vertical = 5.dp),
                             verticalArrangement = Arrangement.spacedBy(10.dp)
@@ -125,50 +130,31 @@ fun SearchScreen(
                             when (it) {
                                 0 -> {
                                     item {
-                                        val posts = searchUiState.searchALlResults.posts
-                                        val users = searchUiState.searchALlResults.users
-                                        val length = posts.count() + users.count()
-                                        var postsIndex = 0
-                                        var usersIndex = 0
-                                        while (postsIndex + usersIndex < length) {
-                                            if (postsIndex < posts.count() && usersIndex < users.count()) {
-                                                if (posts[postsIndex].id < users[usersIndex].id) {
-                                                    PostCard(
-                                                        post = posts[postsIndex],
-                                                        onSeeDetailsClick = {
-                                                            viewModel.ChangeCurrentPost(it)
-                                                            viewModel.ChangeScreenState(SearchScreenState.Detail)
-                                                        }
-                                                    )
-                                                    postsIndex++
-                                                } else {
-                                                    UserCard(
-                                                        onClick = {},
-                                                        user = users[usersIndex]
-                                                    )
-                                                    usersIndex++
-                                                }
-                                            } else if (postsIndex >= posts.count() && usersIndex < users.count()) {
-                                                UserCard(
-                                                    onClick = {},
-                                                    user = users[usersIndex]
-                                                )
-                                                usersIndex++
-                                            } else if (usersIndex >= users.count() && postsIndex < posts.count()) {
-                                                PostCard(
-                                                    post = posts[postsIndex],
-                                                    onSeeDetailsClick = {
-                                                        viewModel.ChangeCurrentPost(it)
-                                                        viewModel.ChangeScreenState(SearchScreenState.Detail)
-                                                    }
-                                                )
-                                                postsIndex++
+                                        SearchAllResultsScreen(
+                                            posts = searchUiState.searchALlResults.posts,
+                                            users = searchUiState.searchALlResults.users,
+                                            onSeeDetailsClick = {
+                                                viewModel.ChangeCurrentPost(it)
+                                                viewModel.ChangeScreenState(SearchScreenState.Detail)
                                             }
-                                            Spacer(modifier = Modifier.height(10.dp))
-                                        }
+                                        )
                                     }
                                 }
                                 1 -> {
+                                    if (!searchUiState.postTabState.isFail) {
+                                        items(searchUiState.postTabState.result){
+                                            PostCard(it) { }
+                                            LaunchedEffect(isAtBottom) {
+                                                if (isAtBottom && searchUiState.postTabState.nextPage) {
+                                                    viewModel.searchPost()
+                                                }
+                                            }
+                                        }
+                                    } else {
+                                        viewModel.searchPost()
+                                    }
+                                }
+                                2 -> {
                                     items(searchUiState.resultList) { item ->
                                         ResultCardTheme {
                                             ResultCard(
@@ -199,194 +185,6 @@ fun SearchScreen(
             }
         }
 
-    }
-}
-
-@Composable
-fun ResultCard(
-    onClick: () -> Unit,
-    recipe: Recipe
-) {
-    Card(
-        onClick = onClick,
-        modifier = Modifier
-            .fillMaxWidth()
-            .wrapContentHeight(),
-        shape = RoundedCornerShape(8.dp),
-        border = BorderStroke(2.dp, MaterialTheme.colorScheme.outline),
-        colors = CardDefaults.cardColors(MaterialTheme.colorScheme.surfaceContainer)
-    ) {
-        Row(
-            modifier = Modifier.height(120.dp)
-        ) {
-            AsyncImage(
-                modifier = Modifier
-                    .fillMaxHeight()
-                    .weight(1f),
-                model = ImageRequest.Builder(context = LocalContext.current)
-                    .data(recipe.strMealThumb)
-                    .crossfade(true)
-                    .build(),
-                contentDescription = null,
-                contentScale = ContentScale.Crop,
-                error = painterResource(id = R.drawable.ic_broken_image),
-                placeholder = painterResource(id = R.drawable.loading_img)
-            )
-            Column(
-                modifier = Modifier
-                    .fillMaxHeight()
-                    .weight(1f)
-                    .padding(10.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                Text(
-                    text = recipe.strMeal,
-                    modifier = Modifier
-                        .weight(2f)
-                        .fillMaxWidth()
-                        .wrapContentHeight(),
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 24.sp,
-                    textAlign = TextAlign.Start
-                )
-                Text(
-                    text = recipe.strCategory,
-                    modifier = Modifier
-                        .weight(1f)
-                        .fillMaxWidth(),
-                    fontSize = 18.sp,
-                    fontStyle = FontStyle.Italic
-                )
-                Text(
-                    text = recipe.strArea,
-                    modifier = Modifier
-                        .weight(1f)
-                        .fillMaxWidth(),
-                    fontSize = 18.sp,
-                    fontWeight = FontWeight.Medium
-                )
-            }
-        }
-    }
-}
-
-@Composable
-fun UserCard(
-    onClick: () -> Unit,
-    user: User
-) {
-    ResultCardTheme {
-        Card(
-            onClick = onClick,
-            modifier = Modifier
-                .fillMaxWidth()
-                .wrapContentHeight(),
-            shape = RoundedCornerShape(8.dp),
-            border = BorderStroke(2.dp, MaterialTheme.colorScheme.outline),
-            colors = CardDefaults.cardColors(MaterialTheme.colorScheme.surfaceContainer)
-        ) {
-            Row(
-                modifier = Modifier.height(150.dp)
-            ) {
-                AsyncImage(
-                    modifier = Modifier
-                        .fillMaxHeight()
-                        .padding(10.dp)
-                        .clip(CircleShape)
-                        .weight(1f),
-                    model = ImageRequest.Builder(context = LocalContext.current)
-                        .data(user.avatar)
-                        .crossfade(true)
-                        .build(),
-                    contentDescription = null,
-                    contentScale = ContentScale.Crop,
-                    error = painterResource(id = R.drawable.ic_broken_image),
-                    placeholder = painterResource(id = R.drawable.loading_img),
-                )
-                Column(
-                    modifier = Modifier
-                        .wrapContentHeight()
-                        .weight(2f)
-                        .padding(10.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    Text(
-                        text = user.name,
-                        modifier = Modifier
-                            .weight(2f)
-                            .fillMaxWidth()
-                            .wrapContentHeight(),
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 18.sp,
-                        textAlign = TextAlign.Start
-                    )
-                    Row(
-                        modifier = Modifier
-                            .weight(1f)
-                            .wrapContentHeight()
-                            .align(Alignment.Start),
-                    ) {
-                        Text(
-                            text = user.totalFollowers.toString(),
-                            fontSize = 15.sp,
-                            fontWeight = FontWeight.Medium
-                        )
-                        Text(
-                            text = " followers",
-                            fontSize = 15.sp
-                        )
-                    }
-                    Row(
-                        modifier = Modifier
-                            .weight(1f)
-                            .align(Alignment.Start),
-                    ) {
-                        Text(
-                            text = user.totalFollowing.toString(),
-                            fontSize = 15.sp,
-                            fontWeight = FontWeight.Medium
-                        )
-                        Text(
-                            text = " followings",
-                            fontSize = 15.sp
-                        )
-                    }
-                    Text(
-                        text = user.bio,
-                        modifier = Modifier
-                            .weight(1f)
-                            .fillMaxWidth()
-                            .wrapContentHeight(),
-                        fontSize = 15.sp,
-                        softWrap = true
-                    )
-                }
-            }
-        }
-    }
-}
-
-@Composable
-fun PostCard(
-    post: Post,
-    onSeeDetailsClick: (Post) -> Unit
-) {
-    ResultCardTheme {
-        NewsfeedCard(
-            post = post,
-            onSeeDetailsClick = onSeeDetailsClick,
-            modifier = Modifier
-                .wrapContentHeight()
-                .background(
-                    color = MaterialTheme.colorScheme.surfaceContainer,
-                    shape = RoundedCornerShape(8.dp)
-                )
-                .border(
-                    color = MaterialTheme.colorScheme.outline,
-                    width = 2.dp,
-                    shape = RoundedCornerShape(8.dp)
-                )
-        )
     }
 }
 

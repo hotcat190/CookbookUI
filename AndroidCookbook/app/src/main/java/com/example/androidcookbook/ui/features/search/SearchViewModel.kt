@@ -1,5 +1,6 @@
 package com.example.androidcookbook.ui.features.search
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.androidcookbook.data.repositories.AllSearcherRepository
@@ -8,6 +9,7 @@ import com.example.androidcookbook.domain.model.post.Post
 import com.example.androidcookbook.domain.model.recipe.Recipe
 import com.example.androidcookbook.domain.model.recipe.RecipeList
 import com.example.androidcookbook.domain.model.search.SearchAll
+import com.example.androidcookbook.domain.model.search.SearchPost
 import com.skydoves.sandwich.ApiResponse
 import com.skydoves.sandwich.onFailure
 import com.skydoves.sandwich.onSuccess
@@ -35,7 +37,7 @@ class SearchViewModel @Inject constructor(
                 val meals = data?.meals
                 if (meals != null) {
                     _uiState.update {
-                        it.copy(result = meals.toString(), resultList = meals, fail = false)
+                        it.copy(result = meals.toString(), resultList = meals, fail = false, searchQuery = searchQuery)
                     }
                     ChangeScreenState(SearchScreenState.Food)
                 } else {
@@ -50,11 +52,18 @@ class SearchViewModel @Inject constructor(
     fun searchAll(query: String) {
         viewModelScope.launch {
             val response: ApiResponse<SearchAll> = allSearcherRepository.searchAll(query)
+            _uiState.update {
+                it.copy(
+                    postTabState = SearchTabUiState(),
+                    userTabState = SearchTabUiState(),
+                    foodTabState = SearchTabUiState()
+                )
+            }
             response.onSuccess {
                 val result = data
                 if (result != null) {
                     _uiState.update {
-                        it.copy(result = data.toString(), searchALlResults = result, fail = false)
+                        it.copy(result = data.toString(), searchALlResults = result, fail = false, searchQuery = query)
                     }
                     ChangeScreenState(SearchScreenState.Food)
                 } else {
@@ -62,6 +71,51 @@ class SearchViewModel @Inject constructor(
                 }
             }.onFailure {
                 _uiState.update { it.copy(result = "Failed to fetch data", fail = true) }
+            }
+        }
+    }
+
+    fun searchPost() {
+        viewModelScope.launch {
+            val response: ApiResponse<SearchPost> = allSearcherRepository
+                .searchPosts(
+                    _uiState.value.searchQuery,
+                    _uiState.value.postTabState.currentPage + 1
+                )
+            response.onSuccess {
+                if (data.posts != null) {
+                    _uiState.update {
+                        it.copy(
+                            postTabState = SearchTabUiState(
+                                currentPage = it.postTabState.currentPage + 1,
+                                result = it.postTabState.result + data.posts,
+                                isFail = false,
+                                messageStr = "Search successfully"
+                            )
+                        )
+                    }
+
+                } else {
+                    _uiState.update {
+                        it.copy(
+                            postTabState = SearchTabUiState(
+                                isFail = true,
+                                messageStr = "Couldn't find any posts"
+                            )
+                        )
+                    }
+                }
+            }.onFailure {
+                _uiState.update {
+                    it.copy(
+                        postTabState = SearchTabUiState(
+                            isFail = true,
+                            messageStr = "Search failed"
+                        )
+                    )
+                }
+                Log.d("Search Post", "searchPost: " )
+
             }
         }
     }
