@@ -19,3 +19,8 @@ export class LoginDto {
   @ApiProperty({ description: 'Token FCM'})
   tokenFCM?: string;
 }
+export class TokenDto {
+  @IsString()
+  @ApiProperty({ description: 'Token FCM' })
+  token: string;
+}

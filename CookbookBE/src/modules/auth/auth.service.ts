@@ -1,7 +1,7 @@
 // src/modules/auth/auth.service.ts
 import { Injectable, BadRequestException, UnauthorizedException, NotFoundException, InternalServerErrorException } from '@nestjs/common';
 import { RegisterDto } from './dtos/register.dto';
-import { LoginDto } from './dtos/login.dto';
+import { LoginDto, TokenDto } from './dtos/login.dto';
 import { ForgotDto } from './dtos/forgot.dto';
 import { ResetPassword1Dto, ResetPassword2Dto } from './dtos/reset-password.dto';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -100,7 +100,7 @@ export class AuthService {
 
     const payload = { sub: user.id, username: user.username, roles: user.roles };
     const token = this.jwtService.sign(payload);
-    
+
     if(tokenFCM !== null && tokenFCM !== undefined){
       user.tokenFCM = tokenFCM;
       await this.usersRepository.save(user);
@@ -368,12 +368,12 @@ export class AuthService {
     return { isFavorited: false };
 
   }
-  async setTokenFCM(tokenFCM: string, userId: number): Promise<any> {
+  async setTokenFCM(tokenDto: TokenDto, userId: number): Promise<any> {
     const user = await this.usersRepository.findOne({ where: { id: userId } });
     if (!user) {
       throw new NotFoundException('User not found');
     }
-    user.tokenFCM = tokenFCM;
+    user.tokenFCM = tokenDto.token;
     await this.usersRepository.save(user);
     return { message: 'Đã cập nhật tokenFCM.' };
   }
