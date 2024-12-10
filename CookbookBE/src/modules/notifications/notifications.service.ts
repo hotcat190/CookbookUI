@@ -54,24 +54,9 @@ export class NotificationsService {
     return { message: 'Cài đặt thông báo đã được cập nhật.' };
   }
 
-  async sendNotification(userId: number, message: string, relatedId: number, type: string): Promise<void> {
-    const user = await this.usersRepository.findOne({ where: { id: userId } });
-    if (!user) return;
 
-    const notification = this.notificationsRepository.create({
-      user,
-      message,
-      relatedId,
-      type,
-      isRead: false,
-    });
-
-    await this.notificationsRepository.save(notification);
-
-  }
   async sendNoti(notiDto: NotiDto): Promise<any> {
     try {
-      console.log('sendNoti', notiDto);
       const user = await this.usersRepository.findOne({ where: { id: notiDto.userId } });
       const token = user.tokenFCM;
       const title = notiDto.title;
@@ -88,10 +73,62 @@ export class NotificationsService {
           data2 : "123"
         }
       });
-      console.log('Successfully sent message:', response);
       return response;
     } catch (error) {
       throw error;
     }
   }
+  async sendNotification(type_noti: string, userId: number, title: string, body: string, data1?: string, data2?: string, data3?: string, data4?: string ) {
+    try {
+      const user = await this.usersRepository.findOne({ where: { id: userId } });
+      const token = user.tokenFCM;
+
+      await admin.messaging().send({
+        token,
+        notification: {
+          title,
+          body,
+          
+        },
+        data : {
+          type: type_noti || "TYPE",
+          data_1 : data1 || "DATA1",
+          data_2 : data2 || "DATA2",
+          data_3 : data3 || "DATA3",
+          data_4 : data4 || "DATA4"
+        }
+      });
+    } catch (error) {
+      throw error;
+    }
+  }
+  async sendNotificationWithImage(type_noti: string, userId: number, title: string, body: string, imageU: string, data1?: string, data2?: string, data3?: string, data4?: string ) {
+    try {
+      const user = await this.usersRepository.findOne({ where: { id: userId } });
+      const token = user.tokenFCM;
+
+      await admin.messaging().send({
+        token,
+        android: {
+          notification: {
+            title,
+            body,
+            imageUrl: imageU || "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f9/Unicode_0x003F.svg/1200px-Unicode_0x003F.svg.png",
+            icon: "ic_launcher",
+          }
+        },    
+        data : {
+          type: type_noti || "TYPE",
+          data_1 : data1 || "DATA1",
+          data_2 : data2 || "DATA2",
+          data_3 : data3 || "DATA3",
+          data_4 : data4 || "DATA4"
+        }
+      });
+    } catch (error) {
+      console.log(error);
+      throw error;
+    }
+  }
+
 }

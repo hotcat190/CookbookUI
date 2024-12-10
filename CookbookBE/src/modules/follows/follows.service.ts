@@ -21,6 +21,10 @@ export class FollowsService {
       }
 
       const targetUser = await this.usersRepository.findOne({ where: { id: targetUserId } });
+      const user = await this.usersRepository.findOne({
+         where: { id: currentUserId },
+         select: ['name', 'avatar'],
+      });
       if (!targetUser) {
       throw new NotFoundException('Người dùng không tồn tại.');
       }
@@ -35,6 +39,8 @@ export class FollowsService {
       const follower = await this.usersRepository.findOne({ where: { id: currentUserId } });
       const follow = this.followsRepository.create({ follower, following: targetUser });
       await this.followsRepository.save(follow);
+      console.log(user.avatar);
+      await this.notificationsService.sendNotificationWithImage("follow",targetUserId,`${user.name}`,`${user.name} đã theo dõi bạn.`,user.avatar,`${currentUserId}`);
       return { message: 'Đã theo dõi người dùng.'};
 
     } catch (error) {
