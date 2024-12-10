@@ -9,6 +9,7 @@ import com.example.androidcookbook.data.providers.DataStoreManager
 import com.example.androidcookbook.data.repositories.AuthRepository
 import com.example.androidcookbook.domain.model.auth.SignInRequest
 import com.example.androidcookbook.domain.model.auth.SignInResponse
+import com.example.androidcookbook.domain.model.user.GUEST_ID
 import com.example.androidcookbook.domain.model.user.User
 import com.example.androidcookbook.ui.features.auth.AuthViewModel
 import com.example.androidcookbook.ui.nav.utils.sharedViewModel
@@ -63,7 +64,7 @@ class CookbookViewModel @Inject constructor(
                         )
                     }.collect { (username, password) ->
 
-                        if (user.value.id == 0 && username != null && password != null) {
+                        if (user.value.id == GUEST_ID && username != null && password != null) {
                             val response = authRepository.login(SignInRequest(username, password))
                             response.onSuccess {
                                 updateUser(data, username, password)

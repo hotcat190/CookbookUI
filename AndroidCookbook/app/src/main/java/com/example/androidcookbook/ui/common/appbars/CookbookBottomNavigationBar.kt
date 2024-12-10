@@ -3,6 +3,7 @@ package com.example.androidcookbook.ui.common.appbars
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.asPaddingValues
@@ -33,8 +34,12 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.fragment.app.FragmentManager.BackStackEntry
 import androidx.navigation.NavDestination
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.rememberNavController
 import com.example.androidcookbook.R
+import com.example.androidcookbook.domain.model.user.User
 import com.example.androidcookbook.ui.nav.Routes
 import com.example.androidcookbook.ui.nav.utils.hasRoute
 import com.example.androidcookbook.ui.theme.AndroidCookbookTheme
@@ -46,6 +51,7 @@ fun CookbookBottomNavigationBar(
     onNewsfeedClick: () -> Unit,
     onUserProfileClick: () -> Unit,
     onCreatePostClick: () -> Unit,
+    currentUser: User,
     currentDestination: NavDestination? = null,
 ) {
 
@@ -59,11 +65,11 @@ fun CookbookBottomNavigationBar(
 
         Column {
             HorizontalDivider(
-                thickness = 1.dp,
-                modifier = Modifier
-                    .height(1.dp)
-                    .fillMaxWidth(),
-                color = MaterialTheme.colorScheme.onSurface.copy(0.25F)
+//                thickness = 1.dp,
+//                modifier = Modifier
+//                    .height(1.dp)
+//                    .fillMaxWidth(),
+//                color = MaterialTheme.colorScheme.onSurface.copy(0.25F)
             )
 
             NavigationBar(
@@ -71,6 +77,7 @@ fun CookbookBottomNavigationBar(
                 modifier = Modifier
                     .padding(WindowInsets.navigationBars.asPaddingValues())
                     .consumeWindowInsets(WindowInsets.navigationBars.asPaddingValues())
+                    .padding(bottom = 4.dp)
                     .heightIn(max = 50.dp),
             ) {
                 NewsfeedNavigationBarItem(currentDestination, onNewsfeedClick, colors)
@@ -95,7 +102,7 @@ fun CookbookBottomNavigationBar(
 
                 CategoryNavigationBarItem(currentDestination, onCategoryClick, colors)
 
-                UserProfileNavigationBarItem(currentDestination, onUserProfileClick, colors)
+                UserProfileNavigationBarItem(currentDestination, currentUser, onUserProfileClick, colors)
             }
         }
 
@@ -130,18 +137,19 @@ private fun RowScope.CookbookNavigationBarItem(
 @Composable
 private fun RowScope.UserProfileNavigationBarItem(
     currentDestination: NavDestination?,
+    currentUser: User,
     onUserProfileClick: () -> Unit,
     colors: NavigationBarItemColors
 ) {
     CookbookNavigationBarItem(
         currentDestination = currentDestination,
-        route = Routes.App.UserProfile(0),
+        route = Routes.App.UserProfile(currentUser),
         onClick = onUserProfileClick,
         icon = {
             Icon(
                 painter = painterResource(R.drawable.icon_user_profile),
                 contentDescription = "User Profile",
-                tint = Color(0xFF0D1114)
+//                tint = Color(0xFF0D1114)
             )
         },
 //        label = {
@@ -170,7 +178,7 @@ private fun RowScope.NewsfeedNavigationBarItem(
                 painter = painterResource(R.drawable.home),
                 contentDescription = "Newsfeed",
                 modifier = Modifier,
-                tint = Color(0xFF0D1114)
+//                tint = Color(0xFF0D1114)
 
             )
         },
@@ -200,7 +208,7 @@ private fun RowScope.AiChatNavigationBarItem(
                 painter = painterResource(R.drawable.ai_gen_light_mode),
                 contentDescription = "Chat",
                 modifier = Modifier.scale(1.2F),
-                tint = Color(0xFF0D1114)
+//                tint = Color(0xFF0D1114)
 
             )
         },
@@ -229,7 +237,7 @@ private fun RowScope.CategoryNavigationBarItem(
             Icon(
                 painter = painterResource(R.drawable.icon_category),
                 contentDescription = "Home",
-                tint = Color(0xFF0D1114)
+//                tint = Color(0xFF0D1114)
 
             )
         },
@@ -248,7 +256,7 @@ private fun RowScope.CategoryNavigationBarItem(
 @Composable
 fun NavBarPreview() {
     AppBarTheme {
-        CookbookBottomNavigationBar({}, {}, {}, {}, {})
+        CookbookBottomNavigationBar({}, {}, {}, {}, {}, currentUser = User())
     }
 }
 
@@ -256,6 +264,34 @@ fun NavBarPreview() {
 @Composable
 fun NavBarDarkPreview() {
     AppBarTheme(darkTheme = true) {
-        CookbookBottomNavigationBar({}, {}, {}, {}, {})
+        CookbookBottomNavigationBar(
+            {}, {}, {}, {}, {}, currentUser = User()
+        )
+    }
+}
+
+@Preview
+@Composable
+fun NavBarItemPreview() {
+    AppBarTheme(darkTheme = true) {
+        Row {
+            NavigationBarItem(
+                selected = true,
+                onClick = { },
+                icon = {
+                    Box(
+                        modifier = Modifier.size(24.dp)
+                    ) {
+                        Icon(
+                            painter = painterResource(R.drawable.home),
+                            contentDescription = "Newsfeed",
+                            modifier = Modifier,
+                        )
+                    }
+                },
+//        label = label,
+                alwaysShowLabel = false,
+            )
+        }
     }
 }
