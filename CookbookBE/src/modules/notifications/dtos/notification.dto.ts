@@ -1,6 +1,7 @@
 // src/modules/notifications/dtos/notification.dto.ts
 import { Expose } from 'class-transformer';
 import { ApiProperty } from '@nestjs/swagger';
+import { IsNumber, IsString } from 'class-validator';
 
 export class NotificationDto {
   @ApiProperty({ description: 'ID của thông báo' })
@@ -26,4 +27,16 @@ export class NotificationDto {
   @ApiProperty({ description: 'Ngày tạo thông báo' })
   @Expose()
   createdAt: Date;
+}
+export class NotiDto {
+  @IsNumber()
+  @ApiProperty({ description: 'ID của người dùng', example: 1 })
+  userId: number;
+  @IsString()
+  @ApiProperty({ description: 'Tiêu đề thông báo', example: 'New Notification' })
+  title: string;
+  @IsString()
+  @ApiProperty({ description: 'Nội dung thông báo', example: 'This is a new notification' })
+  body: string;
+
 }

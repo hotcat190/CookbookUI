@@ -3,7 +3,7 @@ import { Injectable, NotFoundException, ForbiddenException, BadRequestException 
 import { InjectRepository } from '@nestjs/typeorm';
 import { Post } from './entities/post.entity';
 import { Comment } from './entities/comment.entity';
-import { Repository } from 'typeorm';
+import { Like, Repository } from 'typeorm';
 import { CreateCommentDto, CreatePostDto, FullReponseCommentDto, FullReponsePostDto, LiteReponsePostDto, ReponseUserDto } from './dtos/create-post.dto';
 import { UpdatePostDto } from './dtos/update-post.dto';
 import { User } from '../auth/entities/user.entity';
@@ -18,7 +18,33 @@ export class PostsService {
     @InjectRepository(Comment) private commentsRepository: Repository<Comment>,
     private mailerService: MailerService,
   ) {}
-
+  async checkLike(postId: number, userId: number): Promise<any> {
+    const post = await this.postsRepository
+      .createQueryBuilder('post')
+      .leftJoin('post.likes', 'likes')
+      .select(['post', 'likes.id'])
+      .where('post.id = :id', { id: postId })
+      .getOne();
+    if (!post) {
+      throw new NotFoundException('Bài viết không tồn tại.');
+    }
+    console.log(userId); 
+    console.log(post.likes);
+    if (post.likes.some((like) => like.id == userId)) {
+      return { isLiked: true };
+    }
+    return { isLiked: false };
+  }
+  async checkLikeComment(commentId: number, userId: number): Promise<any> {
+    const comment = await this.commentsRepository.findOne({ where: { id: commentId }, relations: ['likes'] });
+    if (!comment) {
+      throw new NotFoundException('Bình luận không tồn tại.');
+    }
+    if (comment.likes.some((like) => like.id == userId)) {
+      return { isLiked: true };
+    }
+    return { isLiked: false };
+  }
   async createPost(createPostDto: CreatePostDto, userId: number): Promise<any> {
     const user = await this.usersRepository.findOne({ where: { id: userId } });
     const post = this.postsRepository.create({
@@ -86,24 +112,41 @@ export class PostsService {
     const itemsPerPage = 10;
     const startIndex = (page - 1) * itemsPerPage;
     if (likes.length > itemsPerPage*page) {
-      return {nextPage: "true", likes: likes.slice(startIndex, startIndex + itemsPerPage).map(like => new ReponseUserDto(like))};
+      return {nextPage: true, likes: likes.slice(startIndex, startIndex + itemsPerPage).map(like => new ReponseUserDto(like))};
     }
     else{
-      return {nextPage: "false", likes: likes.slice(startIndex, startIndex + itemsPerPage).map(like => new ReponseUserDto(like))};
+      return {nextPage: false, likes: likes.slice(startIndex, startIndex + itemsPerPage).map(like => new ReponseUserDto(like))};
     }
   }
-  async getComments(postId: number, page: number): Promise<any> {
-    const comments = await this.commentsRepository.find({
-      where: { post: { id: postId } }
-    });
+  async getComments(postId: number, userId: number, page: number): Promise<any> {
 
+    const comments = await this.commentsRepository
+      .createQueryBuilder('comment')
+      .leftJoinAndSelect('comment.user', 'user')
+      .leftJoin('comment.likes', 'likes')
+      .select([
+        'comment.id',
+        'comment.content',
+        'comment.totalLike',
+        'comment.createdAt',
+        'user',
+        'likes.id',
+      ])
+      .where('comment.post = :postId', { postId })
+      .getMany()
+      .then((comments) => comments.map((comment) => {
+        comment.isLiked = comment.likes.some((like) => like.id == userId);
+        return comment;
+      }));
     const itemsPerPage = 10;
     const startIndex = (page - 1) * itemsPerPage;
     if (comments.length > itemsPerPage*page) {
-      return {nextPage: "true", comments: comments.slice(startIndex, startIndex + itemsPerPage).map(comment => new FullReponseCommentDto(comment))};
+      return {nextPage: true, comments: comments.slice(startIndex, startIndex + itemsPerPage).map(comment =>
+         new FullReponseCommentDto(comment)
+        )};
     }
     else{
-      return {nextPage: "false", comments: comments.slice(startIndex, startIndex + itemsPerPage).map(comment => new FullReponseCommentDto(comment))};
+      return {nextPage: false, comments: comments.slice(startIndex, startIndex + itemsPerPage).map(comment => new FullReponseCommentDto(comment))};
     }
   }
   async likePost(postId: number, userId: number): Promise<any> {
@@ -127,7 +170,19 @@ export class PostsService {
     await this.postsRepository.save(post);
     return { message: 'Đã thích bài viết.', totalLike: post.totalLike };
   }
-
+  async likeComment(commentId: number, userId: number): Promise<any> {
+    
+    const comment = await this.commentsRepository.findOne({ where: { id: commentId }, relations: ['likes'] });
+    if (!comment) {
+      throw new NotFoundException('Bình luận không tồn tại.');
+    }
+    if (comment.likes.some((like) => like.id === userId)) {
+      throw new BadRequestException('Bạn đã thích bình luận này trước đó.');
+    }
+    comment.likes.push({ id: userId } as User);
+    await this.commentsRepository.save(comment);
+    return { message: 'Đã thích bình luận.' };
+  }
   async unlikePost(postId: number, userId: number): Promise<any> {
     const post = await this.postsRepository
       .createQueryBuilder('post')
@@ -151,8 +206,58 @@ export class PostsService {
     await this.postsRepository.save(post);
     return { message: 'Đã bỏ thích bài viết.', totalLike: post.totalLike };
   }
-  
-  async getNewfeeds(userId: number, limit: number): Promise<any> {
+  async unlikeComment(commentId: number, userId: number): Promise<any> {
+    const comment = await this.commentsRepository.findOne({ where: { id: commentId }, relations: ['likes'] });
+    if (!comment) {
+      throw new NotFoundException('Bình luận không tồn tại.');
+    }
+    const likeIndex = comment.likes.findIndex((like) => like.id === userId);
+    if (likeIndex === -1) {
+      throw new BadRequestException('Bạn chưa thích bình luận này.');
+    }
+    comment.likes.splice(likeIndex, 1);
+    await this.commentsRepository.save(comment);
+    return { message: 'Đã bỏ thích bình luận.' };
+  }
+  async searchAll(query: string): Promise<any> {
+    const posts = await this.postsRepository.find({
+      where: [
+        { title: Like(`%${query}%`) },
+        { description: Like(`%${query}%`) },
+      ],
+      take: 10,
+    });
+    const users = await this.usersRepository.find({
+      where: [
+        { username: Like(`%${query}%`) },
+        { name: Like(`%${query}%`) },
+      ],
+      take: 10,
+      relations: ['followers', 'following'],
+    });
+
+    return {
+      posts: posts.map(post => new LiteReponsePostDto(post)),
+      users: users.map(user => new ReponseUserDto(user)),
+    };
+  }
+  async searchPost(query: string, page: number): Promise<any> {
+    const posts = await this.postsRepository.find({
+      where: [
+        { title: Like(`%${query}%`) },
+        { description: Like(`%${query}%`) },
+      ],
+    });
+    const itemsPerPage = 10;
+    const startIndex = (page - 1) * itemsPerPage;
+    if (posts.length > itemsPerPage*page) {
+      return {nextPage: true, posts: posts.slice(startIndex, startIndex + itemsPerPage).map(post => new LiteReponsePostDto(post))};
+    }
+    else{
+      return {nextPage: false, posts: posts.slice(startIndex, startIndex + itemsPerPage).map(post => new LiteReponsePostDto(post))};
+    }
+  }
+  async getNewsfeed(userId: number, limit: number): Promise<any> {
     const currentTime = new Date();
     const posts = await this.postsRepository.find();
     const scoredPosts = posts.map(post => {
@@ -195,7 +300,18 @@ export class PostsService {
     await this.postsRepository.save(post);
     return { message: 'Thêm bình luận thành công.'};
   }
-
+  async updateComment(commentId: number, createCommentDto: CreateCommentDto, userId: number): Promise<any> {
+    const comment = await this.commentsRepository.findOne({ where: { id: commentId }, relations: ['user'] });
+    if (!comment) {
+      throw new NotFoundException('Bình luận không tồn tại.');
+    }
+    if (comment.user.id !== userId) {
+      throw new ForbiddenException('Bạn không có quyền chỉnh sửa bình luận này.');
+    }
+    comment.content = createCommentDto.content;
+    await this.commentsRepository.save(comment);
+    return { message: 'Chỉnh sửa bình luận thành công.'};
+  }
   async deleteComment(commentId: number, userId: number): Promise<any> {
     const comment = await this.commentsRepository.findOne({ where: { id: commentId }, relations: ['user'] });
     if (!comment) {
@@ -208,6 +324,6 @@ export class PostsService {
 
     return { message: 'Xóa bình luận thành công.' };
   }
-
+  
   
 }
