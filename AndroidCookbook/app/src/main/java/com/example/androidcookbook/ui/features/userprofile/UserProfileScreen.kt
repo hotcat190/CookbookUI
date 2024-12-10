@@ -201,6 +201,7 @@ fun UserInfo(
                 fontWeight = FontWeight(600),
             ),
             color = MaterialTheme.colorScheme.onSurface,
+            modifier = Modifier.padding(top = 4.dp),
         )
         if (user.id == GUEST_ID) {
             return@Column

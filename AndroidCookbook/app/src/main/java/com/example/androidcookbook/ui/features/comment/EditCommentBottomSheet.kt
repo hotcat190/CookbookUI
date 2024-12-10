@@ -1,4 +1,4 @@
-package com.example.androidcookbook.ui.features.post.details
+package com.example.androidcookbook.ui.features.comment
 
 import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.Column

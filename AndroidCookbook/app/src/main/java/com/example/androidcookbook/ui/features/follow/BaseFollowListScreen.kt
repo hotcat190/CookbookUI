@@ -130,16 +130,16 @@ private fun FollowScreenTopBar(
             verticalAlignment = Alignment.CenterVertically
         ) {
             FollowScreenNavigationItem(
-                text = "Following",
-                selected = type == FollowListScreenType.Following,
-                onClick = onFollowingNavigate,
+                text = "Followers",
+                selected = type == FollowListScreenType.Followers,
+                onClick = onFollowersNavigate,
                 modifier = Modifier
                     .weight(1F)
             )
             FollowScreenNavigationItem(
-                text = "Followers",
-                selected = type == FollowListScreenType.Followers,
-                onClick = onFollowersNavigate,
+                text = "Following",
+                selected = type == FollowListScreenType.Following,
+                onClick = onFollowingNavigate,
                 modifier = Modifier
                     .weight(1F)
             )

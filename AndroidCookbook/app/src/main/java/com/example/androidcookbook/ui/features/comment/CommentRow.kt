@@ -1,4 +1,4 @@
-package com.example.androidcookbook.ui.features.post.details
+package com.example.androidcookbook.ui.features.comment
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.LocalIndication
@@ -15,24 +15,10 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.Send
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.ModalBottomSheet
-import androidx.compose.material3.SheetState
-import androidx.compose.material3.SheetValue
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -46,9 +32,7 @@ import androidx.compose.ui.input.pointer.pointerInteropFilter
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.TextUnit
@@ -59,58 +43,7 @@ import com.example.androidcookbook.domain.model.user.User
 import com.example.androidcookbook.ui.common.iconbuttons.LikeButton
 import com.example.androidcookbook.ui.common.utils.apiDateFormatter
 import com.example.androidcookbook.ui.components.post.SmallAvatar
-import com.example.androidcookbook.ui.theme.transparentTextFieldColors
 import java.time.LocalDate
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun CommentBottomSheet(
-    comments: List<Comment>,
-    user: User,
-    onSendComment: (String) -> Unit,
-    onDeleteComment: (Comment) -> Unit,
-    onEditComment: (Comment) -> Unit,
-    onLikeComment: (Comment) -> Unit,
-    onUserClick: (User) -> Unit,
-    onDismiss: () -> Unit,
-    sheetState: SheetState,
-    modifier: Modifier,
-) {
-    ModalBottomSheet(
-        onDismissRequest = onDismiss,
-        sheetState = sheetState,
-        modifier = modifier
-            .safeDrawingPadding()
-            .fillMaxSize()
-    ) {
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = Modifier
-                .fillMaxSize()
-                .weight(1F),
-        ) {
-            Text(
-                text = "Comments",
-                fontWeight = FontWeight.Bold,
-            )
-            LazyColumn {
-                items(comments) { comment ->
-                    CommentRow(
-                        comment = comment,
-                        currentUser = user,
-                        onDeleteComment = onDeleteComment,
-                        onEditComment = onEditComment,
-                        onLikeComment = onLikeComment,
-                        onUserClick = onUserClick,
-                    )
-                }
-            }
-        }
-        HorizontalDivider()
-
-        WriteCommentRow(user, onUserClick, onSendComment)
-    }
-}
 
 @OptIn(ExperimentalComposeUiApi::class, ExperimentalFoundationApi::class)
 @Composable
@@ -280,92 +213,5 @@ fun CommentRow(
 //                )
 //            }
 //        }
-    }
-}
-
-@Composable
-fun WriteCommentRow(
-    user: User,
-    onUserClick: (User) -> Unit,
-    onSendComment: (String) -> Unit,
-) {
-    val focusManager = LocalFocusManager.current
-    Row(
-        verticalAlignment = Alignment.CenterVertically,
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 8.dp)
-    ) {
-        var commentContent by remember { mutableStateOf("") }
-
-        SmallAvatar(
-            author = user,
-            onUserClick = onUserClick,
-        )
-        Spacer(Modifier.width(8.dp))
-        TextField(
-            value = commentContent,
-            onValueChange = { commentContent = it },
-            placeholder = {
-                Text("Write a comment...")
-            },
-            colors = transparentTextFieldColors(),
-            modifier = Modifier.weight(1F)
-        )
-        IconButton(
-            onClick = {
-                onSendComment(commentContent)
-                commentContent = ""
-                focusManager.clearFocus()
-            }
-        ) {
-            Icon(
-                imageVector = Icons.AutoMirrored.Filled.Send,
-                contentDescription = "Send",
-                tint = MaterialTheme.colorScheme.primary,
-            )
-        }
-    }
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-@Preview
-fun CommentBottomSheetPreview() {
-    CommentBottomSheetTheme {
-        CommentBottomSheet(comments = listOf(
-            Comment(
-                content = "Lorem ipsum dolor sit amet, small consectetur adipiscing elit.",
-            ),
-            Comment(
-                content = "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
-            ),
-            Comment(
-                content = "Lorem dolor sit amet, small consectetur elit.",
-            ),
-            Comment(
-                content = "Lorem ipsum dolor sit, small consectetur adipiscing elit.",
-            ),
-            Comment(
-                content = "Lorem sit amet, small consectetur adipiscing elit.",
-            ),
-            Comment(
-                content = "Lorem sit amet.",
-            ),
-            Comment(
-                content = "Lorem sit amet, small consectetur adipiscing elit, lorem sit amet, small consectetur adipiscing elit, small,",
-            ),
-        ), user = User(
-            id = 1,
-            name = "Username",
-        ), onSendComment = {}, {}, {}, {}, onDismiss = {}, sheetState = SheetState(
-            skipPartiallyExpanded = true,
-            density = Density(LocalContext.current),
-            initialValue = SheetValue.Expanded,
-            confirmValueChange = { true },
-        ),
-            onUserClick = {},
-            modifier = Modifier
-        )
     }
 }

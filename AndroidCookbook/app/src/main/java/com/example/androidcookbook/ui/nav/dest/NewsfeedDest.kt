@@ -46,6 +46,9 @@ fun NavGraphBuilder.newsfeed(
                     } else {
                         navController.navigate(Routes.OtherProfile(user))
                     }
+                },
+                onLoadMore = {
+                    newsfeedViewModel.loadMore()
                 }
             )
         }

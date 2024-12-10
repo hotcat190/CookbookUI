@@ -10,6 +10,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import com.example.androidcookbook.data.mocks.SamplePosts
 import com.example.androidcookbook.domain.model.post.Post
 import com.example.androidcookbook.domain.model.user.User
+import com.example.androidcookbook.ui.components.EndlessLazyColumn
 import com.example.androidcookbook.ui.theme.AndroidCookbookTheme
 
 @Composable
@@ -20,24 +21,23 @@ fun NewsfeedScreen(
     onDeletePost: (Post) -> Unit,
     onSeeDetailsClick: (Post) -> Unit,
     onUserClick: (User) -> Unit,
+    onLoadMore: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    LazyColumn(
+    EndlessLazyColumn(
+        items = posts,
+        itemKey = { post -> post.id },
+        loadMore = onLoadMore,
         modifier = modifier
     ) {
-        items(
-            posts,
-            key = { post -> post.id }
-        ) { post ->
-            NewsfeedCard(
-                post = post,
-                currentUser = currentUser,
-                onEditPost = { onEditPost(post) },
-                onDeletePost = { onDeletePost(post) },
-                onUserClick = onUserClick,
-                onSeeDetailsClick = onSeeDetailsClick
-            )
-        }
+        post -> NewsfeedCard(
+            post = post,
+            currentUser = currentUser,
+            onEditPost = { onEditPost(post) },
+            onDeletePost = { onDeletePost(post) },
+            onUserClick = onUserClick,
+            onSeeDetailsClick = onSeeDetailsClick
+        )
     }
 }
 
@@ -48,7 +48,7 @@ fun NewsfeedCardPreview() {
         NewsfeedScreen(
             posts = SamplePosts.posts,
             currentUser = User(),
-            {}, {}, {}, {},
+            {}, {}, {}, {}, {},
             modifier = Modifier.background(MaterialTheme.colorScheme.background)
         )
     }
@@ -61,7 +61,7 @@ fun NewsfeedCardPreviewDarkTheme() {
         NewsfeedScreen(
             posts = SamplePosts.posts,
             currentUser = User(),
-            {}, {}, {}, {},
+            {}, {}, {}, {}, {},
             modifier = Modifier.background(MaterialTheme.colorScheme.background)
         )
     }

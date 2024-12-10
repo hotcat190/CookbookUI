@@ -15,7 +15,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
@@ -23,6 +22,7 @@ import com.example.androidcookbook.domain.model.post.Post
 import com.example.androidcookbook.domain.model.user.User
 import com.example.androidcookbook.ui.common.utils.apiDateFormatter
 import com.example.androidcookbook.ui.components.post.PostHeader
+import com.example.androidcookbook.ui.components.post.PostTitle
 import java.time.LocalDate
 
 @Composable
@@ -50,16 +50,12 @@ fun NewsfeedCard(
         )
         Column(
             modifier = Modifier
+                .fillMaxWidth()
                 .padding(horizontal = 16.dp)
                 .padding(bottom = 16.dp)
         ) {
             Spacer(modifier = Modifier.height(16.dp))
-            Text(
-                text = post.title,
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.onSurface,
-            )
+            PostTitle(post.title)
             if (post.mainImage != null) {
                 AsyncImage(
                     model = ImageRequest.Builder(LocalContext.current)
@@ -92,3 +88,4 @@ fun NewsfeedCard(
         }
     }
 }
+

@@ -13,9 +13,9 @@ import androidx.navigation.toRoute
 import com.example.androidcookbook.domain.model.post.Post
 import com.example.androidcookbook.ui.CookbookUiState
 import com.example.androidcookbook.ui.CookbookViewModel
-import com.example.androidcookbook.ui.features.post.details.CommentBottomSheet
-import com.example.androidcookbook.ui.features.post.details.CommentBottomSheetTheme
-import com.example.androidcookbook.ui.features.post.details.EditCommentBottomSheet
+import com.example.androidcookbook.ui.features.comment.CommentBottomSheet
+import com.example.androidcookbook.ui.features.comment.CommentBottomSheetTheme
+import com.example.androidcookbook.ui.features.comment.EditCommentBottomSheet
 import com.example.androidcookbook.ui.features.post.details.EditCommentState
 import com.example.androidcookbook.ui.features.post.details.PostDetailsScreen
 import com.example.androidcookbook.ui.features.post.details.PostDetailsViewModel

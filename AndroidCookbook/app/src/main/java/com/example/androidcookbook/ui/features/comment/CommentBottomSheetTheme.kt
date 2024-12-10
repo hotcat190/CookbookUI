@@ -1,4 +1,4 @@
-package com.example.androidcookbook.ui.features.post.details
+package com.example.androidcookbook.ui.features.comment
 
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme

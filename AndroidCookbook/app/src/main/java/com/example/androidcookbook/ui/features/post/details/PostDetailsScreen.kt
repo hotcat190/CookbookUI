@@ -12,7 +12,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
@@ -30,7 +29,6 @@ import androidx.compose.material.IconButton
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Bookmark
-import androidx.compose.material.icons.outlined.BookmarkAdd
 import androidx.compose.material.icons.outlined.BookmarkBorder
 import androidx.compose.material.icons.outlined.Share
 import androidx.compose.material3.MaterialTheme
@@ -66,6 +64,9 @@ import com.example.androidcookbook.domain.model.user.User
 import com.example.androidcookbook.ui.common.iconbuttons.LikeButton
 import com.example.androidcookbook.ui.common.utils.apiDateFormatter
 import com.example.androidcookbook.ui.components.post.PostHeader
+import com.example.androidcookbook.ui.components.post.PostTitle
+import com.example.androidcookbook.ui.features.comment.CommentRow
+import com.example.androidcookbook.ui.features.comment.WriteCommentRow
 import java.time.LocalDate
 
 enum class DetailState {
@@ -182,6 +183,12 @@ private fun PostDetailsInfo(
             .padding(15.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
+        PostTitle(
+            title = post.title,
+            modifier = Modifier
+                .align(Alignment.Start)
+                .padding(bottom = 16.dp)
+        )
         if (post.mainImage != null) {
             AsyncImage(
                 model = ImageRequest.Builder(LocalContext.current)
@@ -349,7 +356,7 @@ fun OutlinedIconButton(
         Icon(
             icon,
             contentDescription = null,
-            tint = MaterialTheme.colorScheme.secondary
+            tint = MaterialTheme.colorScheme.onSurface
         )
     }
 }
@@ -365,7 +372,7 @@ fun LobsterTextButton(
             .wrapContentHeight()
             .width(110.dp)
             .padding(5.dp),
-        colors = ButtonDefaults.buttonColors(MaterialTheme.colorScheme.tertiary),
+        colors = ButtonDefaults.buttonColors(MaterialTheme.colorScheme.secondary),
         shape = RoundedCornerShape(size = 999.dp),
         onClick = onclick
     ) {
@@ -375,7 +382,7 @@ fun LobsterTextButton(
                 fontSize = 14.sp,
                 fontFamily = FontFamily(Font(R.font.lobster_regular)),
                 fontWeight = FontWeight(400),
-                color = MaterialTheme.colorScheme.secondary,
+                color = MaterialTheme.colorScheme.onSecondary,
             )
         )
     }

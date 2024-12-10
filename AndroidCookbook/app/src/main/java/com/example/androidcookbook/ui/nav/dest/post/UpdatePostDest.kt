@@ -86,6 +86,7 @@ fun NavGraphBuilder.updatePost(
             onPostButtonClick = {
                 createPostViewModel.updatePost(
                     onSuccessNavigate = { post ->
+                        navController.popBackStack()
                         navController.navigate(Routes.App.PostDetails(post))
                     }
                 )

@@ -35,6 +35,7 @@ class NewsfeedViewModel @Inject constructor(
         private set
 
     private val newsfeedLimit = 10
+    private var newsfeedOffset = newsfeedLimit
 
     init {
         refresh()
@@ -42,7 +43,7 @@ class NewsfeedViewModel @Inject constructor(
 
     private fun getNewsfeed() {
         viewModelScope.launch {
-            val response = newsfeedRepository.getNewsfeed(newsfeedLimit)
+            val response = newsfeedRepository.getNewsfeed(newsfeedOffset)
             response.onSuccess {
                 posts.update { data }
             }.onFailure {
@@ -69,5 +70,17 @@ class NewsfeedViewModel @Inject constructor(
         }
     }
 
-
+    fun loadMore() {
+        viewModelScope.launch {
+            newsfeedOffset += newsfeedLimit
+            val response = newsfeedRepository.getNewsfeed(newsfeedOffset)
+            response.onSuccess {
+                posts.update { data }
+            }.onFailure {
+                viewModelScope.launch {
+                    makeToastUseCase("Something went wrong while fetching more posts")
+                }
+            }
+        }
+    }
 }
