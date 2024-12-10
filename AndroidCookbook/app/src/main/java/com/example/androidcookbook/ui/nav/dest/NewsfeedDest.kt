@@ -4,6 +4,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
+import com.example.androidcookbook.ui.CookbookUiState
 import com.example.androidcookbook.ui.CookbookViewModel
 import com.example.androidcookbook.ui.common.containers.RefreshableScreen
 import com.example.androidcookbook.ui.features.newsfeed.NewsfeedScreen
@@ -13,12 +14,13 @@ import com.example.androidcookbook.ui.nav.utils.navigateToProfile
 import com.example.androidcookbook.ui.nav.utils.sharedViewModel
 
 fun NavGraphBuilder.newsfeed(
-    updateAppBar: () -> Unit,
-    navController: NavHostController,
     cookbookViewModel: CookbookViewModel,
+    navController: NavHostController,
 ) {
     composable<Routes.App.Newsfeed> {
-        updateAppBar()
+        cookbookViewModel.updateTopBarState(CookbookUiState.TopBarState.Default)
+        cookbookViewModel.updateBottomBarState(CookbookUiState.BottomBarState.Default)
+        cookbookViewModel.updateCanNavigateBack(false)
 
         val newsfeedViewModel = sharedViewModel<NewsfeedViewModel>(it, navController, Routes.App)
         val posts = newsfeedViewModel.posts.collectAsState().value

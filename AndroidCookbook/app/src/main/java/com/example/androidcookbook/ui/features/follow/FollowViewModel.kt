@@ -1,6 +1,5 @@
 package com.example.androidcookbook.ui.features.follow
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.androidcookbook.data.repositories.UserRepository
@@ -38,7 +37,7 @@ class FollowViewModel @AssistedInject constructor(
     interface FollowViewModelFactory {
         fun create(
             @Assisted("currentUser") currentUser: User,
-            @Assisted("targetUser") targetUser: User
+            @Assisted("targetUser") targetUser: User,
         ): FollowViewModel
     }
 

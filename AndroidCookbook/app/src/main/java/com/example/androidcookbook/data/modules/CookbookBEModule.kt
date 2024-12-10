@@ -29,6 +29,7 @@ import javax.inject.Singleton
 @InstallIn(SingletonComponent::class)
 object CookbookBEModule {
 
+    private const val DIGITAL_OCEAN_API = "https://octopus-app-lvf9o.ondigitalocean.app/"
     private const val COOKBOOK_BE = "https://cookbook-f98z.onrender.com/"
 
     private val loggingInterceptor = HttpLoggingInterceptor().apply {
@@ -60,7 +61,7 @@ object CookbookBEModule {
     @Provides
     @Singleton
     fun provideCookBE(client: OkHttpClient): Retrofit = Retrofit.Builder()
-        .baseUrl(COOKBOOK_BE)
+        .baseUrl(DIGITAL_OCEAN_API)
         .client(client)
         .addConverterFactory(GsonConverterFactory.create())
         .addCallAdapterFactory(ApiResponseCallAdapterFactory.create())

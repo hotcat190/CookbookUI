@@ -1,5 +1,6 @@
 package com.example.androidcookbook.ui.nav.dest.profile
 
+import android.util.Log
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Text
@@ -7,6 +8,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
@@ -47,6 +49,8 @@ fun NavGraphBuilder.otherProfile(
         cookbookViewModel.updateTopBarState(CookbookUiState.TopBarState.Default)
         cookbookViewModel.updateBottomBarState(CookbookUiState.BottomBarState.NoBottomBar)
 
+        Log.d("UserProfileViewModelOwner", "LocalViewModelStoreOwner: ${LocalViewModelStoreOwner.current}")
+
         val userProfileViewModel =
             hiltViewModel<UserProfileViewModel, UserProfileViewModel.UserProfileViewModelFactory>(
 
@@ -68,12 +72,15 @@ fun NavGraphBuilder.otherProfile(
 
                 is UserProfileUiState.Success -> {
                     val userPostState = userProfileViewModel.userPostState.collectAsState().value
+
+                    Log.d("UserProfileViewModelOwner", "LocalViewModelStoreOwner: ${LocalViewModelStoreOwner.current}")
+
                     val followViewModel = sharedViewModel<FollowViewModel, FollowViewModel.FollowViewModelFactory>(
-                        it, navController, Routes.OtherProfile
+                        it, navController, Routes.OtherProfile(user)
                     ) { factory ->
                         factory.create(
                             currentUser,
-                            user
+                            user,
                         )
                     }
                     val isFollowing = followViewModel.isFollowing.collectAsState().value
@@ -136,7 +143,7 @@ fun NavGraphBuilder.otherProfile(
                                 }
                             }
 
-                            UserPostState.Guest -> item {
+                            is UserPostState.Guest -> item {
                                 Column(
                                     horizontalAlignment = Alignment.CenterHorizontally,
                                     modifier = Modifier.fillMaxSize()
@@ -148,11 +155,11 @@ fun NavGraphBuilder.otherProfile(
                     }
                 }
 
-                UserProfileUiState.Failure -> {
+                is UserProfileUiState.Failure -> {
                     GuestProfile("Failed to fetch user profile.")
                 }
 
-                UserProfileUiState.Guest -> {
+                is UserProfileUiState.Guest -> {
                     GuestProfile("Login to see your posts.")
                 }
             }

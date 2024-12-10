@@ -82,7 +82,11 @@ fun NavGraphBuilder.createPost(
             onPostButtonClick = {
                 createPostViewModel.createPost(
                     onSuccessNavigate = { post ->
-                        navController.navigate(Routes.App.PostDetails(post))
+                        navController.navigate(Routes.App.PostDetails(post)) {
+                            popUpTo<Routes.App> {
+                                inclusive = false
+                            }
+                        }
                     }
                 )
             },

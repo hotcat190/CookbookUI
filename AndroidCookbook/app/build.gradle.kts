@@ -76,7 +76,7 @@ dependencies {
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
     implementation(libs.androidx.ui.test.android)
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.0")
+    implementation(libs.kotlinx.serialization.json)
     implementation("com.squareup.okhttp3:logging-interceptor:4.9.1")
     implementation("com.airbnb.android:lottie-compose:6.5.0")
 

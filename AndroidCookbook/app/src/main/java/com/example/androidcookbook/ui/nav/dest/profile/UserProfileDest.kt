@@ -12,6 +12,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
 import androidx.navigation.toRoute
 import com.example.androidcookbook.domain.model.user.User
+import com.example.androidcookbook.ui.CookbookUiState
 import com.example.androidcookbook.ui.CookbookViewModel
 import com.example.androidcookbook.ui.common.containers.RefreshableScreen
 import com.example.androidcookbook.ui.features.follow.FollowListScreenType
@@ -30,7 +31,6 @@ import com.example.androidcookbook.ui.nav.utils.navigateToProfile
 import kotlin.reflect.typeOf
 
 fun NavGraphBuilder.userProfile(
-    updateAppBar: () -> Unit,
     cookbookViewModel: CookbookViewModel,
     navController: NavHostController,
 ) {
@@ -39,7 +39,9 @@ fun NavGraphBuilder.userProfile(
             typeOf<User>() to CustomNavTypes.UserType
         )
     ) {
-        updateAppBar()
+        cookbookViewModel.updateTopBarState(CookbookUiState.TopBarState.Default)
+        cookbookViewModel.updateBottomBarState(CookbookUiState.BottomBarState.Default)
+
         val user = it.toRoute<Routes.App.UserProfile>().user
 
         val userProfileViewModel =
@@ -121,7 +123,7 @@ fun NavGraphBuilder.userProfile(
                                 }
                             }
 
-                            UserPostState.Guest -> item {
+                            is UserPostState.Guest -> item {
                                 Column(
                                     horizontalAlignment = Alignment.CenterHorizontally,
                                     modifier = Modifier.fillMaxSize()
@@ -133,11 +135,11 @@ fun NavGraphBuilder.userProfile(
                     }
                 }
 
-                UserProfileUiState.Failure -> {
+                is UserProfileUiState.Failure -> {
                     GuestProfile("Failed to fetch user profile.")
                 }
 
-                UserProfileUiState.Guest -> {
+                is UserProfileUiState.Guest -> {
                     GuestProfile("Login to see your posts.")
                 }
             }

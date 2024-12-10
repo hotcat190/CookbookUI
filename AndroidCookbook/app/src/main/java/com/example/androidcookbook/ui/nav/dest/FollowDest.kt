@@ -1,11 +1,14 @@
 package com.example.androidcookbook.ui.nav.dest
 
+import android.util.Log
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
@@ -15,9 +18,12 @@ import com.example.androidcookbook.ui.CookbookUiState
 import com.example.androidcookbook.ui.CookbookViewModel
 import com.example.androidcookbook.ui.features.follow.BaseFollowListScreen
 import com.example.androidcookbook.ui.features.follow.FollowListScreenType
+import com.example.androidcookbook.ui.features.follow.FollowScreenViewModel
 import com.example.androidcookbook.ui.features.follow.FollowViewModel
 import com.example.androidcookbook.ui.nav.CustomNavTypes
 import com.example.androidcookbook.ui.nav.Routes
+import com.example.androidcookbook.ui.nav.utils.navigateToProfile
+import com.example.androidcookbook.ui.nav.utils.sharedViewModel
 import kotlin.reflect.typeOf
 
 fun NavGraphBuilder.follow(
@@ -32,24 +38,37 @@ fun NavGraphBuilder.follow(
         val targetUser = it.toRoute<Routes.Follow>().user
         val startingScreen = it.toRoute<Routes.Follow>().type
 
+        val currentUser = cookbookViewModel.user.collectAsState().value
+
         cookbookViewModel.updateCanNavigateBack(true)
         cookbookViewModel.updateBottomBarState(CookbookUiState.BottomBarState.NoBottomBar)
         cookbookViewModel.updateTopBarState(CookbookUiState.TopBarState.NoTopBar)
+
+        Log.d("FOLLOW", "LocalViewModelStoreOwner: ${LocalViewModelStoreOwner.current}")
 
         val followViewModel = hiltViewModel<FollowViewModel, FollowViewModel.FollowViewModelFactory> { factory ->
             factory.create(cookbookViewModel.user.value, targetUser)
         }
 
-        var screenType by remember { mutableStateOf(startingScreen) }
+        val followScreenViewModel = hiltViewModel<FollowScreenViewModel, FollowScreenViewModel.FollowScreenViewModelFactory>(
+//            it, navController, Routes.Follow(targetUser, startingScreen)
+        ) { factory ->
+            factory.create(startingScreen)
+        }
+
+        val screenType = followScreenViewModel.screenType.collectAsState().value
 
         BaseFollowListScreen(
             user = targetUser,
             type = screenType,
-            list = if (screenType == FollowListScreenType.Followers) {
-                followViewModel.followers.collectAsState().value
-            } else followViewModel.followers.collectAsState().value,
+            list = (
+                if (screenType == FollowListScreenType.Followers) {
+                    followViewModel.followers.collectAsState().value
+                } else
+                    followViewModel.following.collectAsState().value
+            ),
             onListItemClick = { user ->
-                navController.navigate(Routes.OtherProfile(user))
+                navController.navigateToProfile(currentUser, user)
             },
             isFollowing = { user ->
                 followViewModel.checkFollowing(user)
@@ -61,10 +80,10 @@ fun NavGraphBuilder.follow(
                 navController.popBackStack()
             },
             onFollowingNavigate = {
-                screenType = FollowListScreenType.Following
+                followScreenViewModel.setScreenType(FollowListScreenType.Following)
             },
             onFollowersNavigate = {
-                screenType = FollowListScreenType.Followers
+                followScreenViewModel.setScreenType(FollowListScreenType.Followers)
             }
         )
     }

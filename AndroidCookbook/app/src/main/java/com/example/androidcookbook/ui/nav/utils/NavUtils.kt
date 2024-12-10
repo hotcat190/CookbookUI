@@ -4,6 +4,7 @@ import androidx.navigation.NavDestination
 import androidx.navigation.NavDestination.Companion.hasRoute
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavHostController
+import androidx.navigation.navOptions
 import com.example.androidcookbook.domain.model.user.User
 import com.example.androidcookbook.ui.nav.Routes
 
@@ -34,8 +35,8 @@ fun <T: Any> NavDestination.hasParent(route: T): Boolean =
  */
 fun NavHostController.navigateToProfile(currentUser: User, targetUser: User) {
     if (currentUser.id == targetUser.id) {
-        navigateIfNotOn(Routes.App.UserProfile(currentUser))
+        navigateIfNotOn<Routes.App.UserProfile>(Routes.App.UserProfile(currentUser))
     } else {
-        navigate(Routes.OtherProfile(targetUser))
+        navigateIfNotOn<Routes.OtherProfile>(Routes.OtherProfile(targetUser))
     }
 }

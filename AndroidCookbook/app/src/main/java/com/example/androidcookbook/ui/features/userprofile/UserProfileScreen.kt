@@ -206,7 +206,7 @@ fun UserInfo(
             return@Column
         }
         Row {
-            Box(
+            Row(
                 modifier = Modifier
                     .clickable {
                         onFollowersClick()
@@ -230,7 +230,7 @@ fun UserInfo(
                 )
             }
             Spacer(Modifier.width(8.dp))
-            Box(
+            Row(
                 modifier = Modifier
                     .clickable { onFollowingClick() }
             ) {
@@ -252,7 +252,7 @@ fun UserInfo(
                 )
             }
         }
-        if (user.bio.isEmpty()) {
+        if (user.bio.isNullOrEmpty()) {
             return@Column
         }
         Text(

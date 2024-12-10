@@ -56,6 +56,9 @@ fun FollowingListItem(
                     .clickable { onClick(user) }
 
             )
+            if (user.bio.isNullOrEmpty()) {
+                return@Column
+            }
             Text(
                 text = user.bio,
                 color = MaterialTheme.colorScheme.onSurface,
@@ -63,7 +66,6 @@ fun FollowingListItem(
                 maxLines = 2,
                 overflow = TextOverflow.Ellipsis
             )
-
         }
         FollowButton(
             onFollowButtonClick = onFollowButtonClick,

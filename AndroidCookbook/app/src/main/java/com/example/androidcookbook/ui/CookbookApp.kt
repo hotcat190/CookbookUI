@@ -145,11 +145,7 @@ fun CookbookApp(
             }, updateUser = { response ->
                 viewModel.updateUser(response)
             })
-            appScreens(navController = navController, updateAppBar = {
-                viewModel.updateTopBarState(CookbookUiState.TopBarState.Default)
-                viewModel.updateBottomBarState(CookbookUiState.BottomBarState.Default)
-                viewModel.updateCanNavigateBack(false)
-            }, cookbookViewModel = viewModel)
+            appScreens(navController = navController, cookbookViewModel = viewModel)
             composable<Routes.Search> {
                 val searchViewModel = hiltViewModel<SearchViewModel>()
                 val searchUiState = searchViewModel.uiState.collectAsState().value
