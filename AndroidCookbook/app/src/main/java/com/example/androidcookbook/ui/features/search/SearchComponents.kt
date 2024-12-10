@@ -186,6 +186,9 @@ fun UserCard(
                             fontSize = 15.sp
                         )
                     }
+                    if (user.bio == null) {
+                        return@Column
+                    }
                     Text(
                         text = user.bio,
                         modifier = Modifier
@@ -210,6 +213,10 @@ fun PostCard(
         NewsfeedCard(
             post = post,
             onSeeDetailsClick = onSeeDetailsClick,
+            currentUser = User(),
+            onDeletePost = {},
+            onEditPost = {},
+            onUserClick = {},
             modifier = Modifier
                 .wrapContentHeight()
                 .background(

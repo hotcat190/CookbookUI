@@ -119,7 +119,7 @@ private fun FollowScreenTopBar(
                 )
             }
             Text(
-                text = "${user.name}'s $type"
+                text = user.name
             )
         }
 

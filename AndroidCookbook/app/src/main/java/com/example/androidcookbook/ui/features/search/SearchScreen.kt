@@ -190,41 +190,41 @@ fun SearchScreen(
     }
 }
 
-@Preview
-@Composable
-fun CardPreview() {
-    ResultCardTheme {
-        ResultCard(
-            {},
-            Recipe(
-                0,
-                "Summer Dish",
-                "Side",
-                "Japanese",
-                "",
-                ""
-            )
-        )
-    }
-}
-
-@Preview
-@Composable
-fun CardPreviewDark() {
-    ResultCardTheme(darkTheme = true) {
-        ResultCard(
-            {},
-            Recipe(
-                0,
-                "Summer Dish",
-                "Side",
-                "Japanese",
-                "",
-                ""
-            )
-        )
-    }
-}
+//@Preview
+//@Composable
+//fun CardPreview() {
+//    ResultCardTheme {
+//        ResultCard(
+//            {},
+//            Recipe(
+//                0,
+//                "Summer Dish",
+//                "Side",
+//                "Japanese",
+//                "",
+//                ""
+//            )
+//        )
+//    }
+//}
+//
+//@Preview
+//@Composable
+//fun CardPreviewDark() {
+//    ResultCardTheme(darkTheme = true) {
+//        ResultCard(
+//            {},
+//            Recipe(
+//                0,
+//                "Summer Dish",
+//                "Side",
+//                "Japanese",
+//                "",
+//                ""
+//            )
+//        )
+//    }
+//}
 
 @Preview
 @Composable
