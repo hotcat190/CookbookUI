@@ -167,7 +167,7 @@ fun CookbookApp(
                 viewModel.updateTopBarState(CookbookUiState.TopBarState.Custom {
                     AppBarTheme {
                         SearchBar(
-                            onSearch = { searchViewModel.search(it) },
+                            onSearch = { searchViewModel.searchAll(it) },
                             navigateBackAction = {
                                 navController.navigateUp()
                             },
