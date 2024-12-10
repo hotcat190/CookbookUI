@@ -29,8 +29,9 @@ import {
     @ManyToMany(() => User)
     @JoinTable()
     likes: User[];
+    @Column({default: false})
+    isLiked: boolean;
     @Column({default: 0})
-
     @RelationCount((comment: Comment) => comment.likes)
     totalLike: number;
     

@@ -118,15 +118,32 @@ export class PostsService {
       return {nextPage: false, likes: likes.slice(startIndex, startIndex + itemsPerPage).map(like => new ReponseUserDto(like))};
     }
   }
-  async getComments(postId: number, page: number): Promise<any> {
-    const comments = await this.commentsRepository.find({
-      where: { post: { id: postId } }
-    });
+  async getComments(postId: number, userId: number, page: number): Promise<any> {
 
+    const comments = await this.commentsRepository
+      .createQueryBuilder('comment')
+      .leftJoinAndSelect('comment.user', 'user')
+      .leftJoin('comment.likes', 'likes')
+      .select([
+        'comment.id',
+        'comment.content',
+        'comment.totalLike',
+        'comment.createdAt',
+        'user',
+        'likes.id',
+      ])
+      .where('comment.post = :postId', { postId })
+      .getMany()
+      .then((comments) => comments.map((comment) => {
+        comment.isLiked = comment.likes.some((like) => like.id == userId);
+        return comment;
+      }));
     const itemsPerPage = 10;
     const startIndex = (page - 1) * itemsPerPage;
     if (comments.length > itemsPerPage*page) {
-      return {nextPage: true, comments: comments.slice(startIndex, startIndex + itemsPerPage).map(comment => new FullReponseCommentDto(comment))};
+      return {nextPage: true, comments: comments.slice(startIndex, startIndex + itemsPerPage).map(comment =>
+         new FullReponseCommentDto(comment)
+        )};
     }
     else{
       return {nextPage: false, comments: comments.slice(startIndex, startIndex + itemsPerPage).map(comment => new FullReponseCommentDto(comment))};
@@ -154,12 +171,11 @@ export class PostsService {
     return { message: 'Đã thích bài viết.', totalLike: post.totalLike };
   }
   async likeComment(commentId: number, userId: number): Promise<any> {
+    
     const comment = await this.commentsRepository.findOne({ where: { id: commentId }, relations: ['likes'] });
     if (!comment) {
       throw new NotFoundException('Bình luận không tồn tại.');
     }
-    console.log(comment);
-    console.log(comment.likes);
     if (comment.likes.some((like) => like.id === userId)) {
       throw new BadRequestException('Bạn đã thích bình luận này trước đó.');
     }

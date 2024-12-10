@@ -147,7 +147,14 @@ import {
     @ApiResponse({ status: 200, description: 'Danh sách bình luận' })
     @ApiResponse({ status: 404, description: 'Bài viết không tồn tại' })
     getComments(@Param('postId') postId: number, @Param('page') page: number) {
-      return this.postsService.getComments(postId, page);
+      return this.postsService.getComments(postId, -1, page);
+    }
+    @Get('comment-with-like/:postId/:userId/:page')
+    @ApiOperation({ summary: 'Xem bình luận' })
+    @ApiResponse({ status: 200, description: 'Danh sách bình luận' })
+    @ApiResponse({ status: 404, description: 'Bài viết không tồn tại' })
+    getCommentsWithLike(@Param('postId') postId: number, @Param('userId') userId: number, @Param('page') page: number) {
+      return this.postsService.getComments(postId, userId, page);
     }
     @ApiBearerAuth()
     @UseGuards(JwtAuthGuard)
