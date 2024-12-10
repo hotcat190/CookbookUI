@@ -3,7 +3,7 @@ import { Controller, Post, Body, Get, Query, Req, Put, Param, Request as Request
 
 import { AuthService } from '../auth.service';
 import { RegisterDto } from '../dtos/register.dto';
-import { LoginDto } from '../dtos/login.dto';
+import { LoginDto, TokenDto } from '../dtos/login.dto';
 import { ResetPassword1Dto, ResetPassword2Dto } from '../dtos/reset-password.dto';
 import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
 import { ForgotDto } from '../dtos/forgot.dto';
@@ -87,8 +87,8 @@ export class AuthController {
   @UseGuards(JwtAuthGuard)
   @Post('auth/set-token')
   @ApiOperation({ summary: 'Set tokenFCM' })
-  setTokenFCM(@Request1() req, @Body() tokenFCM: string) {
-    return this.authService.setTokenFCM(tokenFCM, req.user.id);
+  setTokenFCM(@Request1() req, @Body() tokenDto: TokenDto) {
+    return this.authService.setTokenFCM(tokenDto, req.user.id);
   }
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
