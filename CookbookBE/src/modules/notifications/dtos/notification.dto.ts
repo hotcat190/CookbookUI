@@ -1,33 +1,44 @@
 // src/modules/notifications/dtos/notification.dto.ts
 import { Expose } from 'class-transformer';
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNumber, IsString } from 'class-validator';
-
-export class NotificationDto {
+import { IsNumber, IsOptional, IsString } from 'class-validator';
+import { Notification } from '../entities/notification.entity';
+export class ReponseNotificationDto {
+  constructor(notification: Notification) {
+    this.id = notification.id;
+    this.type = notification.type;
+    this.message = notification.message;
+    this.relatedId = notification.relatedID;
+    this.isRead = notification.isRead;
+    this.createdAt = notification.updatedAt;
+    this.imageURL = notification.imageURL;
+  }
   @ApiProperty({ description: 'ID của thông báo' })
-  @Expose()
   id: number;
 
   @ApiProperty({ description: 'Loại thông báo' })
-  @Expose()
   type: string;
 
   @ApiProperty({ description: 'Nội dung thông báo' })
-  @Expose()
   message: string;
 
   @ApiProperty({ description: 'ID liên quan đến thông báo (ví dụ: recipeId, commentId, userId)' })
-  @Expose()
   relatedId: number;
 
   @ApiProperty({ description: 'Trạng thái đã đọc của thông báo' })
-  @Expose()
   isRead: boolean;
 
   @ApiProperty({ description: 'Ngày tạo thông báo' })
-  @Expose()
   createdAt: Date;
+
+  @ApiProperty({ description: 'URL hình ảnh' })
+  @IsOptional()
+  imageURL?: string;
 }
+
+
+
+
 export class NotiDto {
   @IsNumber()
   @ApiProperty({ description: 'ID của người dùng', example: 1 })
