@@ -19,8 +19,7 @@ enum class SearchTab {
     All,
     Posts,
     Food,
-    Users,
-    Speech
+    Users
 }
 
 enum class TabState {

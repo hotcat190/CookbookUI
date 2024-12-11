@@ -79,7 +79,7 @@ fun SearchScreen(
     onSeeMoreClick: (User) -> Unit = {}
 ) {
     val pagerState = rememberPagerState(
-        pageCount = { 5 }
+        pageCount = { 4 }
     )
     BackHandler {
         when (searchUiState.currentScreen) {
@@ -248,14 +248,6 @@ fun SearchScreen(
                                             searchByUser = userChecked,
                                             resetResult = false
                                         )
-                                    }
-                                }
-                                4 -> {
-                                    item {
-                                        val context = LocalContext.current
-                                        val application = context.applicationContext as Application
-                                        val speechViewModel = SpeechToTextViewModel(application = application)
-                                        SpeechToTextScreen(viewModel = speechViewModel)
                                     }
                                 }
                             }

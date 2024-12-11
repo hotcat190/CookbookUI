@@ -1,5 +1,6 @@
 package com.example.androidcookbook.ui.common.appbars
 
+import android.app.Application
 import android.util.Log
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -9,9 +10,12 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Mic
+import androidx.compose.material.icons.outlined.Mic
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.IconToggleButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
@@ -20,6 +24,7 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -28,9 +33,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.example.androidcookbook.ui.features.search.SpeechToTextViewModel
 import com.example.androidcookbook.ui.theme.AndroidCookbookTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -49,6 +56,18 @@ fun SearchBar(
         focusRequester.requestFocus()
     }
 
+    val context = LocalContext.current
+    val application = context.applicationContext as Application
+    val speechViewModel = SpeechToTextViewModel(application = application)
+
+    val speechText by speechViewModel.speechText.collectAsState()
+    LaunchedEffect(Unit) {
+        speechViewModel.initializeSpeechRecognizer(context)
+    }
+
+    var isListening by remember { mutableStateOf(false) }
+
+
     TopAppBar(
         colors = TopAppBarDefaults.topAppBarColors(containerColor = MaterialTheme.colorScheme.primary),
         title = {
@@ -57,8 +76,8 @@ fun SearchBar(
                     modifier = Modifier
                         .fillMaxWidth()
                         .focusRequester(focusRequester),
-                    value = searchQuery,
-                    onValueChange = {searchQuery = it},
+                    value = speechText,
+                    onValueChange = {speechViewModel.changeText(it)},
                     placeholder = { Text("Search..", style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.secondary) },
                     shape = RoundedCornerShape(16.dp),
                     textStyle = MaterialTheme.typography.labelMedium,
@@ -78,8 +97,28 @@ fun SearchBar(
                         imeAction = ImeAction.Search
                     ),
                     keyboardActions = KeyboardActions(
-                        onSearch = { onSearch(searchQuery) }
-                    )
+                        onSearch = { onSearch(speechText) }
+                    ),
+                    trailingIcon = {
+                        IconToggleButton(
+                            checked = isListening,
+                            onCheckedChange = {
+                                isListening = it
+                                if (it) {
+                                    speechViewModel.startListening()
+                                } else {
+                                    speechViewModel.stopListening()
+                                }
+                            }
+                        ) {
+                            if (isListening) {
+                                Icon(Icons.Outlined.Mic, null)
+                            } else {
+                                Icon(Icons.Filled.Mic, null)
+                            }
+                        }
+
+                    }
                 )
             }
         },

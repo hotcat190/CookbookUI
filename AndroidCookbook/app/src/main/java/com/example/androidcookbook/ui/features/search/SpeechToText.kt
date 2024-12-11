@@ -8,6 +8,7 @@ import android.os.Bundle
 import android.speech.RecognitionListener
 import android.speech.RecognizerIntent
 import android.speech.SpeechRecognizer
+import android.util.Log
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.ActivityResultLauncher
@@ -44,6 +45,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.AndroidViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.update
 import java.util.Locale
 
 class SpeechRecognizerManager(
@@ -52,9 +54,14 @@ class SpeechRecognizerManager(
     private val onError: (String) -> Unit
 ) {
     private val speechRecognizer: SpeechRecognizer = SpeechRecognizer.createSpeechRecognizer(context)
+
+    //Tạo yêu cầu (dự định) để gửi tới hệ thống để xử lí giọng nói
     private val recognizerIntent: Intent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH).apply {
+        //Chỉ định kiểu nhận diện giọng nói: Free (tự do), không phuj thuộc vào cú pháp hay ngữ cảnh
         putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM)
+        //Nhận diện ngôn ngữ: ngôn ngữ mặc định của thiết bị
         putExtra(RecognizerIntent.EXTRA_LANGUAGE, Locale.getDefault())
+        //Nhaanj kết quả trung gian trước khi có kết quả cuôi cùng
         putExtra(RecognizerIntent.EXTRA_PROMPT, "Speak Something")
     }
 
@@ -106,7 +113,7 @@ class SpeechRecognizerManager(
 }
 
 class SpeechToTextViewModel(application: Application) : AndroidViewModel(application) {
-    private val _speechText = MutableStateFlow("Click button for Speech text")
+    private val _speechText = MutableStateFlow("")
     val speechText: StateFlow<String> get() = _speechText
 
     private var speechRecognizerManager: SpeechRecognizerManager? = null
@@ -115,10 +122,16 @@ class SpeechToTextViewModel(application: Application) : AndroidViewModel(applica
         speechRecognizerManager = SpeechRecognizerManager(
             context = context,
             onResult = { result ->
-                _speechText.value = result
+                run {
+                    _speechText.value = result
+                    Log.d("SPEECH", "initializeSpeechRecognizer: ${result}")
+                }
             },
             onError = { error ->
-                _speechText.value = error
+                run {
+                    Toast.makeText(context, error, Toast.LENGTH_SHORT).show()
+                    Log.d("SPEECH", "initializeSpeechRecognizer: ${error}")
+                }
             }
         )
     }
@@ -134,6 +147,10 @@ class SpeechToTextViewModel(application: Application) : AndroidViewModel(applica
     override fun onCleared() {
         super.onCleared()
         speechRecognizerManager?.destroy()
+    }
+
+    fun changeText(str: String) {
+        _speechText.update { str }
     }
 }
 
@@ -196,6 +213,7 @@ fun SpeechToTextScreen(viewModel: SpeechToTextViewModel) {
 
 }
 
+//Gửi yêu cầu sử dụng mic
 @Composable
 fun RequestAudioPermission(onPermissionGranted: () -> Unit) {
     val context = LocalContext.current
