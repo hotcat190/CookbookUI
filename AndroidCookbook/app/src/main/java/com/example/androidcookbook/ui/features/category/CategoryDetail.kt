@@ -36,6 +36,7 @@ import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
 import androidx.compose.ui.input.nestedscroll.NestedScrollSource
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -66,8 +67,9 @@ fun CategoryDetail(
 
     // Check if LazyColumn is at the top
     // This will trigger every time the scroll position changes
+    var screenWidth = LocalConfiguration.current.screenWidthDp
 
-    var currentImgHeight by remember { mutableStateOf(300f) }
+    var currentImgHeight by remember { mutableStateOf(screenWidth*0.5) }
 
     val nestedScrollConnection = remember {
         object : NestedScrollConnection {
@@ -79,9 +81,9 @@ fun CategoryDetail(
                 if (delta < 0 || (isAtTop)) {
                     val newImgHeight = currentImgHeight + delta
                     val previousImgSize = currentImgHeight
-                    currentImgHeight = newImgHeight.coerceIn(75f, 300f)
+                    currentImgHeight = newImgHeight.coerceIn(screenWidth*0.3, screenWidth*0.5)
                     val consumed = currentImgHeight - previousImgSize
-                    return Offset(0f, consumed)
+                    return Offset(0f, consumed.toFloat())
                 } else {
                     return super.onPreScroll(available, source)
                 }
