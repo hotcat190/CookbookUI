@@ -19,7 +19,7 @@ import com.example.androidcookbook.R
 
 @Composable
 fun UserAvatar(
-    avatarPath: String?,
+    avatarPath: Any?,
     modifier: Modifier = Modifier
 ) {
     AsyncImage(

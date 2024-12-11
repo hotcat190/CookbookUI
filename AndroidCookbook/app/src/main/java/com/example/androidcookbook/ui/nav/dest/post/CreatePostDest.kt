@@ -97,7 +97,10 @@ fun NavGraphBuilder.createPost(
             onCookTimeChange = {
                 createPostViewModel.updateCookTime(it)
             },
-            createType = CreatePostType.Post
+            createType = CreatePostType.Post,
+            onUserClick = {
+                navController.navigate(Routes.App.UserProfile(it))
+            }
         )
         if (createPostViewModel.isAddStepDialogOpen.collectAsState().value) {
             AddStepDialog(

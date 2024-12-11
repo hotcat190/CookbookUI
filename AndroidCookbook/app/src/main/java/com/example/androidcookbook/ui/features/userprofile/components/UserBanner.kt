@@ -14,7 +14,9 @@ import com.example.androidcookbook.R
 
 @Composable
 fun UserBanner(
-    bannerPath: String?,
+    bannerPath: Any?,
+    modifier: Modifier = Modifier,
+    contentScale: ContentScale = ContentScale.FillWidth
 ) {
     AsyncImage(
 //        painter = painterResource(id = R.drawable.image_5),
@@ -24,10 +26,10 @@ fun UserBanner(
             .build(),
         contentDescription = null,
         modifier =
-        Modifier
+        modifier
             .fillMaxWidth()
             .height(200.dp),
-        contentScale = ContentScale.Crop,
+        contentScale = contentScale,
         error = painterResource(id = R.drawable.image_5),
         placeholder = painterResource(id = R.drawable.image_5),
     )

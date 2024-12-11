@@ -86,6 +86,7 @@ fun CreatePostScreen(
     cookTime: String,
     onCookTimeChange: (String) -> Unit,
     createType: CreatePostType,
+    onUserClick: (User) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     BackHandler { onBackButtonClick() }
@@ -119,7 +120,7 @@ fun CreatePostScreen(
                 onEditPost = {},
                 onDeletePost = {},
                 createdAt = LocalDate.now().toString(),
-                onUserClick = {},
+                onUserClick = onUserClick,
             )
 
             Spacer(modifier = Modifier.height(8.dp))
@@ -468,6 +469,8 @@ fun CreatePostScreenPreview() {
             cookTime = "1h",
             onCookTimeChange = {},
             createType = CreatePostType.Post,
+            onUserClick = {},
+//            modifier = Modifier.background(MaterialTheme.colorScheme.background)
         )
     }
 }
@@ -492,7 +495,8 @@ fun CreatePostScreenPreviewDarkTheme() {
             {},
             cookTime = "1h",
             onCookTimeChange = {},
-            createType = CreatePostType.Post
+            createType = CreatePostType.Post,
+            onUserClick = {},
 //            modifier = Modifier.background(MaterialTheme.colorScheme.background)
         )
     }

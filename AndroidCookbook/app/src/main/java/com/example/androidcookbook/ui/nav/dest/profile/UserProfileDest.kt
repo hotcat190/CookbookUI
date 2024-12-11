@@ -85,19 +85,22 @@ fun NavGraphBuilder.userProfile(
                         headerButton = {
                             EditProfileButton(
                                 onEditProfileClick = {
-                                    navController.navigate(Routes.EditProfile)
+                                    navController.navigate(Routes.EditProfile(userProfileUiState.user))
                                 }
                             )
+                        },
+                        navigateToEditProfile = {
+                            navController.navigate(Routes.EditProfile(userProfileUiState.user))
                         },
                         followersCount = followViewModel.followers.collectAsState().value.size,
                         followingCount = followViewModel.following.collectAsState().value.size,
                         onFollowersClick = {
-                            navController.navigateIfNotOn(
+                            navController.navigate(
                                 Routes.Follow(userProfileUiState.user, FollowListScreenType.Followers)
                             )
                         },
                         onFollowingClick = {
-                            navController.navigateIfNotOn(
+                            navController.navigate(
                                 Routes.Follow(userProfileUiState.user, FollowListScreenType.Following)
                             )
                         },

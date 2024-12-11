@@ -5,6 +5,7 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -13,6 +14,9 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
@@ -22,14 +26,15 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.example.androidcookbook.domain.model.user.User
 import com.example.androidcookbook.ui.features.userprofile.components.UserAvatar
 import com.example.androidcookbook.ui.features.userprofile.components.UserBanner
 import com.example.androidcookbook.ui.theme.AndroidCookbookTheme
@@ -37,15 +42,18 @@ import com.example.androidcookbook.ui.theme.transparentTextFieldColors
 
 @Composable
 fun EditProfileScreen(
-    user: User,
+    avatarPath: Uri?,
     updateAvatarUri: (Uri?) -> Unit,
+    bannerPath: Uri?,
     updateBannerUri: (Uri?) -> Unit,
-    onBioChange: (String) -> Unit,
+    name: TextFieldValue,
+    onNameChange: (TextFieldValue) -> Unit,
+    bio: TextFieldValue,
+    onBioChange: (TextFieldValue) -> Unit,
     onBackButtonClick: () -> Unit,
     onUpdate: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val focusManager = LocalFocusManager.current
     Column(
         modifier = modifier.fillMaxSize()
     ) {
@@ -57,6 +65,7 @@ fun EditProfileScreen(
             modifier = Modifier
                 .padding(horizontal = 16.dp)
                 .weight(1F)
+                .verticalScroll(rememberScrollState())
         ) {
             val avatarPicker = rememberLauncherForActivityResult(
                 contract = ActivityResultContracts.PickVisualMedia(),
@@ -71,8 +80,18 @@ fun EditProfileScreen(
                 },
                 modifier = Modifier,
             ) {
-                UserAvatar(avatarPath = user.avatar)
+                UserAvatar(
+                    avatarPath = avatarPath,
+                    modifier = Modifier
+                        .clip(CircleShape)
+                        .clickable {
+                        avatarPicker.launch(
+                            PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
+                        )
+                    }
+                )
             }
+
             HorizontalDivider()
             val bannerPicker = rememberLauncherForActivityResult(
                 contract = ActivityResultContracts.PickVisualMedia(),
@@ -87,7 +106,39 @@ fun EditProfileScreen(
                 },
                 modifier = Modifier,
             ) {
-                UserBanner(bannerPath = user.banner)
+                UserBanner(
+                    bannerPath = bannerPath,
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier.clickable {
+                        bannerPicker.launch(
+                            PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
+                        )
+                    }
+                )
+            }
+            HorizontalDivider()
+
+            val nameFocusRequester = remember { FocusRequester() }
+            EditProfileItem(
+                text = "Name",
+                onChange = { nameFocusRequester.requestFocus() },
+                modifier = Modifier,
+            ) {
+                TextField(
+                    value = name,
+                    onValueChange = onNameChange,
+                    textStyle = MaterialTheme.typography.bodyLarge,
+                    placeholder = {
+                        Text(
+                            text = "Write your name",
+                        )
+                    },
+                    singleLine = true,
+                    colors = transparentTextFieldColors(),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .focusRequester(nameFocusRequester)
+                )
             }
             HorizontalDivider()
 
@@ -98,7 +149,7 @@ fun EditProfileScreen(
                 modifier = Modifier,
             ) {
                 TextField(
-                    value = user.bio ?: "",
+                    value = bio,
                     onValueChange = onBioChange,
                     textStyle = MaterialTheme.typography.bodyLarge,
                     placeholder = {
@@ -108,10 +159,18 @@ fun EditProfileScreen(
                     },
                     singleLine = false,
                     minLines = 5,
+                    suffix = {
+                        Text(
+                            text = bio.text.length.toString(),
+                            onTextLayout = {
+
+                            }
+                        )
+                    },
                     colors = transparentTextFieldColors(),
                     modifier = Modifier
                         .fillMaxWidth()
-                        .focusRequester(bioFocusRequester),
+                        .focusRequester(bioFocusRequester)
                 )
             }
             HorizontalDivider()
@@ -151,7 +210,7 @@ fun EditProfileItem(
             )
             Spacer(modifier = Modifier.weight(1f))
             val changeTextColorDark = Color(0xFF6BA7EC)
-            val changeTextColorLight = Color(0xFF3180F3)
+            val changeTextColorLight = Color(0xFF2179F3)
             Text(
                 text = "Change",
                 style = MaterialTheme.typography.bodyLarge,
@@ -182,9 +241,13 @@ fun EditProfileItem(
 private fun EditProfileScreenPreview() {
     AndroidCookbookTheme {
         EditProfileScreen(
-            user = User(),
+            avatarPath = null,
             updateAvatarUri = {},
+            bannerPath = null,
             updateBannerUri = {},
+            name = TextFieldValue(),
+            onNameChange = {},
+            bio = TextFieldValue(),
             onBioChange = {},
             onBackButtonClick = {},
             onUpdate = {},
@@ -197,10 +260,14 @@ private fun EditProfileScreenPreview() {
 private fun EditProfileScreenDarkPreview() {
     AndroidCookbookTheme(darkTheme = true) {
         EditProfileScreen(
-            user = User(),
+            avatarPath = null,
             updateAvatarUri = {},
+            bannerPath = null,
             updateBannerUri = {},
+            bio = TextFieldValue(),
             onBioChange = {},
+            name = TextFieldValue(),
+            onNameChange = {},
             onBackButtonClick = {},
             onUpdate = {},
         )

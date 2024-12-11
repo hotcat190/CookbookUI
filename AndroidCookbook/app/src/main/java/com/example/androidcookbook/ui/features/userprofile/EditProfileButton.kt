@@ -34,6 +34,7 @@ private fun EditProfileButtonPreview() {
         UserProfileHeader(
             bannerPath = null,
             avatarPath = null,
+            navigateToEditProfile = {},
             headerButton = {
                 EditProfileButton(onEditProfileClick = {})
             }
