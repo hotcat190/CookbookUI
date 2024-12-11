@@ -66,46 +66,56 @@ fun NotificationItem(
 ) {
     Row(
         modifier = modifier
-            .padding(16.dp)
             .fillMaxWidth()
             .clickable { onClick(notification) }
     ) {
-        Icon(
-            imageVector = NotificationIconMap[notification.type] ?: Icons.Default.Notifications,
-            contentDescription = "Notification Icon",
-            tint = NotificationColorMap[notification.type] ?: Color.Black,
-        )
-
-        Column(
-            modifier = Modifier.padding(horizontal = 16.dp)
+        Row(
+            modifier = Modifier
+                .weight(1f)
+                .padding(16.dp),
         ) {
-            Row(
-                Modifier.padding(bottom = 8.dp)
-            ) {
-                SmallAvatar(notification.imageURL)
-            }
+            Icon(
+                imageVector = NotificationIconMap[notification.type] ?: Icons.Default.Notifications,
+                contentDescription = "Notification Icon",
+                tint = NotificationColorMap[notification.type] ?: Color.Black,
+            )
 
-            TextWithBoldStrings(notification.message, style = MaterialTheme.typography.bodyMedium)
-
-            Row(
-                modifier = Modifier.padding(top = 8.dp),
+            Column(
+                modifier = Modifier.padding(horizontal = 16.dp)
             ) {
-                when (notification.type) {
-                    NotificationType.NEW_FOLLOWER -> {}
-                    NotificationType.NEW_POST_LIKE -> {
+                Row(
+                    Modifier.padding(bottom = 8.dp)
+                ) {
+                    SmallAvatar(notification.imageURL)
+                }
+
+                TextWithBoldStrings(
+                    notification.message,
+                    style = MaterialTheme.typography.bodyMedium
+                )
+
+                Row(
+                    modifier = Modifier.padding(top = 8.dp),
+                ) {
+                    when (notification.type) {
+                        NotificationType.NEW_FOLLOWER -> {}
+                        NotificationType.NEW_POST_LIKE -> {
 //                    val post: Post = getPost(notification.relatedId)
-                        val post = SamplePosts.posts.find { it.id == notification.relatedId }!!
-                        NotificationSupportingText(
-                            text = "${post.title} ${post.mainImage ?: ""}",
-                            modifier = Modifier
-                        )
-                    }
+                            val post = SamplePosts.posts.find { it.id == notification.relatedId }!!
+                            NotificationSupportingText(
+                                text = "${post.title} ${post.mainImage ?: ""}",
+                                modifier = Modifier
+                            )
+                        }
 
-                    NotificationType.NEW_COMMENT_LIKE -> {
+                        NotificationType.NEW_COMMENT_LIKE -> {
 //                        val comment = getComment(notification.relatedId)
-                        val comment = SamplePosts.posts.find { it.id == notification.relatedId }!!
+                            val comment =
+                                SamplePosts.posts.find { it.id == notification.relatedId }!!
+                        }
+
+                        NotificationType.NEW_POST_COMMENT -> {}
                     }
-                    NotificationType.NEW_POST_COMMENT -> {}
                 }
             }
         }

@@ -41,9 +41,10 @@ fun NotificationScreen(
         ) {
             items(notifications) { notification ->
                 NotificationItem(
-                    notification, onNotificationClick,
+                    notification = notification,
+                    onClick = onNotificationClick,
                     if (notification.isRead) Modifier
-                    else Modifier.background(LightBlue.copy(alpha = 0.1f))
+                    else Modifier.background(LightBlue.copy(alpha = 0.1f)),
                 )
                 HorizontalDivider()
             }

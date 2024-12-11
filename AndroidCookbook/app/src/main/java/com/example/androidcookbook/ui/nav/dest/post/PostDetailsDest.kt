@@ -90,6 +90,7 @@ fun NavGraphBuilder.postDetails(viewModel: CookbookViewModel, navController: Nav
                         onUserClick = { user ->
                             navController.navigateToProfile(viewModel.user.value, user)
                         },
+                        postLikes = postDetailsViewModel.postLikes.collectAsState().value,
                         modifier = Modifier
                     )
 

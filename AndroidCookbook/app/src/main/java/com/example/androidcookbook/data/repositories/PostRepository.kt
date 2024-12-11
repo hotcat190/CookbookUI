@@ -41,4 +41,5 @@ class PostRepository @Inject constructor(
 
     suspend fun queryPostBookmark(postId: Int, userId: Int) = postService.queryPostBookmark(postId, userId)
 
+    suspend fun getPostLikes(id: Int, page: Int) = postService.getPostLikes(id, page)
 }

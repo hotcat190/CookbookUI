@@ -63,6 +63,7 @@ fun NavGraphBuilder.authScreens(
                         popUpTo<Routes.Auth> { inclusive = true }
                     }
                 },
+                requestState = authViewModel.authRequestState.collectAsState().value,
                 supportingText = uiState.dialogMessage
             )
         }

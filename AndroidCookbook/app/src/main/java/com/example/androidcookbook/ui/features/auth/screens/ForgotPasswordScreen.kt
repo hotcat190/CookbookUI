@@ -39,7 +39,8 @@ fun ForgotPasswordScreen(
         // Submit button
         SignButton(
             onClick = onSubmit,
-            actionText = "Continue"
+            actionText = "Continue",
+            enabled = true,
         )
 
         // Back to Sign In clickable

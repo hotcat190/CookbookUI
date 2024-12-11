@@ -116,4 +116,8 @@ class CookbookViewModel @Inject constructor(
             authRepository.sendLogOutRequest()
         }
     }
+
+    companion object {
+        var isNotificationBadgeDisplayed = MutableStateFlow(false)
+    }
 }

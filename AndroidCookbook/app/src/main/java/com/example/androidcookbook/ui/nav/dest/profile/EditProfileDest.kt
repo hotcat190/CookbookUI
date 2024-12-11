@@ -1,8 +1,6 @@
 package com.example.androidcookbook.ui.nav.dest.profile
 
-import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.runtime.collectAsState
-import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
@@ -11,7 +9,6 @@ import androidx.navigation.toRoute
 import com.example.androidcookbook.domain.model.user.User
 import com.example.androidcookbook.ui.CookbookUiState
 import com.example.androidcookbook.ui.CookbookViewModel
-import com.example.androidcookbook.ui.features.userprofile.UserProfileViewModel
 import com.example.androidcookbook.ui.features.userprofile.edit.EditProfileScreen
 import com.example.androidcookbook.ui.features.userprofile.edit.EditProfileViewModel
 import com.example.androidcookbook.ui.nav.CustomNavTypes

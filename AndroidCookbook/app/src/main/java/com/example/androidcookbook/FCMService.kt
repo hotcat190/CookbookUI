@@ -7,8 +7,10 @@ import android.content.Context
 import android.content.Intent
 import android.util.Log
 import androidx.core.app.NotificationCompat
+import com.example.androidcookbook.ui.CookbookViewModel
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
+import kotlinx.coroutines.flow.update
 
 class FCMService : FirebaseMessagingService() {
 
@@ -31,6 +33,9 @@ class FCMService : FirebaseMessagingService() {
             // Do something with the customKey value
             Log.d("test",customKey.toString())
         }
+        Log.d("FCMService", "isNotificationBadgeDisplayed: ${CookbookViewModel.isNotificationBadgeDisplayed}")
+        CookbookViewModel.isNotificationBadgeDisplayed.update { true }
+        Log.d("FCMService", "isNotificationBadgeDisplayed: ${CookbookViewModel.isNotificationBadgeDisplayed}")
 
         val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         val notificationId = 1

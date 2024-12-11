@@ -93,7 +93,7 @@ private fun PasswordInputField(
                 Icon(
                     imageVector = image,
                     contentDescription = description,
-                    tint = MaterialTheme.colorScheme.outline
+                    tint = MaterialTheme.colorScheme.primary
                 )
             }
         },
@@ -185,7 +185,7 @@ fun BaseTextPreview() {
 @Composable
 fun PasswordTextPreview() {
     SignLayoutTheme(
-        darkTheme = true
+        darkTheme = false
     ) {
         PasswordInputField(
             text = "",

@@ -1,25 +1,25 @@
 package com.example.androidcookbook.ui.features.post.details
 
+import android.content.Intent
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Button
 import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.Checkbox
@@ -31,6 +31,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Bookmark
 import androidx.compose.material.icons.outlined.BookmarkBorder
 import androidx.compose.material.icons.outlined.Share
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -52,16 +53,20 @@ import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.example.androidcookbook.R
+import com.example.androidcookbook.data.mocks.SampleComments
 import com.example.androidcookbook.data.mocks.SamplePosts
+import com.example.androidcookbook.data.mocks.SampleUser
 import com.example.androidcookbook.domain.model.post.Comment
 import com.example.androidcookbook.domain.model.post.Post
 import com.example.androidcookbook.domain.model.user.User
 import com.example.androidcookbook.ui.common.iconbuttons.LikeButton
+import com.example.androidcookbook.ui.common.image.OverlapCircleImage
 import com.example.androidcookbook.ui.common.utils.apiDateFormatter
 import com.example.androidcookbook.ui.components.post.PostHeader
 import com.example.androidcookbook.ui.components.post.PostTitle
@@ -93,6 +98,7 @@ fun PostDetailsScreen(
     onCommentClick: () -> Unit,
     onSendComment: (String) -> Unit,
     onUserClick: (User) -> Unit,
+    postLikes: List<User>,
     modifier: Modifier = Modifier,
 ) {
     val checkedStates: SnapshotStateList<Boolean> = remember {
@@ -100,7 +106,7 @@ fun PostDetailsScreen(
     }
     checkedStates.addAll(
         List(
-            size = post.ingredient?.size ?: 0,
+            size = (post.ingredient?.size) ?: 0,
             init = {false}
         )
     )
@@ -132,7 +138,9 @@ fun PostDetailsScreen(
                         onCommentClick,
                         onUserClick,
                         checkedStates,
+                        postLikes,
                     )
+                    HorizontalDivider()
                 }
                 items(
                     comments,
@@ -165,15 +173,13 @@ private fun PostDetailsInfo(
     onCommentClick: () -> Unit,
     onUserClick: (User) -> Unit,
     checkedStates: SnapshotStateList<Boolean>,
+    postLikes: List<User>,
     modifier: Modifier = Modifier
 ) {
     var state by remember { mutableStateOf(DetailState.Description) }
     PostHeader(
         author = post.author,
         createdAt = LocalDate.parse(post.createdAt, apiDateFormatter).toString(),
-        showOptionsButton = showPostOptions,
-        onEditPost = onEditPost,
-        onDeletePost = onDeletePost,
         onUserClick = onUserClick,
         modifier = Modifier.padding(start = 15.dp)
     )
@@ -260,14 +266,54 @@ private fun PostDetailsInfo(
             )
         }
 
-        // Share button
-        OutlinedIconButton(
-            icon = Icons.Outlined.Share,
-            onclick = {
+        ShareButton(post)
+    }
 
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = Modifier
+            .padding(horizontal = 16.dp)
+            .wrapContentSize()
+    ) {
+        if (postLikes.isNotEmpty()) {
+            Box(
+                modifier = Modifier
+                    .wrapContentSize()
+
+            ) {
+                for (index in 0..2) {
+                    if (index >= postLikes.size) break
+
+//            AsyncImage(
+//                model = ImageRequest.Builder(LocalContext.current)
+//                    .data(it.avatar)
+//                    .crossfade(true)
+//                    .build(),
+//                contentDescription = "null",
+//                placeholder = painterResource(R.drawable.default_avatar),
+//                error = painterResource(R.drawable.default_avatar)
+//            )
+                    OverlapCircleImage(
+                        data = postLikes[index].avatar,
+                        modifier = Modifier
+                            .offset {
+                                IntOffset(
+                                    x = -8.dp.roundToPx() + (0 + index) * 10.dp.roundToPx(),
+                                    0
+                                )
+                            }
+                    )
+                }
             }
+            Spacer(modifier = Modifier.width(16.dp))
+        }
+        Text(
+            text = "${post.totalLike} likes",
+            fontSize = 15.sp,
+            color = MaterialTheme.colorScheme.onSurface,
         )
     }
+
     Row(
         horizontalArrangement = Arrangement.SpaceEvenly,
         modifier = Modifier
@@ -283,7 +329,7 @@ private fun PostDetailsInfo(
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .wrapContentHeight()
+            .fillMaxSize()
             .padding(horizontal = 16.dp, vertical = 16.dp)
     ) {
         Column(
@@ -294,15 +340,18 @@ private fun PostDetailsInfo(
                     Text(
                         text = post.description,
                         style = TextStyle(
-                            fontSize = 24.sp,
+                            fontSize = 18.sp,
                             fontWeight = FontWeight(400),
-                            color = MaterialTheme.colorScheme.secondary,
-                        )
+                            color = MaterialTheme.colorScheme.onSurface,
+                        ),
+                        modifier = Modifier
+                            .padding(horizontal = 8.dp)
                     )
                 }
 
                 DetailState.Ingredient -> {
                     checkedStates.forEachIndexed { index, checked ->
+                        if (index == post.ingredient?.size) return@forEachIndexed
                         val ingredientText: String =
                             post.ingredient?.get(index)?.name + " " + post.ingredient?.get(index)?.quantity
                         Row(
@@ -354,6 +403,30 @@ private fun PostDetailsInfo(
 }
 
 @Composable
+fun ShareButton(
+    post: Post,
+    modifier: Modifier = Modifier
+) {
+    val sendIntent: Intent = Intent().apply {
+        action = Intent.ACTION_SEND
+        putExtra(Intent.EXTRA_TEXT, "${post.title}\n${post.mainImage}\n${post.description}")
+        type = "text/plain"
+    }
+    val shareIntent = Intent.createChooser(sendIntent, null)
+    val context = LocalContext.current
+
+
+    // Share button
+    OutlinedIconButton(
+        icon = Icons.Outlined.Share,
+        onclick = {
+            context.startActivity(shareIntent)
+        },
+        modifier = modifier,
+    )
+}
+
+@Composable
 fun OutlinedIconButton(
     modifier: Modifier = Modifier,
     icon: ImageVector,
@@ -370,6 +443,8 @@ fun OutlinedIconButton(
         )
     }
 }
+
+
 
 @Composable
 fun LobsterTextButton(
@@ -407,7 +482,7 @@ fun PostDetailsPreview() {
         SamplePosts.posts[0].copy(mainImage = "https://images.pexels.com/photos/1640777/pexels-photo-1640777.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1"),
         currentUser = User(),
         showPostOptions = true,
-        comments = listOf(),
+        comments = SampleComments.comments,
         onDeletePost = {},
         onEditPost = {},
         onEditComment = {},
@@ -419,6 +494,7 @@ fun PostDetailsPreview() {
         onLikedClick = {},
         isBookmarked = false,
         onBookmarkClick = {},
-        onUserClick = {}
+        onUserClick = {},
+        postLikes = SampleUser.users
     )
 }

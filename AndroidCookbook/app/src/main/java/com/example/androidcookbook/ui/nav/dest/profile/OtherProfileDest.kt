@@ -144,8 +144,7 @@ fun NavGraphBuilder.otherProfile(
                                     onPostSeeDetailsClick = { post ->
                                         navController.navigate(Routes.App.PostDetails(post))
                                     },
-                                    onUserClick = { user ->
-                                        navController.navigateToProfile(currentUser, user)
+                                    onUserClick = {
                                     },
                                     currentUser = currentUser
                                 )

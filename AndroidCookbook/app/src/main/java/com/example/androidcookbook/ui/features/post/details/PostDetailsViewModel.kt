@@ -57,6 +57,8 @@ class PostDetailsViewModel @AssistedInject constructor(
         private set
     var isPostBookmarked: MutableStateFlow<Boolean> = MutableStateFlow(false)
         private set
+    var postLikes: MutableStateFlow<List<User>> = MutableStateFlow(emptyList())
+        private set
 
     init {
         refresh()
@@ -68,6 +70,18 @@ class PostDetailsViewModel @AssistedInject constructor(
         queryPostLike(_post.id)
         queryPostBookmark(_post.id)
         getComments(false)
+        getPostLikes()
+    }
+
+    private fun getPostLikes() {
+        viewModelScope.launch {
+            val response = postRepository.getPostLikes(_post.id, 1)
+            response.onSuccess {
+                postLikes.update { data.likes }
+            }.onFailure {
+                postLikes.update { emptyList() }
+            }
+        }
     }
 
     fun updateShowBottomCommentSheet(value: Boolean) {

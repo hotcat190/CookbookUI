@@ -56,14 +56,14 @@ fun CookbookAppBarDefault(
     TopAppBar(
         modifier = modifier,
         colors = TopAppBarDefaults.topAppBarColors(
-            containerColor = MaterialTheme.colorScheme.primary,
-            scrolledContainerColor = MaterialTheme.colorScheme.primary
+            containerColor = Color.Transparent,
+            scrolledContainerColor = Color.Transparent
         ),
         title = {
             Text(
                 text = "Cookbook",
                 style = MaterialTheme.typography.titleLarge,
-                color = MaterialTheme.colorScheme.secondary
+                color = MaterialTheme.colorScheme.onSurface
             )
         },
         actions = {
@@ -97,7 +97,7 @@ fun CookbookAppBarDefault(
                     onClick = onNotificationClick,
                     modifier = Modifier.size(30.dp),
                     colors = IconButtonDefaults.iconButtonColors(
-                        containerColor = MaterialTheme.colorScheme.primary
+                        containerColor = Color.Transparent
                     )
                 ) {
                     Icon(
@@ -113,7 +113,7 @@ fun CookbookAppBarDefault(
                     onClick = {menuExpanded = !menuExpanded},
                     modifier = Modifier.size(30.dp),
                     colors = IconButtonDefaults.iconButtonColors(
-                        containerColor = MaterialTheme.colorScheme.primary
+                        containerColor = Color.Transparent,
                     )
                 ) {
                     Icon(
