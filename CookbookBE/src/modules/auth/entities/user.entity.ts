@@ -6,6 +6,7 @@ import {
     OneToMany,
     JoinTable,
     ManyToMany,
+    RelationCount,
   } from 'typeorm';
   import { Post } from '../../posts/entities/post.entity';
   import { Follow } from '../../follows/entities/follow.entity';
@@ -54,8 +55,9 @@ import {
   
     @OneToMany(() => Follow, (follow) => follow.following)
     followers: Follow[];
-
-
+    
+    @RelationCount((user: User) => user.followers)
+    numberFollowers: number;
     @ManyToMany(() => Post)
     @JoinTable()
     favorites: Post[];
@@ -66,13 +68,15 @@ import {
     @Column({ nullable: true, length: 500 })
     bio: string;
 
-    @Column({ default: 'Tôi dại dột', length: 30 })
+    @Column({ default: 'Ham ăn', length: 30 })
     name: string;
 
     @Column({ nullable: true })
     avatar: string;
-
-
+    @Column({ nullable: true })
+    banner: string;
+    @Column({ nullable: true })
+    tokenFCM: string;
 
   }
   

@@ -18,13 +18,19 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.androidcookbook.R
+import com.example.androidcookbook.ui.features.auth.theme.SignLayoutTheme
 
 @Composable
-fun AppLogo() {
-    Column {
+fun AppLogo(
+    modifier: Modifier = Modifier
+) {
+    Column(
+        modifier = modifier
+    ) {
         Image(
             painter = painterResource(id = R.drawable.image_1),
             contentDescription = null,
@@ -47,5 +53,13 @@ fun AppLogo() {
                 color = MaterialTheme.colorScheme.primary,
             )
         )
+    }
+}
+
+@Composable
+@Preview
+fun AppLogoPreview() {
+    SignLayoutTheme {
+        AppLogo()
     }
 }

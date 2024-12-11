@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.requiredWidth
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -24,6 +25,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalViewConfiguration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.androidcookbook.ui.features.auth.theme.SignLayoutTheme
@@ -49,19 +52,26 @@ fun SignLayout(
         ) {
             val ovalColor = MaterialTheme.colorScheme.onBackground
             // Background and layout setup
-            Canvas(
-                modifier = Modifier
-                    .height(275.dp)
-                    .requiredWidth(500.dp)
-                    .absoluteOffset(
-                        y = (-100).dp,
-                    )
+            val configuration = LocalConfiguration.current
+            val ovalWidth = configuration.screenWidthDp.dp.times(1.25f)
+            val ovalHeight = configuration.screenHeightDp.dp.times(0.25f)
+            Column(
+                modifier = Modifier.align(Alignment.TopCenter)
             ) {
-                drawOval(
-                    color = ovalColor,
+                Canvas(
+                    modifier = Modifier
+                        .height(ovalHeight)
+                        .requiredWidth(ovalWidth)
+                        .absoluteOffset(
+                            y = (ovalHeight).times(-0.25F),
+                        )
+                ) {
+                    drawOval(
+                        color = ovalColor,
 //                    topLeft = Offset(-215f, -300f),
 //                    size = Size(1500f, 750f)
-                )
+                    )
+                }
             }
 
             Column(

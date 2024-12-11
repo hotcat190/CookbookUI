@@ -7,6 +7,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.androidcookbook.data.network.AiGenService
 import com.example.androidcookbook.data.repositories.AiGenRepository
 import com.example.androidcookbook.domain.model.aigen.AiRecipe
+import com.example.androidcookbook.domain.model.aigen.UploadDataFromImage
 import com.example.androidcookbook.domain.model.ingredient.Ingredient
 import com.google.gson.GsonBuilder
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -54,7 +55,6 @@ class AiGenViewModel @Inject constructor(
     }
 
 
-
     fun deleteIngredient(index: Int) {
         _aiGenUiState.update { currentState ->
             val updatedIngredient = currentState.ingredients.toMutableList()
@@ -74,12 +74,11 @@ class AiGenViewModel @Inject constructor(
     }
 
 
-
-
     fun updateIngredientQuantity(index: Int, updatedIngredientQuantity: String) {
         _aiGenUiState.update { currentState ->
             val updatedIngredient = currentState.ingredients.toMutableList()
-            updatedIngredient[index] = updatedIngredient[index].copy(quantity = updatedIngredientQuantity)
+            updatedIngredient[index] =
+                updatedIngredient[index].copy(quantity = updatedIngredientQuantity)
             currentState.copy(ingredients = updatedIngredient)
         }
     }
@@ -87,7 +86,7 @@ class AiGenViewModel @Inject constructor(
     fun addEmptyIngredient() {
         _aiGenUiState.update { currentState ->
             val updatedIngredients = currentState.ingredients.toMutableList()
-            updatedIngredients.add(Ingredient("",""))
+            updatedIngredients.add(Ingredient("", ""))
             currentState.copy(ingredients = updatedIngredients)
         }
     }
@@ -97,6 +96,26 @@ class AiGenViewModel @Inject constructor(
             val updatedIngredients = currentState.ingredients.toMutableList()
             updatedIngredients.add(ingredient)
             currentState.copy(ingredients = updatedIngredients)
+        }
+    }
+
+    fun addRecipe(updatedRecipeString: String) {
+        _aiGenUiState.update { currentState ->
+            val updatedRecipes = currentState.recipes.toMutableList()
+            updatedRecipes.add(updatedRecipeString)
+            currentState.copy(
+                recipes = updatedRecipes
+            )
+        }
+    }
+
+    fun removeRecipe(updatedRecipeString: String) {
+        _aiGenUiState.update { currentState ->
+            val updatedRecipes = currentState.recipes.toMutableList()
+            updatedRecipes.remove(updatedRecipeString)
+            currentState.copy(
+                recipes = updatedRecipes
+            )
         }
     }
 
@@ -142,7 +161,12 @@ class AiGenViewModel @Inject constructor(
 
     fun updateIsProcessing() {
         _aiGenUiState.update { currentState ->
-            currentState.copy(isProcessing = true, isTakingInput = false, isDone = false)
+            currentState.copy(
+                isProcessing = true,
+                isTakingInput = false,
+                isDone = false,
+                isDoneUploadingImage = false
+            )
         }
     }
 
@@ -160,13 +184,34 @@ class AiGenViewModel @Inject constructor(
 
     fun updateIsDone() {
         _aiGenUiState.update { currentState ->
-            currentState.copy(isDone = true, isProcessing = false, isTakingInput = false)
+            currentState.copy(
+                isDone = true,
+                isProcessing = false,
+                isTakingInput = false,
+                isDoneUploadingImage = false
+            )
         }
     }
 
     fun updateIsTakingInput() {
         _aiGenUiState.update { currentState ->
-            currentState.copy(isTakingInput = true, isDone = false, isProcessing = false)
+            currentState.copy(
+                isTakingInput = true,
+                isDone = false,
+                isProcessing = false,
+                isDoneUploadingImage = false
+            )
+        }
+    }
+
+    fun updateIsDoneUploadingImage() {
+        _aiGenUiState.update { currentState ->
+            currentState.copy(
+                isTakingInput = false,
+                isDone = false,
+                isProcessing = false,
+                isDoneUploadingImage = true,
+            )
         }
     }
 
@@ -179,6 +224,15 @@ class AiGenViewModel @Inject constructor(
             _aiGenUiState.first() // Get the current value from the StateFlow
         }
         return gson.toJson(currentState) // Convert to JSON
+    }
+
+    fun getImageInforJson(): String {
+        val uploadDataFromImage = UploadDataFromImage(
+            ingredients = _aiGenUiState.value.ingredients,
+            recipes = _aiGenUiState.value.recipes,
+        )
+
+        return gson.toJson(uploadDataFromImage)
     }
 
     suspend fun uploadImage(imagePart: MultipartBody.Part): AiRecipe? {

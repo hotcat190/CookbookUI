@@ -5,6 +5,7 @@ import com.example.androidcookbook.domain.model.auth.ForgotPasswordRequest
 import com.example.androidcookbook.domain.model.auth.RegisterRequest
 import com.example.androidcookbook.domain.model.auth.RegisterResponse
 import com.example.androidcookbook.domain.model.auth.ResetPasswordRequest
+import com.example.androidcookbook.domain.model.auth.SetTokenRequest
 import com.example.androidcookbook.domain.model.auth.SignInRequest
 import com.example.androidcookbook.domain.model.auth.SignInResponse
 import com.skydoves.sandwich.ApiResponse
@@ -22,10 +23,16 @@ class AuthRepository @Inject constructor(
         return response
     }
 
-    suspend fun sendForgotPasswordRequest(forgotPasswordRequest: ForgotPasswordRequest)
-        = authService.sendForgotPasswordRequest(forgotPasswordRequest)
+    suspend fun sendForgotPasswordRequest(forgotPasswordRequest: ForgotPasswordRequest) =
+        authService.sendForgotPasswordRequest(forgotPasswordRequest)
 
-    suspend fun sendPasswordResetRequest(resetPasswordRequest: ResetPasswordRequest)
-        = authService.sendResetPasswordRequest(resetPasswordRequest)
+    suspend fun sendPasswordResetRequest(resetPasswordRequest: ResetPasswordRequest) =
+        authService.sendResetPasswordRequest(resetPasswordRequest)
+
+    suspend fun sendSetTokenRequest(setTokenRequest: SetTokenRequest): ApiResponse<Any> =
+        authService.sendSetTokenRequest(setTokenRequest)
+
+    suspend fun sendLogOutRequest() =
+        authService.sendLogOutRequest()
 }
 

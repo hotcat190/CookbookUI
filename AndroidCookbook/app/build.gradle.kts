@@ -7,6 +7,7 @@ plugins {
     id("com.google.dagger.hilt.android")
     kotlin("plugin.serialization")
     alias(libs.plugins.compose.compiler)
+    id("com.google.gms.google-services")
 }
 
 android {
@@ -76,9 +77,11 @@ dependencies {
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
     implementation(libs.androidx.ui.test.android)
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.0")
+    implementation(libs.kotlinx.serialization.json)
     implementation("com.squareup.okhttp3:logging-interceptor:4.9.1")
     implementation("com.airbnb.android:lottie-compose:6.5.0")
+    implementation("androidx.datastore:datastore-preferences:1.0.0")
+    implementation(libs.firebase.messaging)
 
 
 
@@ -116,7 +119,15 @@ dependencies {
     implementation(libs.kotlinx.serialization.json)
 
     //Icon extended
-    implementation("androidx.compose.material:material-icons-extended:1.7.5")
+    implementation(libs.androidx.material.icons.extended)
+
+    // firebase
+    implementation(platform("com.google.firebase:firebase-bom:33.7.0"))
+    implementation("com.google.firebase:firebase-analytics")
+    // messaging
+    implementation("com.google.firebase:firebase-messaging-ktx")
+    // notification permission
+    implementation("com.google.accompanist:accompanist-permissions:0.31.1-alpha")
 }
 
 // Allow references to generated code

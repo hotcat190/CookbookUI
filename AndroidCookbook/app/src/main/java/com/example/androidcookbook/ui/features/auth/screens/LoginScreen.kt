@@ -21,6 +21,7 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.example.androidcookbook.ui.features.auth.AuthRequestState
 import com.example.androidcookbook.ui.features.auth.components.ClickableSeparatedText
 import com.example.androidcookbook.ui.features.auth.components.ClickableText
 import com.example.androidcookbook.ui.features.auth.components.InputField
@@ -36,6 +37,7 @@ fun LoginScreen(
     onNavigateToSignUp: () -> Unit,
     onSignInClick: (String, String) -> Unit,
     onUseAsGuest: () -> Unit,
+    requestState: AuthRequestState,
     modifier: Modifier = Modifier,
     supportingText: String = "",
 ) {
@@ -44,6 +46,7 @@ fun LoginScreen(
             onSignInClick = onSignInClick,
             onForgotPasswordClick = onForgotPasswordClick,
             onSignUpClick = onNavigateToSignUp,
+            requestState = requestState,
             supportingText = supportingText
         )
         ClickableText(
@@ -58,6 +61,7 @@ fun SignInComponent(
     onSignUpClick: () -> Unit,
     onForgotPasswordClick: () -> Unit,
     onSignInClick: (String, String) -> Unit,
+    requestState: AuthRequestState,
     modifier: Modifier = Modifier,
     supportingText: String = ""
 ) {
@@ -92,8 +96,11 @@ fun SignInComponent(
         )
         Spacer(Modifier.height(5.dp))
         SignButton(
-            onClick = { onSignInClick(username.trim(), password) },
-            actionText = "Sign In"
+            onClick = {
+                onSignInClick(username.trim(), password)
+            },
+            enabled = requestState == AuthRequestState.Idle,
+            actionText = "Sign In",
         )
     }
 
@@ -113,6 +120,6 @@ fun SignInComponent(
 @Composable
 fun LoginPreview() {
     LoginScreen(
-        {}, {}, { _, _->},{},
+        {}, {}, { _, _->},{},AuthRequestState.Idle
     )
 }
