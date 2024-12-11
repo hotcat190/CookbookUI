@@ -151,7 +151,10 @@ fun SearchScreen(
                                                 viewModel.ChangeCurrentPost(it)
                                                 viewModel.ChangeScreenState(SearchScreenState.Detail)
                                             },
-                                            onSeeMoreClick = onSeeMoreClick
+                                            onSeeMoreClick = onSeeMoreClick,
+                                            onSeeALlClick = {
+                                                pagerState.requestScrollToPage(SearchTab.Users.ordinal)
+                                            }
                                         )
                                     }
                                 }
