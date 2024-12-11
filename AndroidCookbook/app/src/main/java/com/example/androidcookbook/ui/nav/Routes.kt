@@ -30,7 +30,9 @@ object Routes {
     object App {
 
         @Serializable
-        object Category
+        object Category {
+            const val routes = "com.example.androidcookbook.ui.nav.Routes.App.Category"
+        }
         @Serializable
         object AIChef
         @Serializable
