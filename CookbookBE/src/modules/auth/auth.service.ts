@@ -245,9 +245,9 @@ export class AuthService {
     const totalFollowers = profile.followers.length;
     const totalFollowing = profile.following.length;
 
-    const { id, bio, name, avatar } = profile;
+    const { id, bio, name, avatar, banner } = profile;
     
-    return { userId: id, bio, name, avatar, totalFollowers, totalFollowing };
+    return { userId: id, bio, name, avatar, banner, totalFollowers, totalFollowing };
 
   }
   async searchUserByUsername(username: string, page: number): Promise<any> {
