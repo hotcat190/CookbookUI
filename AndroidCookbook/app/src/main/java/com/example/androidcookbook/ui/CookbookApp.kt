@@ -187,7 +187,7 @@ fun CookbookApp(
 
             postDetails(viewModel, navController)
 
-            editProfile(viewModel, currentUser, navController)
+            editProfile(viewModel, navController)
 
             otherProfile(viewModel, currentUser, navController)
 

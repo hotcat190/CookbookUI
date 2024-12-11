@@ -13,11 +13,7 @@ import androidx.compose.foundation.layout.requiredHeight
 import androidx.compose.foundation.layout.requiredWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -35,6 +31,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.androidcookbook.data.mocks.SampleUser
 import com.example.androidcookbook.domain.model.user.User
+import com.example.androidcookbook.ui.common.appbars.BasicTopBar
+import com.example.androidcookbook.ui.common.iconbuttons.BackButton
 import com.example.androidcookbook.ui.theme.AndroidCookbookTheme
 import kotlinx.serialization.Serializable
 
@@ -108,23 +106,11 @@ private fun FollowScreenTopBar(
     modifier: Modifier = Modifier
 ) {
     Column {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            IconButton(
-                onClick = onBackButtonClick,
-            ) {
-                Icon(
-                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                    contentDescription = "Back"
-                )
-            }
-            Text(
-                text = user.name
-            )
-        }
+        BasicTopBar(
+            onBackButtonClick = onBackButtonClick,
+            text = user.name,
+            modifier = modifier
+        )
 
         Row(
             modifier = Modifier
@@ -191,7 +177,7 @@ private fun FollowScreenNavigationItem(
 @Composable
 @Preview(showBackground = true)
 fun BaseFollowListScreenPreview() {
-    AndroidCookbookTheme {
+    AndroidCookbookTheme(darkTheme = false) {
         var type by remember { mutableStateOf(FollowListScreenType.Followers) }
         BaseFollowListScreen(
             user = SampleUser.users[0],
