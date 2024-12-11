@@ -18,7 +18,8 @@ enum class SearchScreenState {
 enum class SearchTab {
     All,
     Posts,
-    Food
+    Food,
+    Users
 }
 
 enum class TabState {

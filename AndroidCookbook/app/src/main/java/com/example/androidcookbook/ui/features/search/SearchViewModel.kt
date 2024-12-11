@@ -10,6 +10,8 @@ import com.example.androidcookbook.domain.model.recipe.Recipe
 import com.example.androidcookbook.domain.model.recipe.RecipeList
 import com.example.androidcookbook.domain.model.search.SearchAll
 import com.example.androidcookbook.domain.model.search.SearchPost
+import com.example.androidcookbook.domain.model.search.SearchUser
+import com.example.androidcookbook.domain.model.user.User
 import com.skydoves.sandwich.ApiResponse
 import com.skydoves.sandwich.onFailure
 import com.skydoves.sandwich.onSuccess
@@ -153,8 +155,74 @@ class SearchViewModel @Inject constructor(
                         )
                     )
                 }
-                Log.d("Search Post", "searchPost: " )
+            }
+        }
+    }
 
+    fun searchUser(searchByUser: Boolean, resetResult: Boolean) {
+        _uiState.update {
+            it.copy(
+                userTabState = SearchTabUiState(
+                    state = TabState.Waiting,
+                    messageStr = "Please wait",
+                    result =
+                        if (resetResult) listOf()
+                        else it.userTabState.result,
+                    currentPage =
+                        if (resetResult) 0
+                        else it.userTabState.currentPage,
+                    nextPage = it.userTabState.nextPage
+                )
+            )
+        }
+        viewModelScope.launch {
+            val response: ApiResponse<SearchUser> =
+                if (searchByUser) {
+                    allSearcherRepository
+                        .searchUsers(
+                            _uiState.value.searchQuery,
+                            _uiState.value.userTabState.currentPage + 1
+                        )
+                } else {
+                    allSearcherRepository
+                        .searchUsersByUsername(
+                            _uiState.value.searchQuery,
+                            _uiState.value.userTabState.currentPage + 1
+                        )
+                }
+            response.onSuccess {
+                if (data.users != null) {
+                    _uiState.update {
+                        it.copy(
+                            userTabState = SearchTabUiState(
+                                currentPage = it.userTabState.currentPage + 1,
+                                result = it.userTabState.result + data.users,
+                                state = TabState.Succeed,
+                                messageStr = "Search successfully",
+                                nextPage = data.nextPage
+                            )
+                        )
+                    }
+
+                } else {
+                    _uiState.update {
+                        it.copy(
+                            userTabState = SearchTabUiState(
+                                state = TabState.Failed,
+                                messageStr = "Couldn't find any posts"
+                            )
+                        )
+                    }
+                }
+            }.onFailure {
+                _uiState.update {
+                    it.copy(
+                        userTabState = SearchTabUiState(
+                            state = TabState.Failed,
+                            messageStr = "Search failed"
+                        )
+                    )
+                }
             }
         }
     }
