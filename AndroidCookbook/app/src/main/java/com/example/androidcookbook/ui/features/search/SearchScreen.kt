@@ -1,5 +1,6 @@
 package com.example.androidcookbook.ui.features.search
 
+import android.app.Application
 import android.util.Log
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.BorderStroke
@@ -151,7 +152,10 @@ fun SearchScreen(
                                                 viewModel.ChangeCurrentPost(it)
                                                 viewModel.ChangeScreenState(SearchScreenState.Detail)
                                             },
-                                            onSeeMoreClick = onSeeMoreClick
+                                            onSeeMoreClick = onSeeMoreClick,
+                                            onSeeALlClick = {
+                                                pagerState.requestScrollToPage(SearchTab.Users.ordinal)
+                                            }
                                         )
                                     }
                                 }

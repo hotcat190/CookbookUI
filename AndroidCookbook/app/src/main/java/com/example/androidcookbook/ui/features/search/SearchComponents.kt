@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -16,6 +17,8 @@ import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
@@ -25,6 +28,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -117,6 +121,7 @@ fun UserCard(
 ) {
     ResultCardTheme {
         Card(
+            onClick = { onSeeMoreClick(user) },
             modifier = Modifier
                 .fillMaxWidth()
                 .wrapContentHeight(),
@@ -201,14 +206,6 @@ fun UserCard(
                             .wrapContentHeight(),
                         fontSize = 15.sp
                     )
-                    Text(
-                        text = "See More >",
-                        style = MaterialTheme.typography.titleMedium,
-                        color = MaterialTheme.colorScheme.onSurface,
-                        modifier = Modifier
-                            .align(Alignment.End)
-                            .clickable { onSeeMoreClick(user) }
-                    )
                 }
             }
         }
@@ -248,7 +245,8 @@ fun SearchAllResultsScreen(
     posts: List<Post>,
     users: List<User>,
     onSeeDetailsClick: (Post) -> Unit,
-    onSeeMoreClick: (User) -> Unit
+    onSeeMoreClick: (User) -> Unit,
+    onSeeALlClick: () -> Unit
 ) {
     var postsIndex = 0
     var usersIndex = 0
@@ -258,23 +256,53 @@ fun SearchAllResultsScreen(
     val maxUsers =
         if (users.count() > 3) 3
         else users.count()
+    Text(
+        text = "Everyone",
+        fontWeight = FontWeight.Bold,
+        fontSize = 20.sp
+    )
     while (usersIndex < maxUsers) {
+        Spacer(modifier = Modifier.height(10.dp))
         UserCard(
             user = users[usersIndex],
             onSeeMoreClick = onSeeMoreClick
         )
         usersIndex++
-        Spacer(modifier = Modifier.height(10.dp))
     }
+    Button(
+        onClick = onSeeALlClick,
+        shape = RoundedCornerShape(5.dp),
+        colors = ButtonDefaults.buttonColors(
+            Color.White
+        ),
+        border = BorderStroke(1.dp, color = Color.Black),
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(5.dp)
+    ) {
+        Text(
+            text = "See All",
+            fontWeight = FontWeight.Bold,
+            color = Color.Black
+        )
+    }
+    Spacer(modifier = Modifier.height(10.dp))
+    Text(
+        text = "Posts",
+        fontWeight = FontWeight.Bold,
+        fontSize = 20.sp
+    )
     while (postsIndex < maxPosts) {
+        Spacer(modifier = Modifier.height(10.dp))
         PostCard(
             post = posts[postsIndex],
             onSeeDetailsClick = onSeeDetailsClick
         )
         postsIndex++
-        Spacer(modifier = Modifier.height(10.dp))
     }
 }
+
+
 
 @Preview
 @Composable

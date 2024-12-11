@@ -20,9 +20,11 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.androidcookbook.domain.model.user.User
 import com.example.androidcookbook.ui.components.post.SmallAvatar
+import com.example.androidcookbook.ui.theme.AndroidCookbookTheme
 import com.example.androidcookbook.ui.theme.transparentTextFieldColors
 
 @Composable
@@ -67,5 +69,17 @@ fun WriteCommentRow(
                 tint = MaterialTheme.colorScheme.primary,
             )
         }
+    }
+}
+
+@Composable
+@Preview
+private fun WriteCommentRowPreview() {
+    AndroidCookbookTheme {
+        WriteCommentRow(
+            user = User(),
+            onUserClick = {},
+            onSendComment = {},
+        )
     }
 }

@@ -8,7 +8,6 @@ import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.safeContentPadding
 import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
@@ -30,6 +29,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
+import androidx.navigation.compose.dialog
 import androidx.navigation.compose.rememberNavController
 import com.example.androidcookbook.ui.common.appbars.AppBarTheme
 import com.example.androidcookbook.ui.common.appbars.CookbookAppBarDefault
@@ -40,6 +40,7 @@ import com.example.androidcookbook.ui.nav.dest.follow
 import com.example.androidcookbook.ui.features.search.SearchScreen
 import com.example.androidcookbook.ui.features.search.SearchViewModel
 import com.example.androidcookbook.ui.nav.Routes
+import com.example.androidcookbook.ui.nav.dest.notification
 import com.example.androidcookbook.ui.nav.dest.post.createPost
 import com.example.androidcookbook.ui.nav.dest.post.postDetails
 import com.example.androidcookbook.ui.nav.dest.post.updatePost
@@ -92,14 +93,15 @@ fun CookbookApp(
                         )
                         CookbookAppBarDefault(
                             showBackButton = uiState.canNavigateBack,
-                            searchButtonAction = {
+                            onSearchButtonClick = {
                                 navController.navigate(Routes.Search)
                             },
-                            onCreatePostClick = {
-                                navController.navigateIfNotOn(Routes.CreatePost)
+                            notificationCount = viewModel.notificationCount.collectAsState().value, // TODO: Get notification count from server
+                            onNotificationClick = {
+                                navController.navigate(Routes.Notifications)
                             },
-                            onMenuButtonClick = {
-
+                            onSettingsClick = {
+                                navController.navigate(Routes.Settings)
                             },
                             onBackButtonClick = {
                                 navController.navigateUp()
@@ -164,15 +166,15 @@ fun CookbookApp(
                 AppEntryPoint(navController = navController)
             }
 
-
-
             authScreens(navController = navController, updateAppBar = {
                 viewModel.updateTopBarState(CookbookUiState.TopBarState.Auth)
                 viewModel.updateBottomBarState(CookbookUiState.BottomBarState.NoBottomBar)
             }, updateUser = { response,username,password ->
                 viewModel.updateUser(response,username,password)
             })
+
             appScreens(navController = navController, cookbookViewModel = viewModel)
+
             composable<Routes.Search> {
                 val searchViewModel = hiltViewModel<SearchViewModel>()
                 val searchUiState = searchViewModel.uiState.collectAsState().value
@@ -201,6 +203,7 @@ fun CookbookApp(
                 )
             }
             createPost(viewModel, currentUser, navController)
+
             updatePost(viewModel, currentUser, navController)
 
             postDetails(viewModel, navController)
@@ -210,6 +213,12 @@ fun CookbookApp(
             otherProfile(viewModel, currentUser, navController)
 
             follow(viewModel, navController)
+
+            notification(viewModel, navController)
+
+            dialog<Routes.Settings> {
+                // Settings Dialog
+            }
         }
     }
 }
