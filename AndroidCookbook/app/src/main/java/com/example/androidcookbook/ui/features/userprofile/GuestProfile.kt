@@ -21,9 +21,10 @@ fun GuestProfile(
             UserProfileHeader(
                 bannerPath = null,
                 avatarPath = null,
+                navigateToEditProfile = {},
                 headerButton = {},
             )
-            UserInfo(User(), 0, 0, {}, {})
+            UserInfo(User(), 0, 0,{}, {}, {})
         }
         item {
             Column(

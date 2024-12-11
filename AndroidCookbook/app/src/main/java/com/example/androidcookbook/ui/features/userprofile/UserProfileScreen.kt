@@ -15,11 +15,14 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -43,6 +46,7 @@ fun UserProfileScreen(
     headerButton: @Composable () -> Unit,
     followersCount: Int,
     followingCount: Int,
+    navigateToEditProfile: () -> Unit,
     onFollowersClick: () -> Unit,
     onFollowingClick: () -> Unit,
     modifier: Modifier = Modifier,
@@ -60,12 +64,14 @@ fun UserProfileScreen(
                 UserProfileHeader(
                     avatarPath = user.avatar,
                     bannerPath = user.banner,
+                    navigateToEditProfile = navigateToEditProfile,
                     headerButton = headerButton,
                 )
                 UserInfo(
                     user,
                     followersCount,
                     followingCount,
+                    navigateToEditProfile = navigateToEditProfile,
                     onFollowersClick = onFollowersClick,
                     onFollowingClick = onFollowingClick,
                 )
@@ -113,6 +119,7 @@ fun LazyListScope.userPostPortion(
 fun UserProfileHeader(
     avatarPath: String? = null,
     bannerPath: String? = null,
+    navigateToEditProfile: () -> Unit,
     headerButton: @Composable () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -121,10 +128,20 @@ fun UserProfileHeader(
             .fillMaxWidth()
             .height(270.dp)
     ) {
-        UserBanner(bannerPath)
+        UserBanner(
+            bannerPath,
+            Modifier.clickable {
+                navigateToEditProfile()
+            }
+        )
         UserAvatar(
             avatarPath,
-            Modifier.offset(x = 20.dp, y = 140.dp)
+            Modifier
+                .offset(x = 20.dp, y = 140.dp)
+                .clip(CircleShape)
+                .clickable {
+                    navigateToEditProfile()
+                }
         )
         Box(
             modifier = Modifier
@@ -143,6 +160,7 @@ fun UserInfo(
     user: User,
     followersCount: Int,
     followingCount: Int,
+    navigateToEditProfile: () -> Unit,
     onFollowersClick: () -> Unit,
     onFollowingClick: () -> Unit,
     modifier: Modifier = Modifier,
@@ -221,6 +239,9 @@ fun UserInfo(
                 fontWeight = FontWeight(400),
             ),
             color = MaterialTheme.colorScheme.onSurface,
+            modifier = Modifier.clickable {
+                navigateToEditProfile()
+            }
         )
     }
 }
@@ -245,6 +266,7 @@ fun ProfileDarkPreview() {
             },
             followersCount = 0,
             followingCount = 1,
+            navigateToEditProfile = {},
             onFollowersClick = {},
             onFollowingClick = {},
             content = {
@@ -281,6 +303,7 @@ fun ProfilePreview() {
             },
             followersCount = 0,
             followingCount = 1,
+            navigateToEditProfile = {},
             onFollowersClick = {},
             onFollowingClick = {},
             content = {
@@ -304,6 +327,7 @@ fun AvtPreview() {
         UserProfileHeader(
             avatarPath = null,
             bannerPath = null,
+            navigateToEditProfile = {},
             headerButton = {
 //                EditProfileButton(onEditProfileClick = {})
                 FollowButton(onFollowButtonClick = {}, followButtonState = isFollowingPreview)
@@ -326,6 +350,7 @@ fun UserInfoPreview() {
             ),
             followersCount = 0,
             followingCount = 1,
+            navigateToEditProfile = {},
             onFollowersClick = {},
             onFollowingClick = {},
         )

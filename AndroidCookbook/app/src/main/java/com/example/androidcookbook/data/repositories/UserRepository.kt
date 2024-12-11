@@ -1,6 +1,7 @@
 package com.example.androidcookbook.data.repositories
 
 import com.example.androidcookbook.data.network.UserService
+import com.example.androidcookbook.domain.network.UpdateUserRequest
 import javax.inject.Inject
 
 class UserRepository @Inject constructor(
@@ -10,6 +11,8 @@ class UserRepository @Inject constructor(
 
     suspend fun getUserPosts(userId: Int) = userService.getUserPosts(userId)
 
+    suspend fun updateUser(request: UpdateUserRequest) = userService.updateUser(request)
+
     suspend fun getUserFollowers(userId: Int) = userService.getUserFollowers(userId)
 
     suspend fun getUserFollowing(userId: Int) = userService.getUserFollowing(userId)
@@ -17,4 +20,6 @@ class UserRepository @Inject constructor(
     suspend fun followUser(userId: Int) = userService.followUser(userId)
 
     suspend fun unfollowUser(userId: Int) = userService.unfollowUser(userId)
+
+
 }

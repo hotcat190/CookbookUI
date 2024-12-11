@@ -8,6 +8,12 @@ import androidx.activity.SystemBarStyle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.annotation.RequiresApi
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.safeDrawingPadding
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import com.example.androidcookbook.ui.CookbookApp
 import com.example.androidcookbook.ui.theme.AndroidCookbookTheme
 import com.google.android.gms.tasks.OnCompleteListener
@@ -40,7 +46,12 @@ class MainActivity : ComponentActivity() {
         )
         setContent {
             AndroidCookbookTheme {
-                CookbookApp()
+                Surface(
+                    modifier = Modifier
+                        .fillMaxSize()
+                ) {
+                    CookbookApp()
+                }
             }
         }
     }

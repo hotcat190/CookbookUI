@@ -110,13 +110,14 @@ fun NavGraphBuilder.otherProfile(
                         },
                         followersCount = followViewModel.followers.collectAsState().value.size,
                         followingCount = followViewModel.following.collectAsState().value.size,
+                        navigateToEditProfile = {},
                         onFollowersClick = {
-                            navController.navigateIfNotOn(
+                            navController.navigate(
                                 Routes.Follow(userProfileUiState.user, FollowListScreenType.Followers)
                             )
                         },
                         onFollowingClick = {
-                            navController.navigateIfNotOn(
+                            navController.navigate(
                                 Routes.Follow(userProfileUiState.user, FollowListScreenType.Following)
                             )
                         },

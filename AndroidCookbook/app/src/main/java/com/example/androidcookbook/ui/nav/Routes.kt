@@ -63,7 +63,7 @@ object Routes {
     data class UpdatePost(val post: Post)
 
     @Serializable
-    object EditProfile
+    data class EditProfile(val user: User)
 
     @Serializable
     data class OtherProfile(val user: User)

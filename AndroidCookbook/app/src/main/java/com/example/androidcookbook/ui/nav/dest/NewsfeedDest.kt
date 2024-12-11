@@ -46,7 +46,6 @@ fun NavGraphBuilder.newsfeed(
                     } else {
                         navController.navigate(Routes.OtherProfile(user))
                     }
-                    cookbookViewModel.updateCanNavigateBack(true)
                 },
                 onLoadMore = {
                     newsfeedViewModel.loadMore()

@@ -3,9 +3,13 @@ package com.example.androidcookbook.ui
 import android.app.Activity
 import android.graphics.Color
 import android.util.Log
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.safeContentPadding
+import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -16,6 +20,8 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.core.view.WindowCompat
@@ -61,6 +67,8 @@ fun CookbookApp(
 
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
 
+    val focusManager = LocalFocusManager.current
+
     Scaffold(
         modifier = Modifier
             .nestedScroll(scrollBehavior.nestedScrollConnection),
@@ -85,7 +93,7 @@ fun CookbookApp(
                         CookbookAppBarDefault(
                             showBackButton = uiState.canNavigateBack,
                             searchButtonAction = {
-                                navController.navigateIfNotOn(Routes.Search)
+                                navController.navigate(Routes.Search)
                             },
                             onCreatePostClick = {
                                 navController.navigateIfNotOn(Routes.CreatePost)
@@ -115,16 +123,16 @@ fun CookbookApp(
                     AppBarTheme{
                         CookbookBottomNavigationBar(
                             onCategoryClick = {
-                                navController.navigateIfNotOn(Routes.App.Category)
+                                navController.navigateIfNotOn(Routes.App.Category, true)
                             },
                             onAiChatClick = {
-                                navController.navigateIfNotOn(Routes.App.AIChef)
+                                navController.navigateIfNotOn(Routes.App.AIChef, true)
                             },
                             onNewsfeedClick = {
-                                navController.navigateIfNotOn(Routes.App.Newsfeed)
+                                navController.navigateIfNotOn(Routes.App.Newsfeed, true)
                             },
                             onUserProfileClick = {
-                                navController.navigateIfNotOn(Routes.App.UserProfile(currentUser))
+                                navController.navigateIfNotOn(Routes.App.UserProfile(currentUser), true)
                             },
                             onCreatePostClick = {
                                 navController.navigateIfNotOn(Routes.CreatePost)
@@ -142,7 +150,14 @@ fun CookbookApp(
             startDestination = "check_auth",
             modifier = Modifier
                 .fillMaxSize()
-                .padding(innerPadding),
+                .padding(innerPadding)
+                .consumeWindowInsets(innerPadding)
+                .safeDrawingPadding()
+                .pointerInput(Unit) {
+                    detectTapGestures(onTap = {
+                        focusManager.clearFocus()
+                    })
+                },
         ) {
 
             composable("check_auth") {
