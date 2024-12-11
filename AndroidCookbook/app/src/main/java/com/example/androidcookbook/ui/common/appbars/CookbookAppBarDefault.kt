@@ -49,7 +49,7 @@ fun CookbookAppBarDefault(
     showBackButton: Boolean = false,
     onCreatePostClick: () -> Unit = {},
     searchButtonAction: () -> Unit = {},
-    onMenuButtonClick: () -> Unit = {},
+    onSettingsClick: () -> Unit = {},
     onBackButtonClick: () -> Unit = {},
     scrollBehavior: TopAppBarScrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(),
     onLogoutClick: () -> Unit = {}
@@ -123,7 +123,6 @@ fun CookbookAppBarDefault(
                         containerColor = MaterialTheme.colorScheme.primary
                     )
                 ) {
-
                     Icon(
                         imageVector = Icons.Default.Menu,
                         contentDescription = "Menu Button",
@@ -139,7 +138,7 @@ fun CookbookAppBarDefault(
                         DropdownMenuItem(
                             onClick = {
                                 menuExpanded = false
-
+                                onSettingsClick()
                             },
                             text = {
                                 Text(

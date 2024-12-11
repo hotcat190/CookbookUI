@@ -70,4 +70,7 @@ object Routes {
 
     @Serializable
     data class Follow(val user: User, val type: FollowListScreenType)
+
+    @Serializable
+    object Settings
 }

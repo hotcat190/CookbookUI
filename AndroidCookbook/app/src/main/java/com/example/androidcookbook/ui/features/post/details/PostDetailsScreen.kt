@@ -116,7 +116,8 @@ fun PostDetailsScreen(
             LazyColumn(
                 modifier = modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 5.dp, vertical = 15.dp),
+                    .padding(horizontal = 5.dp)
+                    .padding(top = 15.dp),
             ) {
                 item {
                     PostDetailsInfo(
