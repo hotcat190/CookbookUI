@@ -61,6 +61,7 @@ fun NavGraphBuilder.userProfile(
         }
 
         LaunchedEffect(Unit) {
+            userProfileViewModel.refresh()
             followViewModel.refresh()
         }
 

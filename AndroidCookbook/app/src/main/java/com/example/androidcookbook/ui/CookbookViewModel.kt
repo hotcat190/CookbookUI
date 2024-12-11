@@ -59,7 +59,7 @@ class CookbookViewModel @Inject constructor(
                 }
                 _isLoggedIn.value = isLoggedIn
 
-                launch {
+//                launch {
                     dataStoreManager.username.combine(dataStoreManager.password) { username, password ->
                         Pair(
                             username,
@@ -74,11 +74,9 @@ class CookbookViewModel @Inject constructor(
                             }
                         }
                     }
-                }
+//                }
             }
         }
-
-
     }
 
     fun updateCanNavigateBack(updatedCanNavigateBack: Boolean) {
