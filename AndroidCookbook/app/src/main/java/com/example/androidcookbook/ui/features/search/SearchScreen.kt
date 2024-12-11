@@ -149,7 +149,8 @@ fun SearchScreen(
                                             onSeeDetailsClick = {
                                                 viewModel.ChangeCurrentPost(it)
                                                 viewModel.ChangeScreenState(SearchScreenState.Detail)
-                                            }
+                                            },
+                                            onSeeMoreClick = {}
                                         )
                                     }
                                 }
@@ -223,8 +224,8 @@ fun SearchScreen(
                                     if (searchUiState.userTabState.state != TabState.Idle) {
                                         items(searchUiState.userTabState.result){
                                             UserCard(
-                                                onClick = {},
-                                                user = it
+                                                user = it,
+                                                onSeeMoreClick = {}
                                             )
                                             LaunchedEffect(isAtBottom) {
                                                 if (isAtBottom) {
@@ -326,10 +327,10 @@ fun CardPreviewDark() {
 @Composable
 fun UserCardPreview() {
     UserCard(
-        onClick = {},
         user = User(
             bio = "hehehehehhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhehehehe"
-        )
+        ),
+        onSeeMoreClick = {}
     )
 }
 
