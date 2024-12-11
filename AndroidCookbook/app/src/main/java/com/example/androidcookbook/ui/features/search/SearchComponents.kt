@@ -302,6 +302,8 @@ fun SearchAllResultsScreen(
     }
 }
 
+
+
 @Preview
 @Composable
 fun UserPreview() {

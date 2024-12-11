@@ -1,5 +1,6 @@
 package com.example.androidcookbook.ui.features.search
 
+import android.app.Application
 import android.util.Log
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.BorderStroke
@@ -78,7 +79,7 @@ fun SearchScreen(
     onSeeMoreClick: (User) -> Unit = {}
 ) {
     val pagerState = rememberPagerState(
-        pageCount = { 4 }
+        pageCount = { 5 }
     )
     BackHandler {
         when (searchUiState.currentScreen) {
@@ -247,6 +248,14 @@ fun SearchScreen(
                                             searchByUser = userChecked,
                                             resetResult = false
                                         )
+                                    }
+                                }
+                                4 -> {
+                                    item {
+                                        val context = LocalContext.current
+                                        val application = context.applicationContext as Application
+                                        val speechViewModel = SpeechToTextViewModel(application = application)
+                                        SpeechToTextScreen(viewModel = speechViewModel)
                                     }
                                 }
                             }
