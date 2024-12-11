@@ -1,6 +1,5 @@
 package com.example.androidcookbook.ui.features.userprofile
 
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -12,31 +11,21 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import coil.compose.AsyncImage
-import coil.request.ImageRequest
-import com.example.androidcookbook.R
 import com.example.androidcookbook.data.mocks.SamplePosts
 import com.example.androidcookbook.domain.model.post.Post
 import com.example.androidcookbook.domain.model.user.GUEST_ID
@@ -44,6 +33,8 @@ import com.example.androidcookbook.domain.model.user.User
 import com.example.androidcookbook.ui.features.newsfeed.NewsfeedCard
 import com.example.androidcookbook.ui.features.follow.FollowButton
 import com.example.androidcookbook.ui.features.follow.FollowButtonState
+import com.example.androidcookbook.ui.features.userprofile.components.UserAvatar
+import com.example.androidcookbook.ui.features.userprofile.components.UserBanner
 import com.example.androidcookbook.ui.theme.AndroidCookbookTheme
 
 @Composable
@@ -126,12 +117,15 @@ fun UserProfileHeader(
     modifier: Modifier = Modifier,
 ) {
     Box(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
             .height(270.dp)
     ) {
         UserBanner(bannerPath)
-        UserAvatar(avatarPath)
+        UserAvatar(
+            avatarPath,
+            Modifier.offset(x = 20.dp, y = 140.dp)
+        )
         Box(
             modifier = Modifier
                 .align(Alignment.BottomEnd)
@@ -143,49 +137,6 @@ fun UserProfileHeader(
 }
 
 private val isFollowingPreview = FollowButtonState.Follow
-
-@Composable
-private fun UserBanner(
-    bannerPath: String?,
-) {
-    AsyncImage(
-//        painter = painterResource(id = R.drawable.image_5),
-        model = ImageRequest.Builder(LocalContext.current)
-            .data(bannerPath)
-            .crossfade(true)
-            .build(),
-        contentDescription = null,
-        modifier =
-        Modifier
-            .fillMaxWidth()
-            .height(200.dp),
-        contentScale = ContentScale.Crop,
-        error = painterResource(id = R.drawable.image_5),
-        placeholder = painterResource(id = R.drawable.image_5),
-    )
-}
-
-@Composable
-private fun UserAvatar(avatarPath: String?) {
-    AsyncImage(
-//            painter = painterResource(id = R.drawable.default_avatar),
-        model = ImageRequest.Builder(LocalContext.current)
-            .data(avatarPath)
-            .crossfade(true)
-            .build(),
-        contentDescription = null,
-        modifier =
-        Modifier
-            .size(125.dp)
-            .offset(x = 20.dp, y = 140.dp)
-            .border(shape = CircleShape, width = 5.dp, color = Color.White)
-            .padding(5.dp)
-            .clip(CircleShape),
-        contentScale = ContentScale.Crop,
-        placeholder = painterResource(R.drawable.default_avatar),
-        error = painterResource(R.drawable.default_avatar),
-    )
-}
 
 @Composable
 fun UserInfo(

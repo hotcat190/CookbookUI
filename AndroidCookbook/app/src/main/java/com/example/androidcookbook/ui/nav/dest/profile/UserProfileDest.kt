@@ -47,8 +47,8 @@ fun NavGraphBuilder.userProfile(
         val user = it.toRoute<Routes.App.UserProfile>().user
 
         val userProfileViewModel =
-            hiltViewModel<UserProfileViewModel, UserProfileViewModel.UserProfileViewModelFactory>(
-
+            sharedViewModel<UserProfileViewModel, UserProfileViewModel.UserProfileViewModelFactory>(
+                it, navController, Routes.App
             ) { factory ->
                 factory.create(user)
             }

@@ -179,6 +179,9 @@ fun CookbookApp(
                     searchUiState = searchUiState,
                     onBackButtonClick = {
                         navController.navigateUp()
+                    },
+                    onSeeMoreClick = {
+                        //Click to see user profile
                     }
                 )
             }
@@ -187,7 +190,7 @@ fun CookbookApp(
 
             postDetails(viewModel, navController)
 
-            editProfile(viewModel, currentUser, navController)
+            editProfile(viewModel, navController)
 
             otherProfile(viewModel, currentUser, navController)
 
