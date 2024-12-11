@@ -219,12 +219,14 @@ fun CookbookApp(
             notification(viewModel, navController)
 
             dialog<Routes.Settings> {
+                val notice = viewModel.notice.collectAsState().value
+                val themeType = viewModel.themeType.collectAsState().value
                 AppBarTheme {
                     SettingContainer(
-                        noticeChecked = true,
-                        onNoticeCheckedChange = { },
-                        themeTypeSelected = ThemeType.Default,
-                        onThemeTypeChange = {}
+                        noticeChecked = notice,
+                        onNoticeCheckedChange = { viewModel.updateUserNotice(it) },
+                        themeTypeSelected = themeType,
+                        onThemeTypeChange = { viewModel.updateUserTheme(it) }
                     )
                 }
             }

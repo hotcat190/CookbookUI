@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.androidcookbook.data.providers.AccessTokenProvider
 import com.example.androidcookbook.data.providers.DataStoreManager
+import com.example.androidcookbook.data.providers.ThemeType
 import com.example.androidcookbook.data.repositories.AuthRepository
 import com.example.androidcookbook.domain.model.auth.SignInRequest
 import com.example.androidcookbook.domain.model.auth.SignInResponse
@@ -42,6 +43,12 @@ class CookbookViewModel @Inject constructor(
     private val _user = MutableStateFlow(User())
     val user = _user.asStateFlow()
 
+    private val _themeType = MutableStateFlow(ThemeType.Default)
+    val themeType = _themeType.asStateFlow()
+
+    private val _notice = MutableStateFlow(true)
+    val notice = _notice.asStateFlow()
+
     var notificationCount = MutableStateFlow(0) // TODO: Get notification count from server
         private set
 
@@ -66,7 +73,6 @@ class CookbookViewModel @Inject constructor(
                             password
                         )
                     }.collect { (username, password) ->
-
                         if (user.value.id == GUEST_ID && username != null && password != null) {
                             val response = authRepository.login(SignInRequest(username, password))
                             response.onSuccess {
@@ -75,6 +81,14 @@ class CookbookViewModel @Inject constructor(
                         }
                     }
                 }
+            }
+            dataStoreManager.theme.combine(dataStoreManager.canSendNotification) { theme, canSendNotification ->
+                Pair(
+                    theme, canSendNotification
+                )
+            }.collect { (theme, canSendNotification) ->
+                _themeType.value = theme
+                _notice.value = canSendNotification
             }
         }
 
@@ -116,6 +130,21 @@ class CookbookViewModel @Inject constructor(
         viewModelScope.launch {
             dataStoreManager.clearLoginState()
             authRepository.sendLogOutRequest()
+        }
+    }
+
+    fun updateUserNotice(canNotice: Boolean) {
+        _notice.update { canNotice }
+        viewModelScope.launch {
+            dataStoreManager.saveNotification(canNotice)
+        }
+
+    }
+
+    fun updateUserTheme(theme: ThemeType) {
+        _themeType.update { theme }
+        viewModelScope.launch {
+            dataStoreManager.saveTheme(theme)
         }
     }
 }
