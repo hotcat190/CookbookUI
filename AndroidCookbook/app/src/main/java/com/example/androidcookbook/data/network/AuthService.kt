@@ -11,6 +11,7 @@ import com.example.androidcookbook.domain.model.auth.SignInResponse
 import com.example.androidcookbook.domain.network.SuccessMessageBody
 import com.skydoves.sandwich.ApiResponse
 import retrofit2.http.Body
+import retrofit2.http.GET
 import retrofit2.http.POST
 
 interface AuthService {
@@ -32,7 +33,7 @@ interface AuthService {
     @POST("auth/set-token")
     suspend fun sendSetTokenRequest(@Body request: SetTokenRequest):ApiResponse<SuccessMessageBody>
 
-    @POST("auth/logout")
+    @GET("auth/logout")
     suspend fun sendLogOutRequest(): ApiResponse<SuccessMessageBody>
 }
 

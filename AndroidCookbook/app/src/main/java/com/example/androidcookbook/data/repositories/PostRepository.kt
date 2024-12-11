@@ -17,13 +17,13 @@ class PostRepository @Inject constructor(
 
     suspend fun getPost(postId: Int) = postService.getPost(postId)
 
-    suspend fun queryPostLike(postId: Int) = postService.queryPostLike(postId)
+    suspend fun queryPostLike(postId: Int, userId: Int) = postService.queryPostLike(postId, userId)
 
     suspend fun likePost(id: Int) = postService.likePost(id)
 
     suspend fun unlikePost(id: Int) = postService.unlikePost(id)
 
-    suspend fun getComments(postId: Int, page: Int) = postService.getComments(postId, page)
+    suspend fun getComments(postId: Int, userId: Int, page: Int) = postService.getComments(postId, userId, page)
 
     suspend fun sendComment(postId: Int, request: SendCommentRequest) = postService.sendComment(postId, request)
 
@@ -38,5 +38,7 @@ class PostRepository @Inject constructor(
     suspend fun bookmarkPost(postId: Int) = postService.bookmarkPost(postId)
 
     suspend fun unBookmarkPost(postId: Int) = postService.unBookmarkPost(postId)
+
+    suspend fun queryPostBookmark(postId: Int, userId: Int) = postService.queryPostBookmark(postId, userId)
 
 }

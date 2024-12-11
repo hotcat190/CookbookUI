@@ -60,13 +60,17 @@ fun NavGraphBuilder.otherProfile(
                 factory.create(user)
             }
 
-        val followViewModel = sharedViewModel<FollowViewModel, FollowViewModel.FollowViewModelFactory>(
-            it, navController, Routes.OtherProfile(user)
+        val followViewModel = hiltViewModel<FollowViewModel, FollowViewModel.FollowViewModelFactory>(
+//            it, navController, Routes.OtherProfile(user)
         ) { factory ->
             factory.create(
                 currentUser,
                 user,
             )
+        }
+
+        LaunchedEffect(Unit) {
+            followViewModel.refresh()
         }
 
         val userProfileUiState = userProfileViewModel.uiState.collectAsState().value

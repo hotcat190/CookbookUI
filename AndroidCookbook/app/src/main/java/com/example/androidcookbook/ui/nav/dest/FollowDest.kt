@@ -20,6 +20,7 @@ import com.example.androidcookbook.ui.features.follow.FollowButtonState
 import com.example.androidcookbook.ui.nav.CustomNavTypes
 import com.example.androidcookbook.ui.nav.Routes
 import com.example.androidcookbook.ui.nav.utils.navigateToProfile
+import com.example.androidcookbook.ui.nav.utils.sharedViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlin.reflect.typeOf
 
@@ -43,7 +44,12 @@ fun NavGraphBuilder.follow(
 
         Log.d("FOLLOW", "LocalViewModelStoreOwner: ${LocalViewModelStoreOwner.current}")
 
-        val followViewModel = hiltViewModel<FollowViewModel, FollowViewModel.FollowViewModelFactory> { factory ->
+        val followViewModel = hiltViewModel<FollowViewModel, FollowViewModel.FollowViewModelFactory>(
+//            it, navController, (
+//                if (targetUser.id == currentUser.id) Routes.App.UserProfile(currentUser)
+//                else Routes.OtherProfile(targetUser)
+//            )
+        ) { factory ->
             factory.create(currentUser, targetUser)
         }
 
