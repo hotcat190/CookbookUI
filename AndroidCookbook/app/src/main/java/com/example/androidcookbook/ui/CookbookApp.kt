@@ -96,7 +96,7 @@ fun CookbookApp(
                     AppBarTheme {
                         updateSystemBarColors(
                             Color.TRANSPARENT,
-                            Color.TRANSPARENT
+                            MaterialTheme.colorScheme.background.toArgb(),
                         )
                         CookbookAppBarDefault(
                             showBackButton = uiState.canNavigateBack,

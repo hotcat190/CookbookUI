@@ -262,7 +262,7 @@ private fun PostDetailsInfo(
                     Icons.Outlined.BookmarkBorder
                 },
                 contentDescription = "Bookmark",
-                tint = MaterialTheme.colorScheme.secondary
+                tint = MaterialTheme.colorScheme.onSurface
             )
         }
 
