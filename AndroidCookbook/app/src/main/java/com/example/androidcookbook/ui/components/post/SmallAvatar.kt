@@ -36,3 +36,24 @@ fun SmallAvatar(
         placeholder = painterResource(R.drawable.default_avatar)
     )
 }
+
+@Composable
+fun SmallAvatar(
+    avatar: Any?,
+    modifier: Modifier = Modifier
+) {
+    AsyncImage(
+        model = ImageRequest.Builder(LocalContext.current)
+            .data(avatar)
+            .crossfade(true)
+            .build(),
+//            imageVector = Icons.Default.AccountCircle,
+        contentDescription = "Profile Picture",
+        modifier = modifier
+            .size(32.dp)
+            .clip(CircleShape),
+//            tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.25f),
+        error = painterResource(R.drawable.default_avatar),
+        placeholder = painterResource(R.drawable.default_avatar)
+    )
+}

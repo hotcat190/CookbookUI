@@ -8,7 +8,6 @@ import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.safeContentPadding
 import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
@@ -41,6 +40,7 @@ import com.example.androidcookbook.ui.nav.dest.follow
 import com.example.androidcookbook.ui.features.search.SearchScreen
 import com.example.androidcookbook.ui.features.search.SearchViewModel
 import com.example.androidcookbook.ui.nav.Routes
+import com.example.androidcookbook.ui.nav.dest.notification
 import com.example.androidcookbook.ui.nav.dest.post.createPost
 import com.example.androidcookbook.ui.nav.dest.post.postDetails
 import com.example.androidcookbook.ui.nav.dest.post.updatePost
@@ -93,11 +93,12 @@ fun CookbookApp(
                         )
                         CookbookAppBarDefault(
                             showBackButton = uiState.canNavigateBack,
-                            searchButtonAction = {
+                            onSearchButtonClick = {
                                 navController.navigate(Routes.Search)
                             },
-                            onCreatePostClick = {
-                                navController.navigateIfNotOn(Routes.CreatePost)
+                            notificationCount = viewModel.notificationCount.collectAsState().value, // TODO: Get notification count from server
+                            onNotificationClick = {
+                                navController.navigate(Routes.Notifications)
                             },
                             onSettingsClick = {
                                 navController.navigate(Routes.Settings)
@@ -212,6 +213,8 @@ fun CookbookApp(
             otherProfile(viewModel, currentUser, navController)
 
             follow(viewModel, navController)
+
+            notification(viewModel, navController)
 
             dialog<Routes.Settings> {
                 // Settings Dialog

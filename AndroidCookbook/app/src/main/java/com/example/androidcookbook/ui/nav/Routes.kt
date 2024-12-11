@@ -73,4 +73,7 @@ object Routes {
 
     @Serializable
     object Settings
+
+    @Serializable
+    object Notifications
 }

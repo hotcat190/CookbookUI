@@ -42,6 +42,9 @@ class CookbookViewModel @Inject constructor(
     private val _user = MutableStateFlow(User())
     val user = _user.asStateFlow()
 
+    var notificationCount = MutableStateFlow(0) // TODO: Get notification count from server
+        private set
+
     init {
         viewModelScope.launch {
             dataStoreManager.token.combine(dataStoreManager.isLoggedIn) { token, isLoggedIn ->
@@ -94,6 +97,9 @@ class CookbookViewModel @Inject constructor(
         _uiState.update { it.copy(bottomBarState = bottomBarState) }
     }
 
+    fun updateNotificationCount(count: Int) {
+        notificationCount.update { count }
+    }
 
     fun updateUser(response: SignInResponse, username: String, password: String) {
         _user.update { response.user }
