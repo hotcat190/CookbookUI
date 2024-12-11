@@ -7,6 +7,7 @@ import androidx.navigation.compose.navigation
 import com.example.androidcookbook.ui.CookbookUiState
 import com.example.androidcookbook.ui.CookbookViewModel
 import com.example.androidcookbook.ui.features.aigen.AIGenScreen
+import com.example.androidcookbook.ui.features.aigen.AiGenViewModel
 import com.example.androidcookbook.ui.features.aigen.AiScreenTheme
 import com.example.androidcookbook.ui.features.category.CategoryScreen
 import com.example.androidcookbook.ui.features.category.CategoryViewModel
@@ -41,8 +42,12 @@ fun NavGraphBuilder.appScreens(
             cookbookViewModel.updateBottomBarState(CookbookUiState.BottomBarState.Default)
             cookbookViewModel.updateCanNavigateBack(false)
 
+            val aiGenViewModel = sharedViewModel<AiGenViewModel>(
+                it, navController, Routes.App
+            )
+
             AiScreenTheme {
-                AIGenScreen()
+                AIGenScreen(aiGenViewModel)
             }
         }
         newsfeed(cookbookViewModel, navController)

@@ -61,6 +61,7 @@ class FollowViewModel @AssistedInject constructor(
         } else {
             followUser(user)
         }
+        refresh()
     }
 
     fun unfollowUser(user: User) {
@@ -68,8 +69,9 @@ class FollowViewModel @AssistedInject constructor(
             userRepository.unfollowUser(user.id)
                 .onSuccess {
                     _isFollowing.update { false }
-                    currentUserFollowing.update { it.toMutableList().apply { remove(user) }}
-                    _followers.update { it.toMutableList().apply { remove(user) }}
+//                    currentUserFollowing.update { it.toMutableList().apply { remove(user) }}
+//                    _followers.update { it.toMutableList().apply { remove(user) }}
+                    refresh()
                 }
                 .onFailure {
                     viewModelScope.launch {
@@ -84,8 +86,9 @@ class FollowViewModel @AssistedInject constructor(
             val response = userRepository.followUser(user.id)
             response.onSuccess {
                     _isFollowing.update { true }
-                    currentUserFollowing.update { it.toMutableList().apply { add(user) }}
-                    _followers.update { it.toMutableList().apply { add(user) }}
+//                    currentUserFollowing.update { it.toMutableList().apply { add(user) }}
+//                    _followers.update { it.toMutableList().apply { add(user) }}
+                    refresh()
                 }
                 .onFailure {
                     viewModelScope.launch {

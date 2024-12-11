@@ -109,6 +109,7 @@ class CookbookViewModel @Inject constructor(
     fun logout() {
         viewModelScope.launch {
             dataStoreManager.clearLoginState()
+            authRepository.sendLogOutRequest()
         }
     }
 }

@@ -190,18 +190,30 @@ private fun PostDetailsInfo(
                 .padding(bottom = 16.dp)
         )
         if (post.mainImage != null) {
+//            AsyncImage(
+//                model = ImageRequest.Builder(LocalContext.current)
+//                    .data(post.mainImage)
+//                    .crossfade(true)
+//                    .build(),
+//                contentDescription = null,
+//                modifier = Modifier
+//                    .fillMaxWidth()
+//                    .height(200.dp)
+//                    .clip(RoundedCornerShape(5)),
+//
+//                contentScale = ContentScale.Crop,
+//            )
             AsyncImage(
                 model = ImageRequest.Builder(LocalContext.current)
                     .data(post.mainImage)
                     .crossfade(true)
                     .build(),
                 contentDescription = null,
+                contentScale = ContentScale.FillWidth,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(200.dp)
-                    .clip(RoundedCornerShape(5)),
-
-                contentScale = ContentScale.Crop,
+                    .clip(RoundedCornerShape(16.dp))
+                    .padding(top = 16.dp, bottom = 8.dp)
             )
         }
     }
@@ -256,10 +268,9 @@ private fun PostDetailsInfo(
         )
     }
     Row(
-        horizontalArrangement = Arrangement.SpaceBetween,
+        horizontalArrangement = Arrangement.SpaceEvenly,
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 5.dp)
     ) {
         LobsterTextButton(
             onclick = { state = DetailState.Description },
@@ -273,11 +284,9 @@ private fun PostDetailsInfo(
             .fillMaxWidth()
             .wrapContentHeight()
             .padding(horizontal = 16.dp, vertical = 16.dp)
-            .heightIn(max = 400.dp)
     ) {
         Column(
             modifier = Modifier
-                .verticalScroll(rememberScrollState())
         ) {
             when (state) {
                 DetailState.Description -> {
@@ -388,11 +397,13 @@ fun LobsterTextButton(
     }
 }
 
-@Preview(showBackground = true)
+@Preview(
+    showBackground = true
+)
 @Composable
 fun PostDetailsPreview() {
     PostDetailsScreen(
-        SamplePosts.posts[0],
+        SamplePosts.posts[0].copy(mainImage = "https://images.pexels.com/photos/1640777/pexels-photo-1640777.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1"),
         currentUser = User(),
         showPostOptions = true,
         comments = listOf(),

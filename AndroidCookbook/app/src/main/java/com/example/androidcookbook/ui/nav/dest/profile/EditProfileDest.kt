@@ -14,7 +14,7 @@ fun NavGraphBuilder.editProfile(
     navController: NavHostController,
 ) {
     composable<Routes.EditProfile>{
-        viewModel.updateTopBarState(CookbookUiState.TopBarState.Default)
+        viewModel.updateTopBarState(CookbookUiState.TopBarState.NoTopBar)
         viewModel.updateBottomBarState(CookbookUiState.BottomBarState.NoBottomBar)
         viewModel.updateCanNavigateBack(true)
 

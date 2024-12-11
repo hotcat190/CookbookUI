@@ -54,10 +54,14 @@ fun NavGraphBuilder.userProfile(
             }
 
         val userProfileUiState = userProfileViewModel.uiState.collectAsState().value
-        val followViewModel = sharedViewModel<FollowViewModel, FollowViewModel.FollowViewModelFactory>(
-            it, navController, Routes.App.UserProfile(user)
+        val followViewModel = hiltViewModel<FollowViewModel, FollowViewModel.FollowViewModelFactory>(
+//            it, navController, Routes.App.UserProfile(user)
         ) { factory ->
             factory.create(user, user)
+        }
+
+        LaunchedEffect(Unit) {
+            followViewModel.refresh()
         }
 
         RefreshableScreen(

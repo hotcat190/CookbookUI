@@ -152,7 +152,7 @@ fun CommentRow(
                         },
                     )
                     Text(
-                        text = comment.likes.toString(),
+                        text = comment.totalLike.toString(),
                     )
                 }
             }

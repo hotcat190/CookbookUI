@@ -10,6 +10,7 @@ import com.example.androidcookbook.data.repositories.PostRepository
 import com.example.androidcookbook.domain.model.post.Comment
 import com.example.androidcookbook.domain.model.post.Post
 import com.example.androidcookbook.domain.model.post.SendCommentRequest
+import com.example.androidcookbook.domain.model.user.User
 import com.example.androidcookbook.domain.usecase.DeletePostUseCase
 import com.example.androidcookbook.domain.usecase.MakeToastUseCase
 import com.skydoves.sandwich.message
@@ -28,6 +29,7 @@ import kotlinx.coroutines.launch
 class PostDetailsViewModel @AssistedInject constructor(
     @ApplicationContext private val context: Context,
     @Assisted private val _post: Post,
+    @Assisted private val currentUser: User,
     private val postRepository: PostRepository,
     private val deletePostUseCase: DeletePostUseCase,
     private val makeToastUseCase: MakeToastUseCase,
@@ -35,7 +37,10 @@ class PostDetailsViewModel @AssistedInject constructor(
 
     @AssistedFactory
     interface PostDetailsViewModelFactory {
-        fun create(post: Post): PostDetailsViewModel
+        fun create(
+            post: Post,
+            currentUser: User,
+        ): PostDetailsViewModel
     }
 
     var postUiState: MutableStateFlow<PostUiState> = MutableStateFlow(PostUiState.Loading)
@@ -54,8 +59,12 @@ class PostDetailsViewModel @AssistedInject constructor(
         private set
 
     init {
-//        getPost()
-        postUiState.update { PostUiState.Success(post = _post) }
+        refresh()
+    }
+
+    fun refresh() {
+        getPost()
+        //        postUiState.update { PostUiState.Success(post = _post) }
         queryPostLike(_post.id)
         queryPostBookmark(_post.id)
         getComments(false)
@@ -79,21 +88,25 @@ class PostDetailsViewModel @AssistedInject constructor(
 
     private fun queryPostLike(postId: Int) {
         viewModelScope.launch {
-            // TODO: implement query post like
-//            val response = postRepository.queryPostLike(postId)
-//            response.onSuccess {
-//                isPostLiked.update { true }
-//            }.onFailure {
-//                isPostLiked.update { false }
-//                Log.d("PostDetails", message())
-//            }
+            val response = postRepository.queryPostLike(postId, currentUser.id)
+            response.onSuccess {
+                isPostLiked.update { data.isLiked }
+            }.onFailure {
+                isPostLiked.update { false }
+                Log.d("PostDetails", message())
+            }
         }
     }
 
     private fun queryPostBookmark(postId: Int) {
         viewModelScope.launch {
-            // TODO: implement query post bookmark
-
+            val response = postRepository.queryPostBookmark(postId, currentUser.id)
+            response.onSuccess {
+                isPostBookmarked.update { data.isFavorited }
+            }.onFailure {
+                isPostBookmarked.update { false }
+                Log.d("PostDetails", message())
+            }
         }
     }
 
@@ -165,7 +178,7 @@ class PostDetailsViewModel @AssistedInject constructor(
             commentPage.update { 1 }
         }
         viewModelScope.launch {
-            val response = postRepository.getComments(_post.id, commentPage.value)
+            val response = postRepository.getComments(_post.id, currentUser.id, commentPage.value)
             response.onSuccess {
                 commentsFlow.update { it + data.comments }
                 commentPage.update { it + 1 }
@@ -201,6 +214,7 @@ class PostDetailsViewModel @AssistedInject constructor(
             )
             response.onSuccess {
                 getComments(true)
+                exitEditCommentState()
                 Log.d("PostDetails", data.toString())
             }.onFailure {
                 Log.d("PostDetails", message())
@@ -267,7 +281,7 @@ class PostDetailsViewModel @AssistedInject constructor(
                 if (it.id == comment.id) {
                     it.copy(
                         isLiked = isLiked,
-                        likes = if (isLiked) it.likes + 1 else it.likes - 1,
+                        totalLike = if (isLiked) it.totalLike + 1 else it.totalLike - 1,
                     )
                 } else {
                     it

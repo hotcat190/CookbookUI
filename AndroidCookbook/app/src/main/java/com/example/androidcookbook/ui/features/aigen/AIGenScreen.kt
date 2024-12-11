@@ -57,12 +57,14 @@ import kotlinx.coroutines.launch
 
 @SuppressLint("StateFlowValueCalledInComposition")
 @Composable
-fun AIGenScreen(modifier: Modifier = Modifier) {
+fun AIGenScreen(
+    aiGenViewModel: AiGenViewModel = hiltViewModel(),
+    modifier: Modifier = Modifier
+) {
 
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
 
-    val aiGenViewModel: AiGenViewModel = hiltViewModel()
     val uiState by aiGenViewModel.aiGenUiState.collectAsState()
     val selectedImageUri by aiGenViewModel.selectedImageUri.collectAsState()
 

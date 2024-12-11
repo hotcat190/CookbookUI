@@ -5,6 +5,8 @@ import com.example.androidcookbook.domain.model.post.Post
 import com.example.androidcookbook.domain.model.post.PostCreateRequest
 import com.example.androidcookbook.domain.model.post.PostCreateResponse
 import com.example.androidcookbook.domain.model.post.SendCommentRequest
+import com.example.androidcookbook.domain.network.BookmarkQueryResponse
+import com.example.androidcookbook.domain.network.LikeQueryResponse
 import com.example.androidcookbook.domain.network.SuccessMessageBody
 import com.skydoves.sandwich.ApiResponse
 import retrofit2.http.Body
@@ -21,8 +23,11 @@ interface PostService {
     @GET("posts/{postId}")
     suspend fun getPost(@Path("postId") postId: Int): ApiResponse<Post>
 
-    @GET("posts/{postId}/like")
-    suspend fun queryPostLike(@Path("postId") postId: Int): ApiResponse<SuccessMessageBody> // TODO
+    @GET("like/check/{postId}/{userId}")
+    suspend fun queryPostLike(
+        @Path("postId") postId: Int,
+        @Path("userId") userId: Int,
+    ): ApiResponse<LikeQueryResponse>
 
     @POST("like/{postId}")
     suspend fun likePost(@Path("postId") postId: Int): ApiResponse<SuccessMessageBody>
@@ -30,8 +35,8 @@ interface PostService {
     @DELETE("like/{postId}")
     suspend fun unlikePost(@Path("postId") postId: Int): ApiResponse<SuccessMessageBody>
 
-    @GET("comment/{postId}/{page}")
-    suspend fun getComments(@Path("postId") postId: Int, @Path("page") page: Int): ApiResponse<GetCommentResponse>
+    @GET("comment-with-like/{postId}/{userId}/{page}")
+    suspend fun getComments(@Path("postId") postId: Int, @Path("userId") userId: Int, @Path("page") page: Int): ApiResponse<GetCommentResponse>
 
     @POST("comment/{postId}")
     suspend fun sendComment(@Path("postId") postId: Int, @Body request: SendCommentRequest): ApiResponse<SuccessMessageBody>
@@ -42,10 +47,10 @@ interface PostService {
     @DELETE("comment/{commentId}")
     suspend fun deleteComment(@Path("commentId") commentId: Int): ApiResponse<SuccessMessageBody>
 
-    @POST("comment/{commentId}/like")
+    @POST("comment/like/{commentId}")
     suspend fun likeComment(@Path("commentId") commentId: Int): ApiResponse<SuccessMessageBody>
 
-    @DELETE("comment/{commentId}/like")
+    @DELETE("comment/like/{commentId}")
     suspend fun unlikeComment(@Path("commentId") commentId: Int): ApiResponse<SuccessMessageBody>
 
     @DELETE("posts/{postId}")
@@ -59,4 +64,10 @@ interface PostService {
 
     @DELETE("favorite/{postId}")
     suspend fun unBookmarkPost(@Path("postId") postId: Int): ApiResponse<SuccessMessageBody>
+
+    @DELETE("favorite/check/{postId}/{userId}")
+    suspend fun queryPostBookmark(
+        @Path("postId") postId: Int,
+        @Path("userId") userId: Int
+    ): ApiResponse<BookmarkQueryResponse>
 }
