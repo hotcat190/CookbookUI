@@ -9,6 +9,7 @@ import { UpdatePostDto } from './dtos/update-post.dto';
 import { User } from '../auth/entities/user.entity';
 import { MailerService } from '../mailer/mailer.service';
 import { NotificationsService } from '../notifications/notifications.service';
+import { log } from 'console';
 @Injectable()
 export class PostsService {
   [x: string]: any;
@@ -169,11 +170,11 @@ export class PostsService {
     post.likes.push({ id: userId } as User);
     post.totalLike = post.likes.length;
   
-    await this.postsRepository.save(post);
+    this.postsRepository.save(post);
     const author = post.author;
     const user = await this.usersRepository.findOne({ where: { id: userId } });
     try {
-      await this.notificationsService.sendNotificationWithImage("like-post",author.id,`${user.name} `,`${user.name} đã thích bài viết của bạn: ${post.title}`,post.mainImage||user.avatar,`${postId}`,`${post.title}`);
+      await this.notificationsService.sendNotificationWithImage(author.id,"NEW_POST_LIKE",postId,user.avatar,user.name,`${post.totalLike-1}`,`${post.title}`);
     } catch (error) {
       throw new BadRequestException('Không thể gửi thông báo: ' + error.message);
     }
@@ -186,7 +187,7 @@ export class PostsService {
       .leftJoin('comment.likes', 'likes')
       .leftJoinAndSelect('comment.user', 'user')
       .leftJoinAndSelect('comment.post', 'post')
-      .select(['comment', 'likes.id', 'user'])
+      .select(['comment', 'likes.id', 'user', 'post'])
       .where('comment.id = :id', { id: commentId })
       .getOne();
     
@@ -202,8 +203,9 @@ export class PostsService {
     const author = comment.user;
     const user = await this.usersRepository.findOne({ where: { id: userId } });
     try {
-      await this.notificationsService.sendNotificationWithImage("like-comment",author.id,`${user.name} `,`${user.name} đã thích bình luận của bạn: \n${author.name}: ${comment.content}`,user.avatar,`${comment.post.id}`,`${comment.content}`);
+      await this.notificationsService.sendNotificationWithImage(author.id,"NEW_COMMENT_LIKE", comment.post.id, user.avatar, user.name, `${comment.likes.length-1}`, `${comment.content}`);
     } catch (error) {
+      console.log(error);
       throw new BadRequestException('Không thể gửi thông báo: ' + error.message);
     }
     return { message: 'Đã thích bình luận.' };
@@ -228,7 +230,7 @@ export class PostsService {
     post.likes.splice(likeIndex, 1);
     post.totalLike = post.likes.length;
   
-    await this.postsRepository.save(post);
+    this.postsRepository.save(post);
     return { message: 'Đã bỏ thích bài viết.', totalLike: post.totalLike };
   }
   async unlikeComment(commentId: number, userId: number): Promise<any> {
@@ -321,11 +323,15 @@ export class PostsService {
     } catch (error) {
       throw new BadRequestException('Không thể tạo bình luận: ' + error.message);
     }
-    post.totalComment++;
     await this.postsRepository.save(post);
+    const userIds = await this.commentsRepository
+      .createQueryBuilder('comment')
+      .select('comment.userId')
+      .distinct(true)
+      .getRawMany();
     const author = post.author;
     try {
-      await this.notificationsService.sendNotificationWithImage("comment-post",author.id,`${user.name} `,`${user.name} đã bình luận về bài viết của bạn.`,post.mainImage||user.avatar,`${postId}`,`${createCommentDto.content}`);
+      await this.notificationsService.sendNotificationWithImage(author.id,"NEW_POST_COMMENT",postId,user.avatar,user.name,`${userIds.length-1}`,`${createCommentDto.content}`);
     } catch (error) {
       throw new BadRequestException('Không thể gửi thông báo: ' + error.message);
     }

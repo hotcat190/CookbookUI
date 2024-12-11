@@ -20,11 +20,7 @@ export class FollowsService {
       throw new BadRequestException('Bạn không thể theo dõi chính mình.');
       }
 
-      const targetUser = await this.usersRepository.findOne({ where: { id: targetUserId } });
-      const user = await this.usersRepository.findOne({
-         where: { id: currentUserId },
-         select: ['name', 'avatar'],
-      });
+      const targetUser = await this.usersRepository.findOne({ where: { id: targetUserId }, relations: ['followers']  });
       if (!targetUser) {
       throw new NotFoundException('Người dùng không tồn tại.');
       }
@@ -36,11 +32,10 @@ export class FollowsService {
       throw new BadRequestException('Bạn đã theo dõi người dùng này trước đó.');
       }
 
-      const follower = await this.usersRepository.findOne({ where: { id: currentUserId } });
+      const follower = await this.usersRepository.findOne({ where: { id: currentUserId }});
       const follow = this.followsRepository.create({ follower, following: targetUser });
       await this.followsRepository.save(follow);
-      console.log(user.avatar);
-      await this.notificationsService.sendNotificationWithImage("follow",targetUserId,`${user.name}`,`${user.name} đã theo dõi bạn.`,user.avatar,`${currentUserId}`);
+      await this.notificationsService.sendNotificationWithImage(targetUserId, "NEW_FOLLOWER", follower.id, follower.avatar, follower.name, `${targetUser.numberFollowers}`)
       return { message: 'Đã theo dõi người dùng.'};
 
     } catch (error) {
