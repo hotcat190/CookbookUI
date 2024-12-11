@@ -75,6 +75,7 @@ fun SearchScreen(
     searchUiState: SearchUiState,
     onBackButtonClick: () -> Unit,
     modifier: Modifier = Modifier,
+    onSeeMoreClick: (User) -> Unit = {}
 ) {
     val pagerState = rememberPagerState(
         pageCount = { 4 }
@@ -150,7 +151,7 @@ fun SearchScreen(
                                                 viewModel.ChangeCurrentPost(it)
                                                 viewModel.ChangeScreenState(SearchScreenState.Detail)
                                             },
-                                            onSeeMoreClick = {}
+                                            onSeeMoreClick = onSeeMoreClick
                                         )
                                     }
                                 }
@@ -159,7 +160,6 @@ fun SearchScreen(
                                         items(searchUiState.postTabState.result){
                                             PostCard(it) { }
                                             LaunchedEffect(isAtBottom) {
-
                                                 if (isAtBottom) {
                                                     Log.d("BOTTOM", "SearchScreen: Bottom Reached")
                                                     if (searchUiState.postTabState.state == TabState.Succeed && searchUiState.postTabState.nextPage) {
@@ -225,7 +225,7 @@ fun SearchScreen(
                                         items(searchUiState.userTabState.result){
                                             UserCard(
                                                 user = it,
-                                                onSeeMoreClick = {}
+                                                onSeeMoreClick = onSeeMoreClick
                                             )
                                             LaunchedEffect(isAtBottom) {
                                                 if (isAtBottom) {
