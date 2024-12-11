@@ -32,6 +32,9 @@ class AuthViewModel @Inject constructor(
     private val _uiState: MutableStateFlow<AuthUiState> = MutableStateFlow(AuthUiState())
     val uiState: StateFlow<AuthUiState> = _uiState.asStateFlow()
 
+    var authRequestState: MutableStateFlow<AuthRequestState> = MutableStateFlow(AuthRequestState.Idle)
+        private set
+
     fun changeOpenDialog(open: Boolean) {
         _uiState.update {
             it.copy(
@@ -57,6 +60,7 @@ class AuthViewModel @Inject constructor(
     }
 
     fun signUp(req: RegisterRequest) {
+        authRequestState.update { AuthRequestState.Loading }
         viewModelScope.launch {
             val response = authRepository.register(req)
             response.onSuccess {
@@ -75,6 +79,7 @@ class AuthViewModel @Inject constructor(
                     else -> _uiState.update { it.copy(openDialog = true, dialogMessage = "An error occurred") }
                 }
             }
+            authRequestState.update { AuthRequestState.Idle }
         }
     }
 
@@ -82,6 +87,7 @@ class AuthViewModel @Inject constructor(
         _uiState.update {
             it.copy(dialogMessage = "Loading...")
         }
+        authRequestState.update { AuthRequestState.Loading }
         viewModelScope.launch {
             // Send request and receive the response
             val response = authRepository.login(SignInRequest(username, password))
@@ -115,6 +121,7 @@ class AuthViewModel @Inject constructor(
                     else -> _uiState.update { it.copy(openDialog = true, dialogMessage = "An error occurred") }
                 }
             }
+            authRequestState.update { AuthRequestState.Idle }
         }
     }
 

@@ -43,12 +43,13 @@ fun NavGraphBuilder.userProfile(
     ) {
         cookbookViewModel.updateTopBarState(CookbookUiState.TopBarState.Default)
         cookbookViewModel.updateBottomBarState(CookbookUiState.BottomBarState.Default)
+        cookbookViewModel.updateCanNavigateBack(false)
 
         val user = it.toRoute<Routes.App.UserProfile>().user
 
         val userProfileViewModel =
-            sharedViewModel<UserProfileViewModel, UserProfileViewModel.UserProfileViewModelFactory>(
-                it, navController, Routes.App
+            hiltViewModel<UserProfileViewModel, UserProfileViewModel.UserProfileViewModelFactory>(
+//                it, navController, Routes.App
             ) { factory ->
                 factory.create(user)
             }
@@ -61,6 +62,7 @@ fun NavGraphBuilder.userProfile(
         }
 
         LaunchedEffect(Unit) {
+            userProfileViewModel.refresh()
             followViewModel.refresh()
         }
 
@@ -127,9 +129,7 @@ fun NavGraphBuilder.userProfile(
                                     onPostSeeDetailsClick = { post ->
                                         navController.navigate(Routes.App.PostDetails(post))
                                     },
-                                    onUserClick = { user ->
-                                        navController.navigateToProfile(cookbookViewModel.user.value, user)
-                                    },
+                                    onUserClick = { },
                                     currentUser = userProfileUiState.user,
                                 )
                             }

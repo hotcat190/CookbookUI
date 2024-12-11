@@ -36,7 +36,7 @@ fun SignLayout(
     modifier: Modifier = Modifier,
     content: @Composable () -> Unit,
 ) {
-    SignLayoutTheme(darkTheme = true) {
+    SignLayoutTheme {
         Box(
             modifier = Modifier
                 .fillMaxSize()

@@ -22,7 +22,7 @@ object SampleNotifications {
                         type = NotificationType.NEW_POST_LIKE,
                         message = "**Ly Duc** liked your post",
                         relatedId = 1,
-                        isRead = false,
+                        isRead = true,
                         createdAt = "2024-01-28T00:00:00.000Z",
                         imageURL = null,
                     )
@@ -31,7 +31,7 @@ object SampleNotifications {
                         type = NotificationType.NEW_POST_COMMENT,
                         message = "**Ly Duc** commented on your post",
                         relatedId = 1,
-                        isRead = false,
+                        isRead = true,
                         createdAt = "2024-01-28T00:00:00.000Z",
                         imageURL = null,
                     )

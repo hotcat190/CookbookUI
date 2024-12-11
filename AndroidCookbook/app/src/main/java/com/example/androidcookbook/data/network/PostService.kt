@@ -4,6 +4,7 @@ import com.example.androidcookbook.domain.model.post.GetCommentResponse
 import com.example.androidcookbook.domain.model.post.Post
 import com.example.androidcookbook.domain.model.post.PostCreateRequest
 import com.example.androidcookbook.domain.model.post.PostCreateResponse
+import com.example.androidcookbook.domain.model.post.PostLikesResponse
 import com.example.androidcookbook.domain.model.post.SendCommentRequest
 import com.example.androidcookbook.domain.network.BookmarkQueryResponse
 import com.example.androidcookbook.domain.network.LikeQueryResponse
@@ -70,4 +71,7 @@ interface PostService {
         @Path("postId") postId: Int,
         @Path("userId") userId: Int
     ): ApiResponse<BookmarkQueryResponse>
+
+    @GET("like/{postId}/{page}")
+    suspend fun getPostLikes(@Path("postId") postId: Int, @Path("page") page: Int): ApiResponse<PostLikesResponse>
 }

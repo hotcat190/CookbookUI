@@ -10,6 +10,11 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
+import androidx.compose.material.icons.automirrored.outlined.ArrowForward
+import androidx.compose.material.icons.filled.ChangeCircle
+import androidx.compose.material.icons.outlined.ArrowForward
+import androidx.compose.material.icons.outlined.ChangeCircle
+import androidx.compose.material.icons.outlined.Loop
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -25,13 +30,15 @@ import com.example.androidcookbook.ui.theme.AndroidCookbookTheme
 @Composable
 fun SignButton(
     onClick: () -> Unit,
+    enabled: Boolean,
     actionText: String
 ) {
     Button(
         onClick = onClick,
         modifier = Modifier
             .height(50.dp),
-        colors = ButtonDefaults.buttonColors(MaterialTheme.colorScheme.secondary),
+        colors = if (enabled) ButtonDefaults.buttonColors(MaterialTheme.colorScheme.secondary)
+        else ButtonDefaults.buttonColors(),
         shape = RoundedCornerShape(size = 12.dp)
     ) {
         Row {
@@ -43,11 +50,19 @@ fun SignButton(
                     color = Color(0xFFFFFFFF),
                 )
             )
-            Icon(
-                Icons.AutoMirrored.Filled.ArrowForward,
-                tint = Color.White,
-                contentDescription = null
-            )
+            if (enabled) {
+                Icon(
+                    Icons.AutoMirrored.Filled.ArrowForward,
+                    tint = Color.White,
+                    contentDescription = null
+                )
+            } else {
+                Icon(
+                    Icons.AutoMirrored.Outlined.ArrowForward,
+                    tint = Color.LightGray,
+                    contentDescription = null
+                )
+            }
         }
     }
 }
@@ -56,6 +71,6 @@ fun SignButton(
 @Composable
 private fun SignButtonPreview() {
     SignLayoutTheme {
-        SignButton({}, "Sign In")
+        SignButton({}, false,"Sign In")
     }
 }

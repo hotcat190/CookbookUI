@@ -6,6 +6,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
@@ -31,6 +32,7 @@ fun SmallAvatar(
             .size(32.dp)
             .clip(CircleShape)
             .clickable { onUserClick(author) },
+        contentScale = ContentScale.Crop,
 //            tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.25f),
         error = painterResource(R.drawable.default_avatar),
         placeholder = painterResource(R.drawable.default_avatar)
@@ -52,6 +54,7 @@ fun SmallAvatar(
         modifier = modifier
             .size(32.dp)
             .clip(CircleShape),
+        contentScale = ContentScale.Crop,
 //            tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.25f),
         error = painterResource(R.drawable.default_avatar),
         placeholder = painterResource(R.drawable.default_avatar)

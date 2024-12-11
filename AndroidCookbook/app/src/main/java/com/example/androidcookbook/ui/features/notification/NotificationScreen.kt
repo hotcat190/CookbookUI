@@ -1,10 +1,13 @@
 package com.example.androidcookbook.ui.features.notification
 
+import android.content.res.Configuration
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -37,8 +40,13 @@ fun NotificationScreen(
             modifier = Modifier.fillMaxSize()
         ) {
             items(notifications) { notification ->
-                NotificationItem(notification, onNotificationClick,
+                NotificationItem(
+                    notification = notification,
+                    onClick = onNotificationClick,
+                    if (notification.isRead) Modifier
+                    else Modifier.background(LightBlue.copy(alpha = 0.1f)),
                 )
+                HorizontalDivider()
             }
             item { // Empty state if no notifications
                 if (notifications.isEmpty()) {
@@ -52,9 +60,11 @@ fun NotificationScreen(
 }
 
 @Composable
-@Preview
+@Preview(
+    uiMode = Configuration.UI_MODE_NIGHT_YES,
+)
 private fun NotificationScreenDarkPreview() {
-    AndroidCookbookTheme(darkTheme = true) {
+    AndroidCookbookTheme {
         NotificationScreen(
             notifications = SampleNotifications.notifications,
             onNotificationClick = {},

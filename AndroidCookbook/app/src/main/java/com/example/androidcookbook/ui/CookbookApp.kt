@@ -7,6 +7,7 @@ import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -31,6 +32,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.dialog
 import androidx.navigation.compose.rememberNavController
+import com.example.androidcookbook.data.providers.ThemeType
 import com.example.androidcookbook.ui.common.appbars.AppBarTheme
 import com.example.androidcookbook.ui.common.appbars.CookbookAppBarDefault
 import com.example.androidcookbook.ui.common.appbars.CookbookBottomNavigationBar
@@ -39,6 +41,7 @@ import com.example.androidcookbook.ui.features.auth.theme.SignLayoutTheme
 import com.example.androidcookbook.ui.nav.dest.follow
 import com.example.androidcookbook.ui.features.search.SearchScreen
 import com.example.androidcookbook.ui.features.search.SearchViewModel
+import com.example.androidcookbook.ui.features.setting.SettingContainer
 import com.example.androidcookbook.ui.nav.Routes
 import com.example.androidcookbook.ui.nav.dest.notification
 import com.example.androidcookbook.ui.nav.dest.post.createPost
@@ -49,7 +52,11 @@ import com.example.androidcookbook.ui.nav.dest.profile.otherProfile
 import com.example.androidcookbook.ui.nav.graphs.AppEntryPoint
 import com.example.androidcookbook.ui.nav.graphs.appScreens
 import com.example.androidcookbook.ui.nav.graphs.authScreens
+import com.example.androidcookbook.ui.nav.graphs.AppEntryPoint
+import com.example.androidcookbook.ui.nav.graphs.appScreens
+import com.example.androidcookbook.ui.nav.graphs.authScreens
 import com.example.androidcookbook.ui.nav.utils.navigateIfNotOn
+import kotlinx.coroutines.flow.update
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -89,16 +96,17 @@ fun CookbookApp(
                     AppBarTheme {
                         updateSystemBarColors(
                             Color.TRANSPARENT,
-                            MaterialTheme.colorScheme.background.toArgb()
+                            MaterialTheme.colorScheme.background.toArgb(),
                         )
                         CookbookAppBarDefault(
                             showBackButton = uiState.canNavigateBack,
                             onSearchButtonClick = {
                                 navController.navigate(Routes.Search)
                             },
-                            notificationCount = viewModel.notificationCount.collectAsState().value, // TODO: Get notification count from server
+                            notificationCount = if (CookbookViewModel.isNotificationBadgeDisplayed.collectAsState().value) 1 else 0, // TODO: Get notification count from server
                             onNotificationClick = {
                                 navController.navigate(Routes.Notifications)
+                                CookbookViewModel.isNotificationBadgeDisplayed.update { false }
                             },
                             onSettingsClick = {
                                 navController.navigate(Routes.Settings)
@@ -154,7 +162,6 @@ fun CookbookApp(
                 .fillMaxSize()
                 .padding(innerPadding)
                 .consumeWindowInsets(innerPadding)
-                .safeDrawingPadding()
                 .pointerInput(Unit) {
                     detectTapGestures(onTap = {
                         focusManager.clearFocus()
@@ -165,6 +172,8 @@ fun CookbookApp(
             composable("check_auth") {
                 AppEntryPoint(navController = navController)
             }
+
+
 
             authScreens(navController = navController, updateAppBar = {
                 viewModel.updateTopBarState(CookbookUiState.TopBarState.Auth)
@@ -217,7 +226,14 @@ fun CookbookApp(
             notification(viewModel, navController)
 
             dialog<Routes.Settings> {
-                // Settings Dialog
+                AppBarTheme {
+                    SettingContainer(
+                        noticeChecked = true,
+                        onNoticeCheckedChange = { },
+                        themeTypeSelected = ThemeType.Default,
+                        onThemeTypeChange = {}
+                    )
+                }
             }
         }
     }
@@ -237,7 +253,8 @@ private fun updateSystemBarColors(
             window.statusBarColor = statusBarColor
             window.navigationBarColor = navigationBarColor
             WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = !darkTheme
-            WindowCompat.getInsetsController(window, view).isAppearanceLightNavigationBars = !darkTheme
+            WindowCompat.getInsetsController(window, view).isAppearanceLightNavigationBars =
+                !darkTheme
         }
     }
 }

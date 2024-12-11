@@ -7,8 +7,10 @@ import android.content.Context
 import android.content.Intent
 import android.util.Log
 import androidx.core.app.NotificationCompat
+import com.example.androidcookbook.ui.CookbookViewModel
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
+import kotlinx.coroutines.flow.update
 
 class FCMService : FirebaseMessagingService() {
 
@@ -36,10 +38,16 @@ class FCMService : FirebaseMessagingService() {
         val notificationId = 1
         val requestCode = 1
 
+        Log.d("FCMService", "isNotificationBadgeDisplayed: ${CookbookViewModel.isNotificationBadgeDisplayed}")
+        CookbookViewModel.isNotificationBadgeDisplayed.update { true }
+        Log.d("FCMService", "isNotificationBadgeDisplayed: ${CookbookViewModel.isNotificationBadgeDisplayed}")
+
+        notificationManager.cancelAll()
+
         val channelId = "Firebase Messaging ID"
         val channelName = "Firebase Messaging"
         notificationManager.createNotificationChannel(
-            NotificationChannel(channelId, channelName, NotificationManager.IMPORTANCE_HIGH)
+            NotificationChannel(channelId, channelName, NotificationManager.IMPORTANCE_NONE)
         )
 
         val intent = Intent(this, MainActivity::class.java)

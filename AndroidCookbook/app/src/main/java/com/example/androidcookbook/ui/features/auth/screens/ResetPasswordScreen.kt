@@ -64,7 +64,8 @@ fun ResetPasswordScreen(
         // Submit button
         SignButton(
             onClick = onSubmit,
-            actionText = "Submit"
+            actionText = "Submit",
+            enabled = true
         )
 
         // ClickableText("Return to Sign In")
