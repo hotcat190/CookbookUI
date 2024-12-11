@@ -9,22 +9,30 @@ import { NotiDto } from '../dtos/notification.dto';
 @Controller('notifications')
 export class NotificationsController {
   constructor(private readonly notificationsService: NotificationsService) {}
-
-  @Get()
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
+  @Get(':page')
   @ApiOperation({ summary: 'Nhận thông báo' })
   @ApiResponse({ status: 200, description: 'Danh sách thông báo' })
-  getNotifications(@Request() req) {
-    return this.notificationsService.getNotifications(req.user.id);
+  getNotifications(@Request() req, @Param('page') page: number) {
+    try {
+      return this.notificationsService.getNotifications(req.user.id, page);
+    } catch (error) {
+      console.log(error);
+      throw error;
+    }
   }
-
-  @Put(':notificationId/read')
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
+  @Put('read/:notificationId')
   @ApiOperation({ summary: 'Đánh dấu thông báo đã đọc' })
   @ApiResponse({ status: 200, description: 'Đánh dấu thông báo là đã đọc' })
   @ApiResponse({ status: 404, description: 'Thông báo không tồn tại' })
   markAsRead(@Param('notificationId') notificationId: number, @Request() req) {
     return this.notificationsService.markAsRead(notificationId, req.user.id);
   }
-
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
   @Delete(':notificationId')
   @ApiOperation({ summary: 'Xóa thông báo' })
   @ApiResponse({ status: 200, description: 'Đã xóa thông báo thành công' })
@@ -33,19 +41,5 @@ export class NotificationsController {
     return this.notificationsService.deleteNotification(notificationId, req.user.id);
   }
 
-  @Put('settings')
-  @ApiOperation({ summary: 'Cài đặt thông báo' })
-  @ApiResponse({ status: 200, description: 'Cài đặt thông báo đã được cập nhật' })
-  @ApiResponse({ status: 400, description: 'Cài đặt thông báo không hợp lệ' })
-  updateSettings(@Body() settings: any, @Request() req) {
-    return this.notificationsService.updateSettings(req.user.id, settings);
-  }
-
-  @Post('sendNoti')
-  @ApiOperation({ summary: 'Gửi thông báo' })
-  sendNotification(@Body() notiDto: NotiDto) {
-    console.log(notiDto);
-    return this.notificationsService.sendNoti(notiDto);
-  }
 
 }

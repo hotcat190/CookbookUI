@@ -8,6 +8,18 @@ import androidx.datastore.preferences.preferencesDataStore
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
+enum class ThemeType {
+    Default,
+    Light,
+    Dark;
+
+    companion object {
+        fun fromString(value: String): ThemeType {
+            return values().find { it.name == value } ?: Default
+        }
+    }
+}
+
 
 val Context.dataStore by preferencesDataStore(name = "auth_preferences")
 
@@ -17,6 +29,7 @@ class DataStoreManager(private val context: Context) {
     private val IS_LOGGED_IN_KEY = booleanPreferencesKey("is_logged_in")
     private val USERNAME = stringPreferencesKey("username")
     private val PASSWORD = stringPreferencesKey("password")
+    private val THEME_KEY = stringPreferencesKey("theme")
 
     // Save token
     suspend fun saveToken(token: String) {
@@ -40,6 +53,13 @@ class DataStoreManager(private val context: Context) {
         }
     }
 
+    suspend fun saveTheme(theme: ThemeType) {
+        context.dataStore.edit { preferences ->
+            preferences[THEME_KEY] = theme.name
+        }
+    }
+
+
     // Get token
     val token: Flow<String?> = context.dataStore.data.map { preferences ->
         preferences[TOKEN_KEY]
@@ -60,6 +80,12 @@ class DataStoreManager(private val context: Context) {
     val isLoggedIn: Flow<Boolean> = context.dataStore.data.map { preferences ->
         preferences[IS_LOGGED_IN_KEY] ?: false
     }
+
+    val theme: Flow<ThemeType> = context.dataStore.data.map { preferences ->
+        val themeString = preferences[THEME_KEY] ?: ThemeType.Default.name
+        ThemeType.fromString(themeString)
+    }
+
 
     // Clear login state
     suspend fun clearLoginState() {

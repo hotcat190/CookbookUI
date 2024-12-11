@@ -32,6 +32,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.dialog
 import androidx.navigation.compose.rememberNavController
+import com.example.androidcookbook.data.providers.ThemeType
 import com.example.androidcookbook.ui.common.appbars.AppBarTheme
 import com.example.androidcookbook.ui.common.appbars.CookbookAppBarDefault
 import com.example.androidcookbook.ui.common.appbars.CookbookBottomNavigationBar
@@ -40,6 +41,7 @@ import com.example.androidcookbook.ui.features.auth.theme.SignLayoutTheme
 import com.example.androidcookbook.ui.nav.dest.follow
 import com.example.androidcookbook.ui.features.search.SearchScreen
 import com.example.androidcookbook.ui.features.search.SearchViewModel
+import com.example.androidcookbook.ui.features.setting.SettingContainer
 import com.example.androidcookbook.ui.nav.Routes
 import com.example.androidcookbook.ui.nav.dest.notification
 import com.example.androidcookbook.ui.nav.dest.post.createPost
@@ -219,7 +221,14 @@ fun CookbookApp(
             notification(viewModel, navController)
 
             dialog<Routes.Settings> {
-                // Settings Dialog
+                AppBarTheme {
+                    SettingContainer(
+                        noticeChecked = true,
+                        onNoticeCheckedChange = { },
+                        themeTypeSelected = ThemeType.Default,
+                        onThemeTypeChange = {}
+                    )
+                }
             }
         }
     }
