@@ -1,8 +1,10 @@
 package com.example.androidcookbook.ui.features.search
 
+import android.util.Log
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -11,6 +13,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
@@ -18,6 +21,7 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -27,6 +31,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
@@ -107,12 +112,11 @@ fun ResultCard(
 
 @Composable
 fun UserCard(
-    onClick: () -> Unit,
-    user: User
+    user: User,
+    onSeeMoreClick: (User) -> Unit
 ) {
     ResultCardTheme {
         Card(
-            onClick = onClick,
             modifier = Modifier
                 .fillMaxWidth()
                 .wrapContentHeight(),
@@ -195,8 +199,15 @@ fun UserCard(
                             .weight(1f)
                             .fillMaxWidth()
                             .wrapContentHeight(),
-                        fontSize = 15.sp,
-                        softWrap = true
+                        fontSize = 15.sp
+                    )
+                    Text(
+                        text = "See More >",
+                        style = MaterialTheme.typography.titleMedium,
+                        color = MaterialTheme.colorScheme.onSurface,
+                        modifier = Modifier
+                            .align(Alignment.End)
+                            .clickable { onSeeMoreClick(user) }
                     )
                 }
             }
@@ -236,39 +247,37 @@ fun PostCard(
 fun SearchAllResultsScreen(
     posts: List<Post>,
     users: List<User>,
-    onSeeDetailsClick: (Post) -> Unit
+    onSeeDetailsClick: (Post) -> Unit,
+    onSeeMoreClick: (User) -> Unit
 ) {
-    val length = posts.count() + users.count()
     var postsIndex = 0
     var usersIndex = 0
-    while (postsIndex + usersIndex < length) {
-        if (postsIndex < posts.count() && usersIndex < users.count()) {
-            if (posts[postsIndex].id < users[usersIndex].id) {
-                PostCard(
-                    post = posts[postsIndex],
-                    onSeeDetailsClick = onSeeDetailsClick
-                )
-                postsIndex++
-            } else {
-                UserCard(
-                    onClick = {},
-                    user = users[usersIndex]
-                )
-                usersIndex++
-            }
-        } else if (postsIndex >= posts.count() && usersIndex < users.count()) {
-            UserCard(
-                onClick = {},
-                user = users[usersIndex]
-            )
-            usersIndex++
-        } else if (usersIndex >= users.count() && postsIndex < posts.count()) {
-            PostCard(
-                post = posts[postsIndex],
-                onSeeDetailsClick = onSeeDetailsClick
-            )
-            postsIndex++
-        }
+    val maxPosts =
+        if (posts.count() > 3) 3
+        else posts.count()
+    val maxUsers =
+        if (users.count() > 3) 3
+        else users.count()
+    while (usersIndex < maxUsers) {
+        UserCard(
+            user = users[usersIndex],
+            onSeeMoreClick = onSeeMoreClick
+        )
+        usersIndex++
         Spacer(modifier = Modifier.height(10.dp))
     }
+    while (postsIndex < maxPosts) {
+        PostCard(
+            post = posts[postsIndex],
+            onSeeDetailsClick = onSeeDetailsClick
+        )
+        postsIndex++
+        Spacer(modifier = Modifier.height(10.dp))
+    }
+}
+
+@Preview
+@Composable
+fun UserPreview() {
+
 }

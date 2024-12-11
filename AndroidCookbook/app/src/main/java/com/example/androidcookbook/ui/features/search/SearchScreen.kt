@@ -1,5 +1,6 @@
 package com.example.androidcookbook.ui.features.search
 
+import android.util.Log
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
@@ -13,17 +14,23 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.IconToggleButton
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.FilterAlt
 import androidx.compose.material3.TabRowDefaults
 import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
@@ -31,7 +38,11 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.ComposeCompilerApi
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -64,9 +75,10 @@ fun SearchScreen(
     searchUiState: SearchUiState,
     onBackButtonClick: () -> Unit,
     modifier: Modifier = Modifier,
+    onSeeMoreClick: (User) -> Unit = {}
 ) {
     val pagerState = rememberPagerState(
-        pageCount = { 2 }
+        pageCount = { 4 }
     )
     BackHandler {
         when (searchUiState.currentScreen) {
@@ -120,8 +132,9 @@ fun SearchScreen(
                         modifier = Modifier.weight(12f),
                         verticalAlignment = Alignment.Top
                     ) {
-                        val state = rememberLazyListState()
-                        val isAtBottom = !state.canScrollForward
+                        var state = rememberLazyListState()
+                        var isAtBottom = state.isAtBottom()
+                        var userChecked by remember { mutableStateOf(true) }
                         LazyColumn(
                             state = state,
                             modifier = Modifier
@@ -137,34 +150,100 @@ fun SearchScreen(
                                             onSeeDetailsClick = {
                                                 viewModel.ChangeCurrentPost(it)
                                                 viewModel.ChangeScreenState(SearchScreenState.Detail)
-                                            }
+                                            },
+                                            onSeeMoreClick = onSeeMoreClick
                                         )
                                     }
                                 }
                                 1 -> {
-                                    if (!searchUiState.postTabState.isFail) {
+                                    if (searchUiState.postTabState.state != TabState.Idle) {
                                         items(searchUiState.postTabState.result){
                                             PostCard(it) { }
                                             LaunchedEffect(isAtBottom) {
-                                                if (isAtBottom && searchUiState.postTabState.nextPage) {
-                                                    viewModel.searchPost()
+                                                if (isAtBottom) {
+                                                    Log.d("BOTTOM", "SearchScreen: Bottom Reached")
+                                                    if (searchUiState.postTabState.state == TabState.Succeed && searchUiState.postTabState.nextPage) {
+                                                        viewModel.searchPost()
+                                                    }
                                                 }
                                             }
                                         }
                                     } else {
                                         viewModel.searchPost()
+                                        item {
+                                            Text(text = searchUiState.postTabState.messageStr)
+                                        }
                                     }
                                 }
                                 2 -> {
-                                    items(searchUiState.resultList) { item ->
-                                        ResultCardTheme {
-                                            ResultCard(
-                                                onClick = {
-                                                    viewModel.ChangeScreenState(SearchScreenState.Posts)
-                                                },
-                                                recipe = item
-                                            )
+                                    if (searchUiState.foodTabState.state != TabState.Idle) {
+                                        items(searchUiState.foodTabState.result) { item ->
+                                            ResultCardTheme {
+                                                ResultCard(
+                                                    onClick = {
+                                                        viewModel.ChangeScreenState(SearchScreenState.Posts)
+                                                    },
+                                                    recipe = item
+                                                )
+                                            }
                                         }
+                                    } else {
+                                        viewModel.searchFood()
+                                        item {
+                                            Text(text = searchUiState.foodTabState.messageStr)
+                                        }
+                                    }
+                                }
+                                3 -> {
+                                    item {
+                                            Row(
+                                                modifier = Modifier
+                                                    .wrapContentWidth(),
+                                                verticalAlignment = Alignment.CenterVertically
+                                            ) {
+                                                Spacer(modifier = Modifier.weight(1f))
+                                                Text(text = "Is filtering by: ")
+                                                IconToggleButton(
+                                                    checked = userChecked,
+                                                    onCheckedChange = {
+                                                        userChecked = it
+                                                        viewModel.searchUser(it, true)
+                                                    },
+                                                    modifier = Modifier
+                                                        .border(color = Color.Black, width = 1.dp, shape = RoundedCornerShape(10.dp))
+                                                        .padding(horizontal = 3.dp)
+                                                ) {
+                                                    if (userChecked) {
+                                                        Text("User")
+                                                    } else {
+                                                        Text("Username")
+                                                    }
+                                                }
+                                            }
+                                    }
+                                    if (searchUiState.userTabState.state != TabState.Idle) {
+                                        items(searchUiState.userTabState.result){
+                                            UserCard(
+                                                user = it,
+                                                onSeeMoreClick = onSeeMoreClick
+                                            )
+                                            LaunchedEffect(isAtBottom) {
+                                                if (isAtBottom) {
+                                                    Log.d("BOTTOM", "SearchScreen: Bottom Reached")
+                                                    if (searchUiState.userTabState.state == TabState.Succeed && searchUiState.userTabState.nextPage) {
+                                                        viewModel.searchUser(
+                                                            searchByUser = userChecked,
+                                                            resetResult = false
+                                                        )
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    } else {
+                                        viewModel.searchUser(
+                                            searchByUser = userChecked,
+                                            resetResult = false
+                                        )
                                     }
                                 }
                             }
@@ -172,7 +251,6 @@ fun SearchScreen(
                     }
                 }
             }
-
             SearchScreenState.Posts -> {
 //                NewsfeedScreen(
 //                    posts = SamplePosts.posts,
@@ -190,7 +268,26 @@ fun SearchScreen(
     }
 }
 
-//@Preview
+@Composable
+private fun LazyListState.isAtBottom(): Boolean {
+
+    return remember(this) {
+        derivedStateOf {
+            val visibleItemsInfo = layoutInfo.visibleItemsInfo
+            if (layoutInfo.totalItemsCount == 0) {
+                false
+            } else {
+                val lastVisibleItem = visibleItemsInfo.last()
+                val viewportHeight = layoutInfo.viewportEndOffset + layoutInfo.viewportStartOffset
+
+                (lastVisibleItem.index + 1 == layoutInfo.totalItemsCount &&
+                        lastVisibleItem.offset + lastVisibleItem.size <= viewportHeight)
+            }
+        }
+    }.value
+}
+
+@Preview
 //@Composable
 //fun CardPreview() {
 //    ResultCardTheme {
@@ -230,10 +327,10 @@ fun SearchScreen(
 @Composable
 fun UserCardPreview() {
     UserCard(
-        onClick = {},
         user = User(
             bio = "hehehehehhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhehehehe"
-        )
+        ),
+        onSeeMoreClick = {}
     )
 }
 

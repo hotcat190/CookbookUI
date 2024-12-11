@@ -18,12 +18,21 @@ enum class SearchScreenState {
 enum class SearchTab {
     All,
     Posts,
+    Food,
+    Users
+}
+
+enum class TabState {
+    Idle,
+    Waiting,
+    Succeed,
+    Failed
 }
 
 data class SearchTabUiState<T>(
     val nextPage: Boolean = false,
     val currentPage: Int = 0,
-    val isFail: Boolean = true,
+    val state: TabState = TabState.Idle,
     val messageStr: String = "",
     val result: List<T> = listOf(),
 )

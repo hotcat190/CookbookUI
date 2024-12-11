@@ -179,6 +179,9 @@ fun CookbookApp(
                     searchUiState = searchUiState,
                     onBackButtonClick = {
                         navController.navigateUp()
+                    },
+                    onSeeMoreClick = {
+                        //Click to see user profile
                     }
                 )
             }
