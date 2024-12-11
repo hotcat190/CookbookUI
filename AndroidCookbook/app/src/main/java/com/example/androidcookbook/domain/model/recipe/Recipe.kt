@@ -1,11 +1,27 @@
 package com.example.androidcookbook.domain.model.recipe
 
 data class RecipeList(
-    val meals: List<Recipe>
+    val meals: MutableList<Recipe>
 )
 
-data class Recipe(
-    val idMeal: Int,
+data class RecipeDetailsList(
+    val meals: MutableList<RecipeDetails>
+)
+
+
+
+data class DisplayRecipeDetail(
+    val idMeal: Int = 0,
+    val strMeal: String = "",
+    val strCategory: String = "",
+    val strArea: String = "",
+    val strInstructions: String = "",
+    val strMealThumb: String = "",
+    val ingredients: MutableList<String> = mutableListOf()
+)
+
+data class RecipeDetails(
+    val idMeal: Int = 0,
     val strMeal: String,
     val strCategory: String,
     val strArea: String,
@@ -53,7 +69,15 @@ data class Recipe(
     val strMeasure18: String,
     val strMeasure19: String,
     val strMeasure20: String,
+)
 
+data class Recipe(
+    val idMeal: Int,
+    val strMeal: String,
+    val strCategory: String,
+    val strArea: String,
+    val strInstructions: String,
+    val strMealThumb: String,
 
-    )
+)
 

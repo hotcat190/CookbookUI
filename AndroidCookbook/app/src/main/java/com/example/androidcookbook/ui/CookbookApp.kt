@@ -52,6 +52,9 @@ import com.example.androidcookbook.ui.nav.dest.profile.otherProfile
 import com.example.androidcookbook.ui.nav.graphs.AppEntryPoint
 import com.example.androidcookbook.ui.nav.graphs.appScreens
 import com.example.androidcookbook.ui.nav.graphs.authScreens
+import com.example.androidcookbook.ui.nav.graphs.AppEntryPoint
+import com.example.androidcookbook.ui.nav.graphs.appScreens
+import com.example.androidcookbook.ui.nav.graphs.authScreens
 import com.example.androidcookbook.ui.nav.utils.navigateIfNotOn
 import kotlinx.coroutines.flow.update
 
@@ -170,6 +173,8 @@ fun CookbookApp(
                 AppEntryPoint(navController = navController)
             }
 
+
+
             authScreens(navController = navController, updateAppBar = {
                 viewModel.updateTopBarState(CookbookUiState.TopBarState.Auth)
                 viewModel.updateBottomBarState(CookbookUiState.BottomBarState.NoBottomBar)
@@ -248,7 +253,8 @@ private fun updateSystemBarColors(
             window.statusBarColor = statusBarColor
             window.navigationBarColor = navigationBarColor
             WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = !darkTheme
-            WindowCompat.getInsetsController(window, view).isAppearanceLightNavigationBars = !darkTheme
+            WindowCompat.getInsetsController(window, view).isAppearanceLightNavigationBars =
+                !darkTheme
         }
     }
 }
