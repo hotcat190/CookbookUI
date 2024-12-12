@@ -37,7 +37,7 @@ export class FollowsService {
     const follower = await this.usersRepository.findOne({ where: { id: currentUserId }});
     const follow = this.followsRepository.create({ follower, following: targetUser });
     await this.followsRepository.save(follow);
-    await this.notificationsService.sendNotificationWithImage(targetUserId, "NEW_FOLLOWER", follower.id, follower.avatar, follower.name, `${targetUser.numberFollowers}`)
+    await this.notificationsService.sendNotificationWithImage(targetUserId, "NEW_FOLLOWER", follower.id, follower.avatar, follower.name)
     return { message: 'Đã theo dõi người dùng.'};
 
   }
