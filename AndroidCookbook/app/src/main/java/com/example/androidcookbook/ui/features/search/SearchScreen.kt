@@ -212,7 +212,8 @@ fun SearchScreen(
                                     item {
                                             Row(
                                                 modifier = Modifier
-                                                    .wrapContentWidth(),
+                                                    .wrapContentWidth()
+                                                    .padding(end = 10.dp),
                                                 verticalAlignment = Alignment.CenterVertically
                                             ) {
                                                 Spacer(modifier = Modifier.weight(1f))
@@ -225,10 +226,11 @@ fun SearchScreen(
                                                     },
                                                     modifier = Modifier
                                                         .border(color = Color.Black, width = 1.dp, shape = RoundedCornerShape(10.dp))
-                                                        .padding(horizontal = 3.dp)
+                                                        .padding(horizontal = 5.dp)
+                                                        .height(30.dp)
                                                 ) {
                                                     if (userChecked) {
-                                                        Text("User")
+                                                        Text("Name")
                                                     } else {
                                                         Text("Username")
                                                     }
