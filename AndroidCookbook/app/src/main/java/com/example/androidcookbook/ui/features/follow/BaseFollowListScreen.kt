@@ -32,7 +32,6 @@ import androidx.compose.ui.unit.dp
 import com.example.androidcookbook.data.mocks.SampleUser
 import com.example.androidcookbook.domain.model.user.User
 import com.example.androidcookbook.ui.common.appbars.BasicTopBar
-import com.example.androidcookbook.ui.common.iconbuttons.BackButton
 import com.example.androidcookbook.ui.theme.AndroidCookbookTheme
 import kotlinx.serialization.Serializable
 
@@ -118,14 +117,14 @@ private fun FollowScreenTopBar(
                 .requiredHeight(50.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            FollowScreenNavigationItem(
+            TabNavigationItem(
                 text = "Followers",
                 selected = type == FollowListScreenType.Followers,
                 onClick = onFollowersNavigate,
                 modifier = Modifier
                     .weight(1F)
             )
-            FollowScreenNavigationItem(
+            TabNavigationItem(
                 text = "Following",
                 selected = type == FollowListScreenType.Following,
                 onClick = onFollowingNavigate,
@@ -138,7 +137,7 @@ private fun FollowScreenTopBar(
 }
 
 @Composable
-private fun FollowScreenNavigationItem(
+fun TabNavigationItem(
     text: String,
     selected: Boolean,
     onClick: () -> Unit,

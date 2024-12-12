@@ -82,6 +82,10 @@ fun UserProfileScreen(
 
 }
 
+enum class UserPostPortionType {
+    Posts, Favorites, Likes
+}
+
 fun LazyListScope.userPostPortion(
     userPosts: List<Post>,
     currentUser: User,
@@ -89,28 +93,83 @@ fun LazyListScope.userPostPortion(
     onDeletePost: (Post) -> Unit,
     onPostSeeDetailsClick: (Post) -> Unit,
     onUserClick: (User) -> Unit,
+    type: UserPostPortionType = UserPostPortionType.Posts,
 ) {
-    items(
-        items = userPosts,
-        key = { post -> post.id }
-    ) { post ->
-        NewsfeedCard(
-            post = post,
-            currentUser = currentUser,
-            onEditPost = { onEditPost(post) },
-            onDeletePost = { onDeletePost(post) },
-            onSeeDetailsClick = onPostSeeDetailsClick,
-            onUserClick = onUserClick,
-            modifier = Modifier.padding(horizontal = 6.dp)
-        )
-    }
-    if (userPosts.isEmpty()) {
-        item {
-            Text(
-                text = "No posts at the moment.",
-                textAlign = TextAlign.Center,
-                modifier = Modifier.fillMaxWidth()
-            )
+    when (type) {
+        UserPostPortionType.Posts -> {
+            items(
+                items = userPosts,
+                key = { post -> post.id }
+            ) { post ->
+                NewsfeedCard(
+                    post = post,
+                    currentUser = currentUser,
+                    onEditPost = { onEditPost(post) },
+                    onDeletePost = { onDeletePost(post) },
+                    onSeeDetailsClick = onPostSeeDetailsClick,
+                    onUserClick = onUserClick,
+                    modifier = Modifier.padding(horizontal = 6.dp)
+                )
+            }
+            if (userPosts.isEmpty()) {
+                item {
+                    Text(
+                        text = "No posts at the moment.",
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                }
+            }
+        }
+        UserPostPortionType.Likes -> {
+            items(
+                items = userPosts,
+                key = { post -> post.id }
+            ) { post ->
+                NewsfeedCard(
+                    post = post,
+                    currentUser = currentUser,
+                    onEditPost = { onEditPost(post) },
+                    onDeletePost = { onDeletePost(post) },
+                    onSeeDetailsClick = onPostSeeDetailsClick,
+                    onUserClick = onUserClick,
+                    modifier = Modifier.padding(horizontal = 6.dp)
+                )
+            }
+            if (userPosts.isEmpty()) {
+                item {
+                    Text(
+                        text = "User has no liked posts.",
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                }
+            }
+        }
+        UserPostPortionType.Favorites -> {
+            items(
+                items = userPosts,
+                key = { post -> post.id }
+            ) { post ->
+                NewsfeedCard(
+                    post = post,
+                    currentUser = currentUser,
+                    onEditPost = { onEditPost(post) },
+                    onDeletePost = { onDeletePost(post) },
+                    onSeeDetailsClick = onPostSeeDetailsClick,
+                    onUserClick = onUserClick,
+                    modifier = Modifier.padding(horizontal = 6.dp),
+                )
+            }
+            if (userPosts.isEmpty()) {
+                item {
+                    Text(
+                        text = "User has no favorite posts.",
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                }
+            }
         }
     }
 }
@@ -177,7 +236,9 @@ fun UserInfo(
                 fontWeight = FontWeight(600),
             ),
             color = MaterialTheme.colorScheme.onSurface,
-            modifier = Modifier.padding(top = 4.dp),
+            modifier = Modifier.padding(top = 4.dp).clickable {
+                navigateToEditProfile()
+            },
         )
         if (user.id == GUEST_ID) {
             return@Column

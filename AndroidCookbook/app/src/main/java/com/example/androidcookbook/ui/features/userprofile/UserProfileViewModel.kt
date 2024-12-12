@@ -45,13 +45,18 @@ class UserProfileViewModel @AssistedInject constructor(
         else UserPostState.Loading
     )
 
+    var userPostPortionType: MutableStateFlow<UserPostPortionType> = MutableStateFlow(UserPostPortionType.Posts)
+        private set
 
 
     init {
         viewModelScope.launch {
             getUser(userId = userId)
-            getUserPosts(userId = userId)
         }
+    }
+
+    fun setUserPostPortionType(type: UserPostPortionType) {
+        userPostPortionType.update { type }
     }
 
     private suspend fun getUser(userId: Int) {
@@ -63,25 +68,46 @@ class UserProfileViewModel @AssistedInject constructor(
         userRepository.getUserProfile(userId = userId)
             .onSuccess {
                 uiState.update { UserProfileUiState.Success(user = data) }
-                getUserPosts(userId)
+                when(userPostPortionType.value){
+                    UserPostPortionType.Posts -> getUserPosts(userId)
+                    UserPostPortionType.Favorites -> getUserFavoritePosts()
+                    UserPostPortionType.Likes -> {}
+                }
             }
             .onFailure {
                 uiState.update { UserProfileUiState.Failure(message()) }
             }
     }
 
-    private fun getUserPosts(userId: Int) {
+    fun getUserPosts(userId: Int) {
         if (userId == GUEST_ID) {
             userPostState.update { UserPostState.Guest }
             return
         }
         userPostState.update { UserPostState.Loading }
+
         viewModelScope.launch {
             userRepository.getUserPosts(userId)
                 .onSuccess {
                     userPostState.update { UserPostState.Success(data) }
                 }
                 .onFailure { userPostState.update { UserPostState.Failure } }
+//            userRepository.getUserLikedPosts(userId).onSuccess {
+//                userLikedPosts = data.likes
+//            }.onFailure {
+//                userPostState.update { UserPostState.Failure }
+//            }
+        }
+    }
+
+    fun getUserFavoritePosts() {
+        userPostState.update { UserPostState.Loading }
+        viewModelScope.launch {
+            userRepository.getUserFavoritePosts(1).onSuccess {
+                userPostState.update { UserPostState.Success(data.favorites) }
+            }.onFailure {
+                userPostState.update { UserPostState.Failure }
+            }
         }
     }
 

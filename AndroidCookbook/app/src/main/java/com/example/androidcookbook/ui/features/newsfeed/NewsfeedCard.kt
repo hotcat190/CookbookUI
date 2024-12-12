@@ -129,7 +129,8 @@ fun NewsfeedCard(
                 // Bookmark button
                 IconButton(onClick = {postDetailsViewModel.togglePostBookmark()}) {
                     Icon(
-                        imageVector = if (postDetailsViewModel.isPostBookmarked.collectAsState().value) {
+                        imageVector =
+                        if (postDetailsViewModel.isPostBookmarked.collectAsState().value) {
                             Icons.Outlined.Bookmark
                         } else {
                             Icons.Outlined.BookmarkBorder
