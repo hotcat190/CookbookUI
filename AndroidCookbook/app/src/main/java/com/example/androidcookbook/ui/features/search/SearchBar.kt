@@ -118,6 +118,7 @@ fun SearchBar(
                                     RequestAudioPermission {
                                         isPermissionGranted = true
                                     }
+                                    Icon(Icons.Filled.Mic, null)
                                 } else {
                                     Icon(Icons.Outlined.Mic, null)
                                 }
