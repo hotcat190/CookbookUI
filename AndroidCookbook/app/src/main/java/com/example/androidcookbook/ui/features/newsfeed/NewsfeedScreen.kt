@@ -40,9 +40,6 @@ fun NewsfeedScreen(
             onUserClick = onUserClick,
             onSeeDetailsClick = onSeeDetailsClick,
         )
-        HorizontalDivider(
-            modifier = Modifier.padding(horizontal = 16.dp),
-        )
     }
 }
 

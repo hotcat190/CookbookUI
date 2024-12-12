@@ -5,6 +5,7 @@ import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
@@ -41,6 +42,7 @@ import androidx.navigation.compose.rememberNavController
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.example.androidcookbook.R
+import com.example.androidcookbook.data.providers.ThemeType
 import com.example.androidcookbook.domain.model.category.Category
 import com.example.androidcookbook.domain.model.recipe.DisplayRecipeDetail
 import com.example.androidcookbook.domain.model.recipe.Recipe
@@ -86,6 +88,12 @@ fun CategoryScreen(
     val categoryUiState = categoryViewModel.categoryUiState.collectAsState()
 
     var currentDestination = "categoryList"
+
+    val darkTheme = when(cookbookViewModel.themeType.collectAsState().value) {
+        ThemeType.Default -> isSystemInDarkTheme()
+        ThemeType.Dark -> true
+        ThemeType.Light -> false
+    }
 
 
     NavHost(
@@ -140,7 +148,7 @@ fun CategoryScreen(
             val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
             if (!categoryViewModel.isTopBarSet.value) {
                 cookbookViewModel.updateTopBarState(CookbookUiState.TopBarState.Custom {
-                    AppBarTheme {
+                    AppBarTheme(darkTheme) {
                         SimpleNavigateUpTopBar(
                             navigateBackAction = {
                                 navigationBack()

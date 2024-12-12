@@ -55,10 +55,7 @@ fun CookbookAppBarDefault(
 
     TopAppBar(
         modifier = modifier,
-        colors = TopAppBarDefaults.topAppBarColors(
-            containerColor = Color.Transparent,
-            scrolledContainerColor = Color.Transparent
-        ),
+        colors = defaultTopAppBarColor(),
         title = {
             Text(
                 text = "Cookbook",
@@ -193,6 +190,16 @@ fun CookbookAppBarDefault(
         scrollBehavior = scrollBehavior
     )
 }
+
+@Composable
+@OptIn(ExperimentalMaterial3Api::class)
+fun defaultTopAppBarColor() = TopAppBarDefaults.topAppBarColors(
+    containerColor = Color.Transparent,
+    scrolledContainerColor = Color.Transparent,
+    navigationIconContentColor = MaterialTheme.colorScheme.secondary,
+    actionIconContentColor = MaterialTheme.colorScheme.secondary,
+    titleContentColor = MaterialTheme.colorScheme.onSurface,
+)
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Preview(showBackground = true)

@@ -201,7 +201,7 @@ fun CookbookApp(
                 viewModel.updateBottomBarState(CookbookUiState.BottomBarState.NoBottomBar)
                 viewModel.updateCanNavigateBack(true)
                 viewModel.updateTopBarState(CookbookUiState.TopBarState.Custom {
-                    AppBarTheme {
+                    AppBarTheme(darkTheme) {
                         SearchBar(
                             onSearch = { searchViewModel.searchAll(it) },
                             navigateBackAction = {
@@ -218,13 +218,13 @@ fun CookbookApp(
                     },
                     onSeeMoreClick = { user ->
                         if (user.id == viewModel.user.value.id) {
-                            navController.navigate(Routes.App.UserProfile(user))
+                            navController.navigate(Routes.App.UserProfile(user.id))
                         } else {
-                            navController.navigate(Routes.OtherProfile(user))
+                            navController.navigate(Routes.OtherProfile(user.id))
                         }
                     },
-                    onSeeDetailsClick = {
-                        navController.navigate(Routes.App.PostDetails(it))
+                    onSeeDetailsClick = { post ->
+                        navController.navigate(Routes.App.PostDetails(post.id))
                     }
                 )
             }
