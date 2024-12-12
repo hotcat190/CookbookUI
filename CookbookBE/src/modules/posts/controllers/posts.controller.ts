@@ -64,7 +64,7 @@ import {
     @ApiOperation({ summary: 'Tạo bài viết mới' })
     @ApiResponse({ status: 201, description: 'Tạo bài viết thành công' })
     @ApiResponse({ status: 400, description: 'Dữ liệu không hợp lệ' })
-    createPost(@Body() createPostDto: CreatePostDto, @Request() req) {
+    async createPost(@Body() createPostDto: CreatePostDto, @Request() req) {
       return this.postsService.createPost(createPostDto, req.user.id);
     }
 
@@ -104,7 +104,7 @@ import {
     @ApiOperation({ summary: 'Xem bài viết chi tiết' })
     @ApiResponse({ status: 200, description: 'Thông tin chi tiết của bài viết' })
     @ApiResponse({ status: 404, description: 'Bài viết không tồn tại' })
-    getPostById(@Param('postId') postId: number) {
+    async getPostById(@Param('postId') postId: number) {
       return this.postsService.getPostById(postId);
     }
     

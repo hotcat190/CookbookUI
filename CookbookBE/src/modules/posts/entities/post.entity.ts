@@ -17,9 +17,10 @@ import {
   
   @Entity()
   export class Post {
+    @Index()
     @PrimaryGeneratedColumn()
     id: number;
-  
+
     @Column()
     title: string;
   
@@ -30,11 +31,9 @@ import {
     cookTime: string;
   
     @Column({default: 0})
-    @RelationCount((post: Post) => post.likes)
     totalLike: number;
 
     @Column({default: 0})
-    @RelationCount((post: Post) => post.comments)
     totalComment: number;
 
     @Column({default: 0})

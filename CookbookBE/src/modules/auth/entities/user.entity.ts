@@ -56,8 +56,7 @@ import {
     @OneToMany(() => Follow, (follow) => follow.following)
     followers: Follow[];
     
-    @RelationCount((user: User) => user.followers)
-    numberFollowers: number;
+
     @ManyToMany(() => Post)
     @JoinTable()
     favorites: Post[];

@@ -92,7 +92,7 @@ export class NotificationsService {
           where: { type: "NEW_FOLLOWER", user: { id: userId } },
         });
         title = `${data1}`;
-        message = `${data1} và ${data2} người khác đã theo dõi bạn.`;
+        message = `${data1} vừa đã theo dõi bạn.`;
         body = `${data1} vừa theo dõi bạn.`;
 
         if(noti){
