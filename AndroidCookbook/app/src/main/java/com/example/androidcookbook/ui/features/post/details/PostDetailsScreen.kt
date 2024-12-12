@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -188,7 +189,8 @@ private fun PostDetailsInfo(
             author = post.author,
             createdAt = LocalDate.parse(post.createdAt, apiDateFormatter).toString(),
             onUserClick = onUserClick,
-            modifier = Modifier.padding(start = 15.dp)
+            modifier = Modifier.padding(start = 15.dp),
+            authorFontSize = 19.sp
         )
         Spacer(Modifier.weight(1F))
         PostOptionsButton(
@@ -212,6 +214,15 @@ private fun PostDetailsInfo(
                 .align(Alignment.Start)
                 .padding(bottom = 16.dp)
         )
+        Text(
+            text = post.description,
+            style = TextStyle(
+                fontWeight = FontWeight(400),
+                color = MaterialTheme.colorScheme.onSurface,
+            ),
+            modifier = Modifier
+        )
+
         if (post.mainImage != null) {
             AsyncImage(
                 model = ImageRequest.Builder(LocalContext.current)
@@ -226,6 +237,7 @@ private fun PostDetailsInfo(
                     .padding(top = 16.dp, bottom = 8.dp)
             )
         }
+
     }
     Row(
         modifier = Modifier.fillMaxWidth()
@@ -322,12 +334,22 @@ private fun PostDetailsInfo(
         modifier = Modifier
             .fillMaxWidth()
     ) {
-        LobsterTextButton(
-            onclick = { state = DetailState.Description },
-            text = "Description"
-        )
-        LobsterTextButton(onclick = { state = DetailState.Ingredient }, text = "Ingredient")
-        LobsterTextButton(onclick = { state = DetailState.Recipe }, text = "Recipe")
+//        LobsterTextButton(
+//            onclick = { state = DetailState.Description },
+//            text = "Description"
+//        )
+        LobsterTextButton(onclick = {
+            state = if (state != DetailState.Ingredient) DetailState.Ingredient
+            else DetailState.Description
+        }, text = "Ingredient")
+        LobsterTextButton(onclick = {
+            state = if (state != DetailState.Recipe) DetailState.Recipe
+            else DetailState.Description
+        }, text = "Recipe")
+    }
+    if (state == DetailState.Description) {
+        Spacer(Modifier.height(16.dp))
+        return
     }
     Column(
         modifier = Modifier
@@ -340,16 +362,7 @@ private fun PostDetailsInfo(
         ) {
             when (state) {
                 DetailState.Description -> {
-                    Text(
-                        text = post.description,
-                        style = TextStyle(
-                            fontSize = 18.sp,
-                            fontWeight = FontWeight(400),
-                            color = MaterialTheme.colorScheme.onSurface,
-                        ),
-                        modifier = Modifier
-                            .padding(horizontal = 8.dp)
-                    )
+
                 }
 
                 DetailState.Ingredient -> {

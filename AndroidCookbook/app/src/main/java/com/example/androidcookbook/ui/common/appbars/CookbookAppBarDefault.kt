@@ -37,6 +37,8 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.example.androidcookbook.domain.model.user.GUEST_ID
+import com.example.androidcookbook.domain.model.user.User
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -49,7 +51,8 @@ fun CookbookAppBarDefault(
     onSettingsClick: () -> Unit = {},
     onBackButtonClick: () -> Unit = {},
     scrollBehavior: TopAppBarScrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(),
-    onLogoutClick: () -> Unit = {}
+    onLogoutClick: () -> Unit = {},
+    currentUser: User = User()
 ) {
     var menuExpanded by remember { mutableStateOf(false) } // State to control menu visibility
 
@@ -155,7 +158,7 @@ fun CookbookAppBarDefault(
                             },
                             text = {
                                 Text(
-                                    text = "Logout",
+                                    text = if (currentUser.id == GUEST_ID) "Login" else "Logout",
                                     style = MaterialTheme.typography.bodyMedium,
                                     color = MaterialTheme.colorScheme.onSurface // Black text for contrast
                                 )

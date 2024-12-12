@@ -154,7 +154,7 @@ fun TabNavigationItem(
         Text(
             text = text,
             fontWeight = FontWeight.SemiBold,
-            color = (if (selected) MaterialTheme.colorScheme.primary else Color.Unspecified)
+            color = (if (selected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.primary.copy(alpha = 0.5f))
         )
         if (selected) {
             val color = MaterialTheme.colorScheme.primary

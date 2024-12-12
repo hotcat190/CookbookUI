@@ -4,11 +4,16 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.androidcookbook.data.repositories.NewsfeedRepository
 import com.example.androidcookbook.domain.model.post.Post
+import com.example.androidcookbook.domain.network.ErrorBody
 import com.example.androidcookbook.domain.usecase.DeletePostUseCase
 import com.example.androidcookbook.domain.usecase.MakeToastUseCase
 import com.example.androidcookbook.ui.common.state.ScreenUiState
+import com.skydoves.sandwich.message
+import com.skydoves.sandwich.onException
 import com.skydoves.sandwich.onFailure
 import com.skydoves.sandwich.onSuccess
+import com.skydoves.sandwich.retrofit.errorBody
+import com.skydoves.sandwich.retrofit.serialization.onErrorDeserialize
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
@@ -40,10 +45,11 @@ class NewsfeedViewModel @Inject constructor(
         val response = newsfeedRepository.getNewsfeed(newsfeedOffset)
         response.onSuccess {
             posts.update { data }
-        }.onFailure {
-            viewModelScope.launch {
-                makeToastUseCase("Something went wrong")
-            }
+            screenUiState.update { ScreenUiState.Success(data) }
+        }.onErrorDeserialize<List<Post>, ErrorBody> { errorBody ->
+            screenUiState.update { ScreenUiState.Failure("Something went wrong") }
+        }.onException {
+            screenUiState.update { ScreenUiState.Failure("Something went wrong") }
         }
 
     }
@@ -53,13 +59,8 @@ class NewsfeedViewModel @Inject constructor(
         isRefreshing.update { true }
         viewModelScope.launch {
             getNewsfeed()
-        }.invokeOnCompletion { throwable ->
+        }.invokeOnCompletion {
             isRefreshing.update { false }
-            if (throwable != null) {
-                screenUiState.update { ScreenUiState.Failure(throwable.message ?: "Something went wrong") }
-            } else {
-                screenUiState.update { ScreenUiState.Success(posts.value) }
-            }
         }
     }
 

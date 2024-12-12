@@ -4,11 +4,17 @@ import android.util.Log
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
 import com.example.androidcookbook.domain.model.notification.NotificationType
+import com.example.androidcookbook.domain.model.user.GUEST_ID
 import com.example.androidcookbook.ui.CookbookUiState
 import com.example.androidcookbook.ui.CookbookViewModel
 import com.example.androidcookbook.ui.common.appbars.AppBarTheme
@@ -21,13 +27,17 @@ import com.example.androidcookbook.ui.features.notification.NotificationScreen
 import com.example.androidcookbook.ui.features.notification.NotificationScreenTopBar
 import com.example.androidcookbook.ui.nav.Routes
 import com.example.androidcookbook.ui.nav.utils.guestNavToAuth
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
+import kotlin.coroutines.coroutineContext
 
 fun NavGraphBuilder.notification(
     cookbookViewModel: CookbookViewModel,
-    navController: NavHostController
+    navController: NavHostController,
 ) {
     composable<Routes.Notifications> {
-        cookbookViewModel.updateTopBarState(CookbookUiState.TopBarState.NoTopBar)
         cookbookViewModel.updateBottomBarState(CookbookUiState.BottomBarState.NoBottomBar)
         cookbookViewModel.updateCanNavigateBack(true)
 
@@ -36,45 +46,63 @@ fun NavGraphBuilder.notification(
         val uiState = notificationViewModel.notificationUiState.collectAsState().value
         Log.d("Notification", "notificationUiState: $uiState")
 
-        Scaffold(
-            topBar = {
-                AppBarTheme {
-                    NotificationScreenTopBar(
-                        onBackButtonClick =
-                        { navController.navigateUp() },
-                        onClearAllClick = {
-                            notificationViewModel.clearAllNotifications()
-                        }
+        var isClearing by remember { mutableStateOf(false) }
+
+        LaunchedEffect(isClearing) {
+            if (isClearing) {
+                notificationViewModel.clearAllNotifications()
+                delay(600)
+                notificationViewModel.updateEmpty()
+                isClearing = false
+            }
+        }
+
+        cookbookViewModel.updateTopBarState(CookbookUiState.TopBarState.Custom {
+            AppBarTheme {
+                NotificationScreenTopBar(
+                    onBackButtonClick =
+                    { navController.navigateUp() },
+                    onClearAllClick = {
+                        isClearing = true
+                    }
+                )
+            }
+        })
+        if (cookbookViewModel.user.collectAsState().value.id == GUEST_ID) {
+            GuestLoginScreen {
+                navController.guestNavToAuth()
+            }
+            return@composable
+        }
+
+        LaunchedEffect(key1 = Unit) {
+            notificationViewModel.refresh()
+        }
+
+        when (uiState) {
+            is ScreenUiState.Failure -> FailureScreen(uiState.message) { notificationViewModel.refresh() }
+            ScreenUiState.Guest -> GuestLoginScreen { navController.guestNavToAuth() }
+            ScreenUiState.Loading -> LoadingScreen()
+            is ScreenUiState.Success ->
+                RefreshableScreen(
+                    isRefreshing = notificationViewModel.isRefreshing.collectAsState().value,
+                    onRefresh = { notificationViewModel.refresh() },
+                ) {
+                    NotificationScreen(
+                        notifications = uiState.data,
+                        onNotificationClick = { notification ->
+                            notificationViewModel.markRead(notification.id)
+                            when (notification.type) {
+                                NotificationType.NEW_FOLLOWER -> navController.navigate(Routes.OtherProfile(notification.relatedId))
+                                NotificationType.NEW_POST_LIKE -> navController.navigate(Routes.App.PostDetails(notification.relatedId))
+                                NotificationType.NEW_POST_COMMENT -> navController.navigate(Routes.App.PostDetails(notification.relatedId))
+                                NotificationType.NEW_COMMENT_LIKE -> navController.navigate(Routes.App.PostDetails(notification.relatedId))
+                            }
+                        },
+                        loadMore = { notificationViewModel.loadMore() },
+                        isClearing = isClearing
                     )
                 }
-            }
-        ) { innerPadding ->
-            when (uiState) {
-                is ScreenUiState.Failure -> FailureScreen(uiState.message) { notificationViewModel.refresh() }
-                ScreenUiState.Guest -> GuestLoginScreen { navController.guestNavToAuth() }
-                ScreenUiState.Loading -> LoadingScreen()
-                is ScreenUiState.Success ->
-                    RefreshableScreen(
-                        isRefreshing = notificationViewModel.isRefreshing.collectAsState().value,
-                        onRefresh = { notificationViewModel.refresh() },
-                    ) {
-                        NotificationScreen(
-                            notifications = uiState.data,
-                            onNotificationClick = { notification ->
-                                notificationViewModel.markRead(notification.id)
-                                // TODO: Navigate to notification details
-                                when (notification.type) {
-                                    NotificationType.NEW_FOLLOWER -> navController.navigate(Routes.OtherProfile(notification.relatedId))
-                                    NotificationType.NEW_POST_LIKE -> navController.navigate(Routes.App.PostDetails(notification.relatedId))
-                                    NotificationType.NEW_POST_COMMENT -> navController.navigate(Routes.App.PostDetails(notification.relatedId))
-                                    NotificationType.NEW_COMMENT_LIKE -> navController.navigate(Routes.App.PostDetails(notification.relatedId))
-                                }
-                            },
-                            contentPadding = innerPadding,
-                            loadMore = { notificationViewModel.loadMore() }
-                        )
-                    }
-            }
         }
     }
 }

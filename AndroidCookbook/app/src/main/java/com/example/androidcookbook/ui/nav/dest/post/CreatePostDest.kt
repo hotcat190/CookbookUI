@@ -7,9 +7,11 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
 import com.example.androidcookbook.domain.model.post.Post
+import com.example.androidcookbook.domain.model.user.GUEST_ID
 import com.example.androidcookbook.domain.model.user.User
 import com.example.androidcookbook.ui.CookbookUiState
 import com.example.androidcookbook.ui.CookbookViewModel
+import com.example.androidcookbook.ui.common.screens.GuestLoginScreen
 import com.example.androidcookbook.ui.features.post.create.AddIngredientDialog
 import com.example.androidcookbook.ui.features.post.create.AddStepDialog
 import com.example.androidcookbook.ui.features.post.create.CreatePostScreen
@@ -21,6 +23,7 @@ import com.example.androidcookbook.ui.features.post.create.UpdateStepDialog
 import com.example.androidcookbook.ui.features.post.create.UpdateStepDialogState
 import com.example.androidcookbook.ui.nav.CustomNavTypes
 import com.example.androidcookbook.ui.nav.Routes
+import com.example.androidcookbook.ui.nav.utils.guestNavToAuth
 import kotlin.reflect.typeOf
 
 fun NavGraphBuilder.createPost(
@@ -36,6 +39,13 @@ fun NavGraphBuilder.createPost(
         viewModel.updateTopBarState(CookbookUiState.TopBarState.Default)
         viewModel.updateBottomBarState(CookbookUiState.BottomBarState.NoBottomBar)
         viewModel.updateCanNavigateBack(true)
+
+        if (currentUser.id == GUEST_ID) {
+            GuestLoginScreen {
+                navController.guestNavToAuth()
+            }
+            return@composable
+        }
 
         val createPostViewModel = hiltViewModel<CreatePostViewModel, CreatePostViewModel.CreatePostViewModelFactory>{ factory ->
             factory.create(Post())

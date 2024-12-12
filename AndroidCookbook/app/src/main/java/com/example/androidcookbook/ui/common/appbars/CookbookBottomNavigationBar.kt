@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AddCircle
+import androidx.compose.material3.DividerDefaults
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LocalContentColor
@@ -55,7 +56,7 @@ fun CookbookBottomNavigationBar(
 
         Column {
             HorizontalDivider(
-                color = LocalContentColor.current.copy(alpha = 0.25F)
+                color = DividerDefaults.color.copy(alpha = 0.25F)
             )
 
             NavigationBar(

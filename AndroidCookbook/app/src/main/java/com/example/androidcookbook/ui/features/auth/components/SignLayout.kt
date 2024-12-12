@@ -58,7 +58,7 @@ fun SignLayout(
                             )
                         )
                         .requiredHeight(
-                            LocalConfiguration.current.screenHeightDp.dp
+                            LocalConfiguration.current.screenHeightDp.dp.times(1.01F)
                         )
                         .fillMaxSize()
 

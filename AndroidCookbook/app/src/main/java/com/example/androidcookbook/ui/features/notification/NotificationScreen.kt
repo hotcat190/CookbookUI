@@ -1,6 +1,10 @@
 package com.example.androidcookbook.ui.features.notification
 
 import android.content.res.Configuration
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
@@ -8,6 +12,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
@@ -24,28 +29,39 @@ fun NotificationScreen(
     loadMore: () -> Unit,
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(0.dp),
+    isClearing: Boolean, // New state variable
 ) {
+    val itemsToShow = remember(notifications, isClearing) {
+        if (isClearing) emptyList() else notifications
+    }
     EndlessLazyColumn(
         items = notifications,
         itemKey = { it.id },
         loadMore = loadMore,
         modifier = modifier,
         contentPadding = contentPadding
-    ) { notification ->
-        NotificationItem(
-            notification = notification,
-            onClick = onNotificationClick,
-            if (notification.isRead) Modifier
-            else Modifier.background(LightBlue.copy(alpha = 0.1f)),
-        )
-        HorizontalDivider()
+    ) { index, notification ->
+        val itemDelay = (index * 30).coerceAtMost(180) // Calculate delay (50ms per item, max 500ms)
+        AnimatedVisibility(
+            visible = !isClearing,
+            exit = slideOutHorizontally(
+                animationSpec = tween(durationMillis = 300, delayMillis = itemDelay),
+            ) { it } ,
+        ) {
+            NotificationItem(
+                notification = notification,
+                onClick = onNotificationClick,
+                if (notification.isRead) Modifier
+                else Modifier.background(LightBlue.copy(alpha = 0.1f)),
+            )
+            HorizontalDivider()
+        }
     }
     if (notifications.isEmpty()) {
         Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
             Text("No notifications yet")
         }
     }
-
 }
 
 @Composable
@@ -58,6 +74,7 @@ private fun NotificationScreenDarkPreview() {
             notifications = SampleNotifications.notifications,
             onNotificationClick = {},
             loadMore = {},
+            isClearing = false,
         )
     }
 }
@@ -70,6 +87,7 @@ private fun NotificationScreenPreview() {
             notifications = SampleNotifications.notifications,
             onNotificationClick = {},
             loadMore = {},
+            isClearing = false,
         )
     }
 }

@@ -46,12 +46,7 @@ class MainActivity : ComponentActivity() {
         )
         setContent {
             AndroidCookbookTheme {
-                Surface(
-                    modifier = Modifier
-                        .fillMaxSize()
-                ) {
-                    CookbookApp()
-                }
+                CookbookApp()
             }
         }
     }
