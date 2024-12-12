@@ -64,6 +64,7 @@ fun NavGraphBuilder.follow(
         val screenType = followScreenViewModel.screenType.collectAsState().value
 
         RefreshableScreen(
+            isRefreshing = followViewModel.isRefreshing.collectAsState().value,
             onRefresh = {
                 followViewModel.refresh()
             }

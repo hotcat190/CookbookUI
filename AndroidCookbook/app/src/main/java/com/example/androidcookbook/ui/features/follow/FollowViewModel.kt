@@ -15,6 +15,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 
 @HiltViewModel(assistedFactory = FollowViewModel.FollowViewModelFactory::class)
 class FollowViewModel @AssistedInject constructor(
@@ -24,6 +25,8 @@ class FollowViewModel @AssistedInject constructor(
     private val makeToastUseCase: MakeToastUseCase,
 
 ) : ViewModel() {
+    var isRefreshing = MutableStateFlow(false)
+        private set
     private val _isFollowing = MutableStateFlow(false)
     val isFollowing: StateFlow<Boolean> = _isFollowing
 
@@ -48,10 +51,13 @@ class FollowViewModel @AssistedInject constructor(
     }
 
     fun refresh() {
-        getCurrentUserFollowing()
+        isRefreshing.update { true }
         viewModelScope.launch {
+            getCurrentUserFollowing()
             getFollowers()
             getFollowing()
+        }.invokeOnCompletion {
+            isRefreshing.update { false }
         }
     }
 
