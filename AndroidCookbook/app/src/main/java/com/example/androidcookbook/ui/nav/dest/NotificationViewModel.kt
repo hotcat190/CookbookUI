@@ -73,8 +73,11 @@ class NotificationViewModel @Inject constructor(
                     clearNotification(notification.id)
                 }
             }
-            notificationUiState.update { ScreenUiState.Success(emptyList()) }
         }
+    }
+
+    fun updateEmpty() {
+        notificationUiState.update { ScreenUiState.Success(emptyList()) }
     }
 
     fun markRead(notificationId: Int) {

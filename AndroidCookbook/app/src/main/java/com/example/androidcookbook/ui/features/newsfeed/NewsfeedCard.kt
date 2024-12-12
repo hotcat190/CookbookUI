@@ -95,6 +95,7 @@ fun NewsfeedCard(
         ) {
             Spacer(modifier = Modifier.height(16.dp))
             PostTitle(post.title)
+
             if (post.mainImage != null) {
                 AsyncImage(
                     model = ImageRequest.Builder(LocalContext.current)
@@ -109,11 +110,14 @@ fun NewsfeedCard(
                         .padding(top = 16.dp, bottom = 8.dp)
                 )
             }
+
+            // Post desc
             Text(
                 text = post.description,
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.8f),
             )
+
             Spacer(Modifier.height(8.dp))
             Row(
                 verticalAlignment = Alignment.CenterVertically,
