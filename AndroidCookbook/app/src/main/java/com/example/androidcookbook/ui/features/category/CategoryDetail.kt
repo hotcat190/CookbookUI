@@ -3,7 +3,6 @@ package com.example.androidcookbook.ui.features.category
 import android.annotation.SuppressLint
 import android.util.Log
 import androidx.activity.compose.BackHandler
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -18,7 +17,6 @@ import androidx.compose.material.Divider
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material3.DividerDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -36,8 +34,8 @@ import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
 import androidx.compose.ui.input.nestedscroll.NestedScrollSource
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -48,7 +46,6 @@ import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.example.androidcookbook.R
 import com.example.androidcookbook.domain.model.recipe.DisplayRecipeDetail
-import com.example.androidcookbook.ui.components.ComponentLoadingAnimation
 import com.example.androidcookbook.ui.components.aigen.DashedLine
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -67,9 +64,22 @@ fun CategoryDetail(
 
     // Check if LazyColumn is at the top
     // This will trigger every time the scroll position changes
-    var screenWidth = LocalConfiguration.current.screenWidthDp
+    val d = LocalDensity.current.density
 
-    var currentImgHeight by remember { mutableStateOf(screenWidth*0.5) }
+    val maxHeight = 300f
+    val minHeight = 75f
+
+    val maxHeightPx = with(LocalDensity.current) {
+        maxHeight.dp.roundToPx().toFloat()
+    }
+
+    val minHeightPx = with(LocalDensity.current) {
+        minHeight.dp.roundToPx().toFloat()
+    }
+
+
+
+    var currentImgHeight by remember { mutableStateOf(maxHeightPx) }
 
     val nestedScrollConnection = remember {
         object : NestedScrollConnection {
@@ -81,9 +91,9 @@ fun CategoryDetail(
                 if (delta < 0 || (isAtTop)) {
                     val newImgHeight = currentImgHeight + delta
                     val previousImgSize = currentImgHeight
-                    currentImgHeight = newImgHeight.coerceIn(screenWidth*0.3, screenWidth*0.5)
+                    currentImgHeight = newImgHeight.coerceIn(minHeightPx, maxHeightPx)
                     val consumed = currentImgHeight - previousImgSize
-                    return Offset(0f, consumed.toFloat())
+                    return Offset(0f, consumed)
                 } else {
                     return super.onPreScroll(available, source)
                 }
@@ -92,11 +102,13 @@ fun CategoryDetail(
         }
     }
 
+
+
     Box(Modifier.nestedScroll(nestedScrollConnection)) {
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(currentImgHeight.dp)
+                .height((currentImgHeight/d).dp)
         ) {
             AsyncImage(
                 modifier = Modifier.fillMaxSize(),
@@ -127,7 +139,7 @@ fun CategoryDetail(
             modifier = modifier
                 .fillMaxSize()
                 .offset {
-                    IntOffset(0, currentImgHeight.toInt() * 3)
+                    IntOffset(0, currentImgHeight.toInt())
                 }, scrollState,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
@@ -189,8 +201,7 @@ fun CategoryDetail(
                 Spacer(Modifier.size(20.dp))
             }
 
-            items(items = recipeDetail.ingredients) {
-                ingredient ->
+            items(items = recipeDetail.ingredients) { ingredient ->
 
                 Spacer(Modifier.size(5.dp))
                 Text(
@@ -235,16 +246,8 @@ fun CategoryDetail(
 
         }
 
+
     }
 
-}
-
-@Composable
-fun RecipeInformation(modifier: Modifier = Modifier) {
-    LazyColumn(modifier = modifier.fillMaxSize()) {
-        items(100) {
-            Text("Mock", color = Color.White)
-        }
-    }
 }
 
