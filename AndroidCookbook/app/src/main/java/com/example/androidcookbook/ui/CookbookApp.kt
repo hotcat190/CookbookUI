@@ -84,7 +84,6 @@ fun CookbookApp(
     }
 
     Scaffold(
-        containerColor = MaterialTheme.colorScheme.background,
         modifier = Modifier
             .nestedScroll(scrollBehavior.nestedScrollConnection),
         topBar = {
@@ -108,7 +107,7 @@ fun CookbookApp(
                     ) {
                         updateSystemBarColors(
                             Color.TRANSPARENT,
-                            Color.WHITE,
+                            MaterialTheme.colorScheme.background.toArgb(),
                             darkTheme
                         )
                         CookbookAppBarDefault(

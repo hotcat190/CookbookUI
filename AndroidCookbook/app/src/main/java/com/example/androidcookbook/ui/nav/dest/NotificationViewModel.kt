@@ -1,6 +1,10 @@
 package com.example.androidcookbook.ui.nav.dest
 
 import android.util.Log
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -61,9 +65,16 @@ class NotificationViewModel @Inject constructor(
         }
     }
 
-    fun clearAllNotifications()
-    {
-
+    fun clearAllNotifications() {
+        if (notificationUiState.value is ScreenUiState.Success) {
+            val notifications = (notificationUiState.value as ScreenUiState.Success<List<Notification>>).data
+            for (notification in notifications) {
+                viewModelScope.launch {
+                    clearNotification(notification.id)
+                }
+            }
+            notificationUiState.update { ScreenUiState.Success(emptyList()) }
+        }
     }
 
     fun markRead(notificationId: Int) {
