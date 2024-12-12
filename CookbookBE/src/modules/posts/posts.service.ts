@@ -174,7 +174,7 @@ export class PostsService {
     const author = post.author;
     const user = await this.usersRepository.findOne({ where: { id: userId } });
     try {
-      this.notificationsService.sendNotificationWithImage(author.id,"NEW_POST_LIKE",postId,user.avatar,user.name,`${post.totalLike-1}`,`${post.title}`);
+      await this.notificationsService.sendNotificationWithImage(author.id,"NEW_POST_LIKE",postId,user.avatar,user.name,`${post.totalLike-1}`,`${post.title}`);
     } catch (error) {
       throw new BadRequestException('Không thể gửi thông báo: ' + error.message);
     }
@@ -203,7 +203,7 @@ export class PostsService {
     const author = comment.user;
     const user = await this.usersRepository.findOne({ where: { id: userId } });
     try {
-      this.notificationsService.sendNotificationWithImage(author.id,"NEW_COMMENT_LIKE", comment.post.id, user.avatar, user.name, `${comment.likes.length-1}`, `${comment.content}`);
+      await this.notificationsService.sendNotificationWithImage(author.id,"NEW_COMMENT_LIKE", comment.post.id, user.avatar, user.name, `${comment.likes.length-1}`, `${comment.content}`);
     } catch (error) {
       console.log(error);
       throw new BadRequestException('Không thể gửi thông báo: ' + error.message);
