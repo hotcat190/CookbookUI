@@ -173,9 +173,14 @@ export class PostsService {
   
     this.postsRepository.save(post);
     const author = post.author;
-    const user = await this.usersRepository.findOne({ where: { id: userId } });
-    await this.notificationsService.sendNotificationWithImage(author.id,"NEW_POST_LIKE",postId,user.avatar,user.name,`${post.totalLike-1}`,`${post.title}`);
+    
+    (async () => {
+      const user = await this.usersRepository.findOne({ where: { id: userId } });
+      this.notificationsService.sendNotificationWithImage(author.id,"NEW_POST_LIKE",postId,user.avatar,user.name,`${post.totalLike-1}`,`${post.title}`);
+    })().catch(err => console.error('Error sending notification:', err));
+
     return { message: 'Đã thích bài viết.', totalLike: post.totalLike };
+    
   }
   async likeComment(commentId: number, userId: number): Promise<any> {
     
