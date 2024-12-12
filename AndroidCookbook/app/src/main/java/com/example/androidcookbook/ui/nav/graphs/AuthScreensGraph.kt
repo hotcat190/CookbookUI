@@ -118,8 +118,12 @@ fun NavGraphBuilder.authScreens(
                         forgotPasswordViewModel.updateOtpCode(newOtpCode)
                     },
                     onSubmit = {
-                        forgotPasswordViewModel.submitOtpRequest()
-                        navController.navigate(Routes.Auth.ForgotPassword.Reset)
+                        forgotPasswordViewModel.submitOtpRequest(
+                            onSucces = {
+                                navController.navigate(Routes.Auth.ForgotPassword.Reset)
+                                forgotPasswordViewModel.updateDialogMessage("")
+                            }
+                        )
                     },
                     onNavigateToEmail = {
                         navController.navigate(Routes.Auth.ForgotPassword.Screen)

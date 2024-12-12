@@ -1,5 +1,6 @@
 package com.example.androidcookbook.ui.features.auth.screens
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -74,6 +75,7 @@ fun OtpCodeScreen(
             },
             imeAction = ImeAction.Done,
             onDone = {
+                Log.d("OTP DEBUG", "OtpCodeScreen: ${otpCode}")
                 if (otpCode.length == 6) {
                     onSubmit()
                 }
