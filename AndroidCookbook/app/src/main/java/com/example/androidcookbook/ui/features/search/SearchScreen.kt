@@ -76,7 +76,8 @@ fun SearchScreen(
     searchUiState: SearchUiState,
     onBackButtonClick: () -> Unit,
     modifier: Modifier = Modifier,
-    onSeeMoreClick: (User) -> Unit = {}
+    onSeeMoreClick: (User) -> Unit = {},
+    onSeeDetailsClick:(Post) -> Unit = {}
 ) {
     val pagerState = rememberPagerState(
         pageCount = { 4 }
@@ -148,10 +149,7 @@ fun SearchScreen(
                                         SearchAllResultsScreen(
                                             posts = searchUiState.searchALlResults.posts,
                                             users = searchUiState.searchALlResults.users,
-                                            onSeeDetailsClick = {
-                                                viewModel.ChangeCurrentPost(it)
-                                                viewModel.ChangeScreenState(SearchScreenState.Detail)
-                                            },
+                                            onSeeDetailsClick = onSeeDetailsClick,
                                             onSeeMoreClick = onSeeMoreClick,
                                             onSeeALlClick = {
                                                 pagerState.requestScrollToPage(SearchTab.Users.ordinal)
@@ -162,7 +160,10 @@ fun SearchScreen(
                                 1 -> {
                                     if (searchUiState.postTabState.state != TabState.Idle) {
                                         items(searchUiState.postTabState.result){
-                                            PostCard(it) { }
+                                            PostCard(
+                                                post = it,
+                                                onSeeDetailsClick = onSeeDetailsClick,
+                                            )
                                             LaunchedEffect(isAtBottom) {
                                                 if (isAtBottom) {
                                                     Log.d("BOTTOM", "SearchScreen: Bottom Reached")
