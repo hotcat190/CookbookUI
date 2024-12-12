@@ -1,5 +1,6 @@
 package com.example.androidcookbook.ui.features.post.create
 
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -8,6 +9,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
@@ -102,7 +104,7 @@ fun UpdateStepDialog(
         ) {
             Text(text = "Update Step")
             TextField(
-                value = step,
+                value = newStep,
                 onValueChange = { newStep = it },
                 placeholder = { Text(text = "Step") },
                 keyboardOptions = KeyboardOptions(
@@ -193,7 +195,7 @@ private fun IngredientLayout(
                     value = newIngredient.name,
                     onValueChange = { newIngredient = newIngredient.copy(name = it) },
                     placeholder = { Text(text = "Name") },
-                    maxLines = 1,
+                    singleLine = true,
                     keyboardOptions = KeyboardOptions(
                         capitalization = KeyboardCapitalization.Sentences,
                         imeAction = ImeAction.Next
@@ -201,14 +203,15 @@ private fun IngredientLayout(
                     keyboardActions = KeyboardActions(
                         onNext = { focusManager.moveFocus(FocusDirection.Right) }
                     ),
-                    modifier = Modifier.weight(2F),
+                    modifier = Modifier.weight(2F)
+//                        .horizontalScroll(rememberScrollState()),
                 )
                 Spacer(modifier = Modifier.width(8.dp))
                 TextField(
                     value = newIngredient.quantity,
                     onValueChange = { newIngredient = newIngredient.copy(quantity = it) },
                     placeholder = { Text(text = "Quantity") },
-                    maxLines = 1,
+                    singleLine = true,
                     keyboardOptions = KeyboardOptions(
                         capitalization = KeyboardCapitalization.Sentences,
                         imeAction = ImeAction.Done
@@ -220,6 +223,7 @@ private fun IngredientLayout(
                         }
                     ),
                     modifier = Modifier.weight(1.4F)
+//                        .horizontalScroll(rememberScrollState())
                 )
             }
             Row(

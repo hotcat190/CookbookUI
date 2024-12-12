@@ -121,7 +121,7 @@ fun IngredientsInput(
                     keyboardOptions = KeyboardOptions.Default.copy(
                         imeAction = ImeAction.Next
                     ),
-                    label = { Text("Quantity *", color = MaterialTheme.colorScheme.outline) },
+                    label = { Text("Quantity *", maxLines = 1, softWrap = false, color = MaterialTheme.colorScheme.outline) },
                     colors = TextFieldDefaults.textFieldColors(
                         focusedIndicatorColor = MaterialTheme.colorScheme.outline,
                         unfocusedIndicatorColor = MaterialTheme.colorScheme.outline,
@@ -129,6 +129,7 @@ fun IngredientsInput(
                         textColor = MaterialTheme.colorScheme.outline,
                         backgroundColor = MaterialTheme.colorScheme.surfaceContainer
                     ),
+
 
 
                     )

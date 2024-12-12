@@ -364,22 +364,24 @@ private fun PostDetailsInfo(
                     }
 
                     checkedStates.forEachIndexed { index, checked ->
-                        if (index == post.ingredient?.size) return@forEachIndexed
+                        if (post.ingredient == null || index >= post.ingredient.size) return@forEachIndexed
                         val ingredientText: String =
-                            post.ingredient?.get(index)?.name + " " + post.ingredient?.get(index)?.quantity
+                            post.ingredient.get(index).name + " " + post.ingredient.get(index).quantity
                         Row(
                             verticalAlignment = Alignment.CenterVertically,
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.SpaceBetween
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            modifier = Modifier.fillMaxWidth()
+                                .padding(start = 28.dp, end = 12.dp),
                         ) {
-                            val bulletColor = MaterialTheme.colorScheme.secondary
+                            val bulletColor = MaterialTheme.colorScheme.onSurface
                             Canvas(modifier = Modifier.size(12.dp)) {
                                 drawCircle(bulletColor)
                             }
                             Text(
                                 text = ingredientText,
                                 fontSize = 20.sp,
-                                color = MaterialTheme.colorScheme.secondary
+                                color = MaterialTheme.colorScheme.onSurface,
+                                modifier = Modifier.padding(start = 16.dp)
                             )
                             Checkbox(
                                 checked = checked,
@@ -387,9 +389,8 @@ private fun PostDetailsInfo(
                                     checkedStates[index] = isChecked
                                 },
                                 colors = CheckboxDefaults.colors(
-
-                                    checkmarkColor = MaterialTheme.colorScheme.secondary,
-                                    uncheckedColor = MaterialTheme.colorScheme.secondary,
+                                    checkmarkColor = MaterialTheme.colorScheme.onSurface,
+                                    uncheckedColor = MaterialTheme.colorScheme.onSurface,
                                     checkedColor = Color(101, 85, 143)
                                 )
                             )
@@ -412,10 +413,11 @@ private fun PostDetailsInfo(
                         Text(
                             text = "${index + 1}. $stepText\n",
                             style = TextStyle(
-                                fontSize = 24.sp,
+                                fontSize = 18.sp,
                                 fontWeight = FontWeight(400),
-                                color = MaterialTheme.colorScheme.secondary,
-                            )
+                                color = MaterialTheme.colorScheme.onSurface,
+                            ),
+                            modifier = Modifier.padding(horizontal = 8.dp)
                         )
                     }
 
