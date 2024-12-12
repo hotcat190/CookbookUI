@@ -202,6 +202,7 @@ fun CookbookApp(
 
                 val searchViewModel = hiltViewModel<SearchViewModel>()
                 val searchUiState = searchViewModel.uiState.collectAsState().value
+                var loadRecipeDetail = searchViewModel.loadCurrentRecipeSuccessful.collectAsState().value
 
                 viewModel.updateBottomBarState(CookbookUiState.BottomBarState.NoBottomBar)
                 viewModel.updateCanNavigateBack(true)
@@ -214,13 +215,15 @@ fun CookbookApp(
                 }
 
                 viewModel.updateTopBarState(CookbookUiState.TopBarState.Custom {
-                    AppBarTheme(darkTheme) {
-                        SearchBar(
-                            onSearch = { searchViewModel.searchAll(it) },
-                            navigateBackAction = {
-                                navController.navigateUp()
-                            },
-                        )
+                    if (!loadRecipeDetail) {
+                        AppBarTheme(darkTheme) {
+                            SearchBar(
+                                onSearch = { searchViewModel.searchAll(it) },
+                                navigateBackAction = {
+                                    navController.navigateUp()
+                                },
+                            )
+                        }
                     }
                 })
 
