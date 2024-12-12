@@ -4,6 +4,11 @@ import android.util.Log
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
@@ -22,10 +27,15 @@ import com.example.androidcookbook.ui.features.notification.NotificationScreen
 import com.example.androidcookbook.ui.features.notification.NotificationScreenTopBar
 import com.example.androidcookbook.ui.nav.Routes
 import com.example.androidcookbook.ui.nav.utils.guestNavToAuth
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
+import kotlin.coroutines.coroutineContext
 
 fun NavGraphBuilder.notification(
     cookbookViewModel: CookbookViewModel,
-    navController: NavHostController
+    navController: NavHostController,
 ) {
     composable<Routes.Notifications> {
         cookbookViewModel.updateBottomBarState(CookbookUiState.BottomBarState.NoBottomBar)
@@ -36,13 +46,23 @@ fun NavGraphBuilder.notification(
         val uiState = notificationViewModel.notificationUiState.collectAsState().value
         Log.d("Notification", "notificationUiState: $uiState")
 
+        var isClearing by remember { mutableStateOf(false) }
+
+        LaunchedEffect(isClearing) {
+            if (isClearing) {
+                delay(1000)
+                isClearing = false
+            }
+        }
+
         cookbookViewModel.updateTopBarState(CookbookUiState.TopBarState.Custom {
             AppBarTheme {
                 NotificationScreenTopBar(
                     onBackButtonClick =
                     { navController.navigateUp() },
                     onClearAllClick = {
-                        notificationViewModel.clearAllNotifications()
+                        isClearing = true
+//                            notificationViewModel.clearAllNotifications()
                     }
                 )
             }
@@ -53,6 +73,11 @@ fun NavGraphBuilder.notification(
             }
             return@composable
         }
+
+        LaunchedEffect(key1 = Unit) {
+            notificationViewModel.refresh()
+        }
+
         when (uiState) {
             is ScreenUiState.Failure -> FailureScreen(uiState.message) { notificationViewModel.refresh() }
             ScreenUiState.Guest -> GuestLoginScreen { navController.guestNavToAuth() }
@@ -66,7 +91,6 @@ fun NavGraphBuilder.notification(
                         notifications = uiState.data,
                         onNotificationClick = { notification ->
                             notificationViewModel.markRead(notification.id)
-                            // TODO: Navigate to notification details
                             when (notification.type) {
                                 NotificationType.NEW_FOLLOWER -> navController.navigate(Routes.OtherProfile(notification.relatedId))
                                 NotificationType.NEW_POST_LIKE -> navController.navigate(Routes.App.PostDetails(notification.relatedId))
@@ -74,7 +98,8 @@ fun NavGraphBuilder.notification(
                                 NotificationType.NEW_COMMENT_LIKE -> navController.navigate(Routes.App.PostDetails(notification.relatedId))
                             }
                         },
-                        loadMore = { notificationViewModel.loadMore() }
+                        loadMore = { notificationViewModel.loadMore() },
+                        isClearing = isClearing
                     )
                 }
         }

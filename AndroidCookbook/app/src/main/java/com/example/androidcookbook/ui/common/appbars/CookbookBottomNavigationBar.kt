@@ -60,7 +60,7 @@ fun CookbookBottomNavigationBar(
             )
 
             NavigationBar(
-                containerColor = Color.White,
+                containerColor = Color.Transparent,
                 modifier = Modifier
                     .padding(WindowInsets.navigationBars.asPaddingValues())
                     .consumeWindowInsets(WindowInsets.navigationBars.asPaddingValues())
