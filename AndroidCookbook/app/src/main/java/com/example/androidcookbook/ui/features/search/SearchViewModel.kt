@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.androidcookbook.data.repositories.AllSearcherRepository
 import com.example.androidcookbook.data.repositories.SearchRepository
 import com.example.androidcookbook.domain.model.post.Post
+import com.example.androidcookbook.domain.model.recipe.DisplayRecipeDetail
 import com.example.androidcookbook.domain.model.recipe.Recipe
 import com.example.androidcookbook.domain.model.recipe.RecipeList
 import com.example.androidcookbook.domain.model.search.SearchAll
@@ -31,6 +32,8 @@ class SearchViewModel @Inject constructor(
 
     private val _uiState = MutableStateFlow(SearchUiState())
     val uiState: StateFlow<SearchUiState> = _uiState.asStateFlow()
+    var currentRecipeDetail = DisplayRecipeDetail()
+    var loadCurrentRecipeSuccessful = MutableStateFlow(false)
 
     fun searchFood() {
         _uiState.update {
@@ -240,6 +243,33 @@ class SearchViewModel @Inject constructor(
             it.copy(
                 currentPost = post
             )
+        }
+    }
+
+    fun getRecipeDetailsById(idMeal: Int) {
+        loadCurrentRecipeSuccessful.value = false
+        viewModelScope.launch {
+            val result = searchRepository.getMealById(idMeal).meals.first()
+
+            currentRecipeDetail = DisplayRecipeDetail(
+                idMeal = result.idMeal,
+                strMeal = result.strMeal,
+                strCategory = result.strCategory,
+                strInstructions = result.strInstructions,
+                strArea = result.strArea,
+                strMealThumb = result.strMealThumb
+            )
+
+            (1..20).forEach { index ->
+                val ingredient = result::class.java.getDeclaredField("strIngredient$index")
+                    .apply { isAccessible = true }.get(result) as? String
+                val measure = result::class.java.getDeclaredField("strMeasure$index")
+                    .apply { isAccessible = true }.get(result) as? String
+                if (!ingredient.isNullOrBlank() && !measure.isNullOrBlank()) {
+                    currentRecipeDetail.ingredients.add("$ingredient - $measure")
+                }
+            }
+            loadCurrentRecipeSuccessful.value = true
         }
     }
 

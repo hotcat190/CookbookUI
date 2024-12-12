@@ -53,17 +53,18 @@ fun ResultCard(
     onClick: () -> Unit,
     recipe: Recipe
 ) {
-    Card(
-        onClick = onClick,
+    Column(
         modifier = Modifier
             .fillMaxWidth()
-            .wrapContentHeight(),
-        shape = RoundedCornerShape(8.dp),
-        border = BorderStroke(2.dp, MaterialTheme.colorScheme.outline),
-        colors = CardDefaults.cardColors(MaterialTheme.colorScheme.surfaceContainer)
+            .wrapContentHeight()
+            .clickable {
+                onClick()
+            }
     ) {
         Row(
-            modifier = Modifier.height(120.dp)
+            modifier = Modifier
+                .height(120.dp)
+                .padding(start = 10.dp)
         ) {
             AsyncImage(
                 modifier = Modifier
@@ -113,6 +114,11 @@ fun ResultCard(
                 )
             }
         }
+        Spacer(Modifier.height(8.dp))
+        HorizontalDivider(
+            thickness = 1.dp,
+            modifier = Modifier.alpha(0.75F),
+        )
     }
 }
 
