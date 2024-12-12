@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -39,6 +40,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.ComposeCompilerApi
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -63,9 +65,12 @@ import coil.request.ImageRequest
 import com.example.androidcookbook.R
 import com.example.androidcookbook.data.mocks.SamplePosts
 import com.example.androidcookbook.domain.model.post.Post
+import com.example.androidcookbook.domain.model.recipe.DisplayRecipeDetail
 import com.example.androidcookbook.domain.model.recipe.Recipe
 import com.example.androidcookbook.domain.model.user.GUEST_ID
 import com.example.androidcookbook.domain.model.user.User
+import com.example.androidcookbook.ui.CookbookUiState
+import com.example.androidcookbook.ui.features.category.CategoryDetail
 import com.example.androidcookbook.ui.features.newsfeed.NewsfeedCard
 import com.example.androidcookbook.ui.features.newsfeed.NewsfeedScreen
 import com.example.androidcookbook.ui.features.post.details.PostDetailsScreen
@@ -92,6 +97,7 @@ fun SearchScreen(
             SearchScreenState.Waiting -> onBackButtonClick()
         }
     }
+    val loadRecipeSuccessful = viewModel.loadCurrentRecipeSuccessful.collectAsState().value
     if (searchUiState.fail) {
         Text(
             text = searchUiState.result,
@@ -142,7 +148,7 @@ fun SearchScreen(
                         LazyColumn(
                             state = state,
                             modifier = Modifier
-                                .padding(horizontal = 10.dp, vertical = 5.dp),
+                                .padding(horizontal = 0.dp, vertical = 5.dp),
                             verticalArrangement = Arrangement.spacedBy(10.dp)
                         ) {
                             when (it) {
@@ -188,7 +194,8 @@ fun SearchScreen(
                                             ResultCardTheme {
                                                 ResultCard(
                                                     onClick = {
-                                                        viewModel.ChangeScreenState(SearchScreenState.Posts)
+                                                        viewModel.ChangeScreenState(SearchScreenState.Detail)
+                                                        viewModel.getRecipeDetailsById(item.idMeal)
                                                     },
                                                     recipe = item
                                                 )
@@ -205,7 +212,8 @@ fun SearchScreen(
                                     item {
                                             Row(
                                                 modifier = Modifier
-                                                    .wrapContentWidth(),
+                                                    .wrapContentWidth()
+                                                    .padding(end = 10.dp),
                                                 verticalAlignment = Alignment.CenterVertically
                                             ) {
                                                 Spacer(modifier = Modifier.weight(1f))
@@ -218,10 +226,11 @@ fun SearchScreen(
                                                     },
                                                     modifier = Modifier
                                                         .border(color = Color.Black, width = 1.dp, shape = RoundedCornerShape(10.dp))
-                                                        .padding(horizontal = 3.dp)
+                                                        .padding(horizontal = 5.dp)
+                                                        .height(30.dp)
                                                 ) {
                                                     if (userChecked) {
-                                                        Text("User")
+                                                        Text("Name")
                                                     } else {
                                                         Text("Username")
                                                     }
@@ -268,7 +277,18 @@ fun SearchScreen(
 //                )
             }
             SearchScreenState.Detail -> {
-//                PostDetailsScreen(searchUiState.currentPost, false, {}) //TODO
+                if (loadRecipeSuccessful) {
+                    CategoryDetail(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(start = 8.dp, top = 16.dp, end = 8.dp),
+                        recipeDetail = viewModel.currentRecipeDetail,
+                        navigateBackAction = {
+                            viewModel.ChangeScreenState(SearchScreenState.Food)
+                            viewModel.loadCurrentRecipeSuccessful.value = false
+                        },
+                    )
+                }
             }
         }
 
