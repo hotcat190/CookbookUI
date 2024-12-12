@@ -82,6 +82,7 @@ fun CreatePostScreen(
     onCookTimeChange: (String) -> Unit,
     createType: CreatePostType,
     onUserClick: (User) -> Unit,
+    showErrorMessage: Boolean = false,
     modifier: Modifier = Modifier,
 ) {
     BackHandler { onBackButtonClick() }
@@ -126,7 +127,8 @@ fun CreatePostScreen(
                 description,
                 focusManager,
                 postBody,
-                updatePostBody
+                updatePostBody,
+                showErrorMessage,
             )
 
             Spacer(Modifier.height(16.dp))
@@ -181,6 +183,7 @@ private fun AddPostContent(
     focusManager: FocusManager,
     postBody: String,
     updatePostBody: (String) -> Unit,
+    showErrorMessage: Boolean = false,
 ) {
     Text(
         text = "Post",
@@ -228,6 +231,14 @@ private fun AddPostContent(
             imeAction = ImeAction.Default
         ),
         minLines = 5,
+        supportingText = {
+            if (showErrorMessage) {
+                Text(
+                    text = "Post title/description cannot be empty",
+                    color = MaterialTheme.colorScheme.error
+                )
+            }
+        }
     )
 }
 

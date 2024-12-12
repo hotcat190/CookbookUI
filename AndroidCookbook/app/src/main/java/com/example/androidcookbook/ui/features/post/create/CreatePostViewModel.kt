@@ -38,6 +38,7 @@ class CreatePostViewModel @AssistedInject constructor(
         fun create(post: Post): CreatePostViewModel
     }
 
+    val showErrorMessage: MutableStateFlow<Boolean> = MutableStateFlow(false)
     val cookTime = MutableStateFlow<String>("")
     val postImageUri = MutableStateFlow<Uri?>(post.mainImage?.toUri())
     val postTitle = MutableStateFlow(post.title)
@@ -56,10 +57,12 @@ class CreatePostViewModel @AssistedInject constructor(
 
     fun updatePostTitle(title: String) {
         postTitle.update { title }
+        showErrorMessage.update { false }
     }
 
     fun updatePostBody(body: String) {
         postBody.update { body }
+        showErrorMessage.update { false }
     }
 
     fun updatePostImageUri(uri: Uri?) {
@@ -149,6 +152,10 @@ class CreatePostViewModel @AssistedInject constructor(
     }
 
     fun createPost(onSuccessNavigate: (Post) -> Unit) {
+        if (postTitle.value.isEmpty() || postBody.value.isEmpty()) {
+            showErrorMessage.update { true }
+            return
+        }
         viewModelScope.launch {
             val mainImage = uploadImage()
             val response = postRepository.createPost(

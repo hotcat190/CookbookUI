@@ -4,20 +4,18 @@ import android.net.Uri
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.androidcookbook.data.network.AiGenService
 import com.example.androidcookbook.data.repositories.AiGenRepository
-import com.example.androidcookbook.domain.model.aigen.AiRecipe
-import com.example.androidcookbook.domain.model.aigen.UploadDataFromImage
+import com.example.androidcookbook.domain.model.aigen.AiGenFromImage
+import com.example.androidcookbook.domain.model.aigen.AiResult
+import com.example.androidcookbook.domain.model.aigen.UploadDataToAi
 import com.example.androidcookbook.domain.model.ingredient.Ingredient
 import com.google.gson.GsonBuilder
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import okhttp3.MultipartBody
 import retrofit2.Response
 import javax.inject.Inject
@@ -35,23 +33,24 @@ class AiGenViewModel @Inject constructor(
     val selectedImageUri: StateFlow<Uri?> get() = _selectedImageUri
 
 
-    private val _uploadResponse = MutableStateFlow<AiRecipe?>(null)
-    val uploadResponse: StateFlow<AiRecipe?> = _uploadResponse.asStateFlow()
+    private val _uploadResponse = MutableStateFlow<AiGenFromImage?>(null)
+    val uploadResponse: StateFlow<AiGenFromImage?> = _uploadResponse.asStateFlow()
 
+    private val _aiResult = MutableStateFlow<AiResult?>(null)
+    val aiResult: StateFlow<AiResult?> = _aiResult.asStateFlow()
+
+    private var isEmpty = false
+
+    fun setIsEmpty(isEmpty: Boolean) {
+        this.isEmpty = isEmpty
+    }
+
+    fun isFieldEmpty(): Boolean {
+        return isEmpty
+    }
 
     fun updateSelectedUri(uri: Uri?) {
         _selectedImageUri.value = uri
-    }
-
-    val gson = GsonBuilder().setPrettyPrinting().excludeFieldsWithoutExposeAnnotation().create()
-
-
-    fun updateMealTitle(updatedMealTitle: String) {
-        _aiGenUiState.update { currentState ->
-            currentState.copy(
-                mealTitle = updatedMealTitle
-            )
-        }
     }
 
 
@@ -73,6 +72,11 @@ class AiGenViewModel @Inject constructor(
         }
     }
 
+    fun updateNote(updatedNote: String) {
+        _aiGenUiState.update { currentState ->
+            currentState.copy(note = updatedNote)
+        }
+    }
 
     fun updateIngredientQuantity(index: Int, updatedIngredientQuantity: String) {
         _aiGenUiState.update { currentState ->
@@ -88,6 +92,16 @@ class AiGenViewModel @Inject constructor(
             val updatedIngredients = currentState.ingredients.toMutableList()
             updatedIngredients.add(Ingredient("", ""))
             currentState.copy(ingredients = updatedIngredients)
+        }
+    }
+
+    fun addEmptyRecipe() {
+        _aiGenUiState.update { currentState ->
+            val updatedRecipes = currentState.recipes.toMutableList()
+            updatedRecipes.add("")
+            currentState.copy(
+                recipes = updatedRecipes
+            )
         }
     }
 
@@ -119,45 +133,48 @@ class AiGenViewModel @Inject constructor(
         }
     }
 
-    fun updatePortion(updatedPortion: String) {
+    fun updateRecipe(index: Int, updatedRecipeString: String) {
         _aiGenUiState.update { currentState ->
+            val updatedRecipes = currentState.recipes.toMutableList()
+            updatedRecipes.set(index, updatedRecipeString)
             currentState.copy(
-                portion = updatedPortion
+                recipes = updatedRecipes
             )
         }
     }
 
-    fun updateCookingTime(updatedCookingTime: String) {
+    fun clearIngredients() {
         _aiGenUiState.update { currentState ->
+            val updatedRecipes = currentState.ingredients.toMutableList()
+            updatedRecipes.clear()
             currentState.copy(
-                cookingTime = updatedCookingTime
+                ingredients = updatedRecipes
             )
         }
     }
 
-    fun updateNote(updatedNote: String) {
+
+    fun clearRecipes() {
         _aiGenUiState.update { currentState ->
+            val updatedRecipes = currentState.recipes.toMutableList()
+            updatedRecipes.clear()
             currentState.copy(
-                note = updatedNote
+                recipes = updatedRecipes
             )
         }
     }
 
-    fun updateTimeMeasurement(updatedMeasurement: String) {
+    fun updateIsTakingInput() {
         _aiGenUiState.update { currentState ->
             currentState.copy(
-                timeMeasurement = updatedMeasurement
+                isProcessing = false,
+                isTakingInput = true,
+                isDone = false,
+                isDoneUploadingImage = false
             )
         }
     }
 
-    fun updateServedAs(updatedServedAs: String) {
-        _aiGenUiState.update { currentState ->
-            currentState.copy(
-                servedAs = updatedServedAs
-            )
-        }
-    }
 
     fun updateIsProcessing() {
         _aiGenUiState.update { currentState ->
@@ -170,17 +187,6 @@ class AiGenViewModel @Inject constructor(
         }
     }
 
-    fun isTakingInput(): Boolean {
-        return _aiGenUiState.value.isTakingInput
-    }
-
-    fun isProcessing(): Boolean {
-        return _aiGenUiState.value.isProcessing
-    }
-
-    fun isDone(): Boolean {
-        return _aiGenUiState.value.isDone
-    }
 
     fun updateIsDone() {
         _aiGenUiState.update { currentState ->
@@ -188,17 +194,6 @@ class AiGenViewModel @Inject constructor(
                 isDone = true,
                 isProcessing = false,
                 isTakingInput = false,
-                isDoneUploadingImage = false
-            )
-        }
-    }
-
-    fun updateIsTakingInput() {
-        _aiGenUiState.update { currentState ->
-            currentState.copy(
-                isTakingInput = true,
-                isDone = false,
-                isProcessing = false,
                 isDoneUploadingImage = false
             )
         }
@@ -216,28 +211,9 @@ class AiGenViewModel @Inject constructor(
     }
 
 
-    fun getUiStateJson(): String {
-
-
-        // Assuming `aiGenUiState` is a StateFlow
-        val currentState = runBlocking {
-            _aiGenUiState.first() // Get the current value from the StateFlow
-        }
-        return gson.toJson(currentState) // Convert to JSON
-    }
-
-    fun getImageInforJson(): String {
-        val uploadDataFromImage = UploadDataFromImage(
-            ingredients = _aiGenUiState.value.ingredients,
-            recipes = _aiGenUiState.value.recipes,
-        )
-
-        return gson.toJson(uploadDataFromImage)
-    }
-
-    suspend fun uploadImage(imagePart: MultipartBody.Part): AiRecipe? {
+    suspend fun uploadImage(imagePart: MultipartBody.Part): AiGenFromImage? {
         return try {
-            val response: Response<AiRecipe> = aiGenRepository.uploadImage(image = imagePart)
+            val response: Response<AiGenFromImage> = aiGenRepository.uploadImage(image = imagePart)
             if (response.isSuccessful) {
                 _uploadResponse.value = response.body()
                 response.body()
@@ -251,4 +227,35 @@ class AiGenViewModel @Inject constructor(
         }
     }
 
+
+    fun getAiResult() {
+        viewModelScope.launch {
+            updateIsProcessing()
+            try {
+
+                val response = aiGenRepository.uploadInformation(
+                    UploadDataToAi(
+                        ingredients = _aiGenUiState.value.ingredients,
+                        recipes = _aiGenUiState.value.recipes,
+                        note = _aiGenUiState.value.note
+                    )
+                )
+                if (response.isSuccessful) {
+                    if (aiGenUiState.value.isProcessing) {
+                        _aiResult.value = response.body()
+                        updateIsDone()
+                    }
+                } else {
+                    updateIsTakingInput()
+                    isEmpty = true
+                    Log.d("Error", "Upload failed with code: ${response.code()}")
+                    null
+                }
+            } catch (e: Exception) {
+                Log.d("Error", "Upload Error: ${e.message}")
+                null
+            }
+        }
+    }
 }
+

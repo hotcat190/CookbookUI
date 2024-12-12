@@ -35,6 +35,7 @@ import androidx.compose.material.icons.outlined.Share
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
@@ -57,15 +58,19 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.unit.times
+import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.example.androidcookbook.R
 import com.example.androidcookbook.data.mocks.SampleComments
 import com.example.androidcookbook.data.mocks.SamplePosts
 import com.example.androidcookbook.data.mocks.SampleUser
+import com.example.androidcookbook.data.providers.ThemeType
 import com.example.androidcookbook.domain.model.post.Comment
 import com.example.androidcookbook.domain.model.post.Post
 import com.example.androidcookbook.domain.model.user.User
+import com.example.androidcookbook.ui.CookbookViewModel
 import com.example.androidcookbook.ui.common.iconbuttons.LikeButton
 import com.example.androidcookbook.ui.common.image.OverlapCircleImage
 import com.example.androidcookbook.ui.common.utils.apiDateFormatter
@@ -220,7 +225,7 @@ private fun PostDetailsInfo(
                 fontWeight = FontWeight(400),
                 color = MaterialTheme.colorScheme.onSurface,
             ),
-            modifier = Modifier
+            modifier = Modifier.align(Alignment.Start)
         )
 
         if (post.mainImage != null) {
@@ -245,9 +250,15 @@ private fun PostDetailsInfo(
         // Like button
         LikeButton(isLiked, onLikedClick)
 
+        val cookbookViewModel = hiltViewModel<CookbookViewModel>()
+        val darkTheme = when(cookbookViewModel.themeType.collectAsState().value) {
+            ThemeType.Default -> isSystemInDarkTheme()
+            ThemeType.Dark -> true
+            ThemeType.Light -> false
+        }
         // Chat button
         IconButton(onClick = onCommentClick) {
-            if (isSystemInDarkTheme()) {
+            if (darkTheme) {
 
                 Image(
                     painter = painterResource(R.drawable.comment_icon_dark_theme),
@@ -262,7 +273,6 @@ private fun PostDetailsInfo(
                     painter = painterResource(R.drawable.comment_icon_light_theme),
                     modifier = Modifier.size(21.dp),
                     contentDescription = "Comment icon",
-                    alpha = 0.75F,
                 )
             }
         }
@@ -320,12 +330,12 @@ private fun PostDetailsInfo(
                     )
                 }
             }
-            Spacer(modifier = Modifier.width(16.dp))
         }
         Text(
             text = "${post.totalLike} likes",
             fontSize = 15.sp,
             color = MaterialTheme.colorScheme.onSurface,
+            modifier = Modifier.offset(x = (postLikes.size).times(3).dp)
         )
     }
 

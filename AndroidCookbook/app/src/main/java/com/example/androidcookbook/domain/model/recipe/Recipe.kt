@@ -17,7 +17,8 @@ data class DisplayRecipeDetail(
     val strArea: String = "",
     val strInstructions: String = "",
     val strMealThumb: String = "",
-    val ingredients: MutableList<String> = mutableListOf()
+    val ingredients: MutableList<String> = mutableListOf(),
+    val strSource: String = ""
 )
 
 data class RecipeDetails(
@@ -27,6 +28,7 @@ data class RecipeDetails(
     val strArea: String,
     val strInstructions: String,
     val strMealThumb: String,
+    val strSource: String,
 
     val strIngredient1: String,
     val strIngredient2: String,

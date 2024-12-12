@@ -54,8 +54,9 @@ fun NotificationScreen(
                 if (notification.isRead) Modifier
                 else Modifier.background(LightBlue.copy(alpha = 0.1f)),
             )
-            HorizontalDivider()
+
         }
+        HorizontalDivider()
     }
     if (notifications.isEmpty()) {
         Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {

@@ -209,16 +209,12 @@ fun EditProfileItem(
                 color = MaterialTheme.colorScheme.onSurface,
             )
             Spacer(modifier = Modifier.weight(1f))
-            val changeTextColorDark = Color(0xFF6BA7EC)
-            val changeTextColorLight = Color(0xFF2179F3)
+            val changeTextColor = Color(0xFF6BA7EC)
             Text(
                 text = "Change",
                 style = MaterialTheme.typography.bodyLarge,
                 fontWeight = FontWeight.SemiBold,
-                color = (
-                    if (isSystemInDarkTheme()) changeTextColorDark
-                    else changeTextColorLight
-                ), // TODO
+                color = changeTextColor,
                 modifier = Modifier
                     .clickable {
                         onChange()

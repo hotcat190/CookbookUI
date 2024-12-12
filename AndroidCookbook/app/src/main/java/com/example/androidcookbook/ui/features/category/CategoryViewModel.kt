@@ -68,7 +68,8 @@ class CategoryViewModel @Inject constructor(
                 strCategory = result.strCategory,
                 strInstructions = result.strInstructions,
                 strArea = result.strArea,
-                strMealThumb = result.strMealThumb
+                strMealThumb = result.strMealThumb,
+                strSource = result.strSource
             )
 
             (1..20).forEach { index ->

@@ -1,5 +1,6 @@
 package com.example.androidcookbook.ui.features.newsfeed
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.androidcookbook.data.repositories.NewsfeedRepository
@@ -36,6 +37,7 @@ class NewsfeedViewModel @Inject constructor(
 
     private val newsfeedLimit = 10
     private var newsfeedOffset = newsfeedLimit
+    val isLoadingMore: MutableStateFlow<Boolean> = MutableStateFlow(false)
 
     init {
         refresh()
@@ -77,15 +79,19 @@ class NewsfeedViewModel @Inject constructor(
     }
 
     fun loadMore() {
+        Log.d("NewsfeedViewModel", "loadMore")
+        isLoadingMore.update { true }
         viewModelScope.launch {
             newsfeedOffset += newsfeedLimit
             val response = newsfeedRepository.getNewsfeed(newsfeedOffset)
             response.onSuccess {
                 posts.update { data }
+                isLoadingMore.update { false }
             }.onFailure {
                 viewModelScope.launch {
                     makeToastUseCase("Something went wrong while fetching more posts")
                 }
+                isLoadingMore.update { false }
             }
         }
     }

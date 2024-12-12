@@ -2,13 +2,10 @@ package com.example.androidcookbook.ui.features.post.details
 
 import android.content.Context
 import android.util.Log
-import android.widget.Toast
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.androidcookbook.data.repositories.PostRepository
 import com.example.androidcookbook.domain.model.post.Comment
-import com.example.androidcookbook.domain.model.post.Post
 import com.example.androidcookbook.domain.model.post.SendCommentRequest
 import com.example.androidcookbook.domain.model.user.User
 import com.example.androidcookbook.domain.usecase.DeletePostUseCase
@@ -61,6 +58,9 @@ class PostDetailsViewModel @AssistedInject constructor(
         private set
     var postLikes: MutableStateFlow<List<User>> = MutableStateFlow(emptyList())
         private set
+    var isTogglingLike: MutableStateFlow<Boolean> = MutableStateFlow(false)
+        private set
+    var isTogglingBookmark = false
 
     init {
         refresh()
@@ -69,32 +69,30 @@ class PostDetailsViewModel @AssistedInject constructor(
     fun refresh() {
         isRefreshing.update { true }
         viewModelScope.launch {
-            getPost()
             //        postUiState.update { PostUiState.Success(post = _post) }
             queryPostLike(_postId)
             queryPostBookmark(_postId)
-            getComments(true)
-            getPostLikes()
         }.invokeOnCompletion {
             isRefreshing.update { false }
         }
     }
 
-    private suspend fun getPostLikes() {
-        val response = postRepository.getPostLikes(_postId, 1)
-        response.onSuccess {
-            postLikes.update { data.likes }
-        }.onFailure {
-            postLikes.update { emptyList() }
+    fun getPostLikes() {
+        viewModelScope.launch {
+            val response = postRepository.getPostLikes(_postId, 1)
+            response.onSuccess {
+                postLikes.update { data.likes }
+            }.onFailure {
+                postLikes.update { emptyList() }
+            }
         }
-
     }
 
     fun updateShowBottomCommentSheet(value: Boolean) {
         showBottomCommentSheet.update { value }
     }
 
-    private suspend fun getPost() {
+    suspend fun getPost() {
         val response = postRepository.getPost(_postId)
         response.onSuccess {
             postUiState.update { PostUiState.Success(post = data) }
@@ -129,24 +127,33 @@ class PostDetailsViewModel @AssistedInject constructor(
 
     private fun likePost() {
         viewModelScope.launch {
+            if (isTogglingLike.value) return@launch
+
+            isTogglingLike.update { true }
             val response = postRepository.likePost(_postId)
             response.onSuccess {
                 isPostLiked.update { true }
+                isTogglingLike.update { false }
             }.onFailure {
                 Log.d("PostDetails", message())
                 showToast("Failed to like post")
+                isTogglingLike.update { false }
             }
         }
     }
 
     private fun unlikePost() {
         viewModelScope.launch {
+            if (isTogglingLike.value) return@launch
+            isTogglingLike.update { true }
             val response = postRepository.unlikePost(_postId)
             response.onSuccess {
                 isPostLiked.update { false }
+                isTogglingLike.update { false }
             }.onFailure {
                 Log.d("PostDetails", message())
                 showToast("Failed to unlike post")
+                isTogglingLike.update { false }
             }
         }
     }
@@ -161,22 +168,30 @@ class PostDetailsViewModel @AssistedInject constructor(
 
     private fun bookmarkPost() {
         viewModelScope.launch {
+            if (isTogglingBookmark) return@launch
+            isTogglingBookmark = true
             val response = postRepository.bookmarkPost(_postId)
             response.onSuccess {
                 isPostBookmarked.update { true }
+                isTogglingBookmark = false
             }.onFailure {
                 showToast("Failed to bookmark post")
+                isTogglingBookmark = false
             }
         }
     }
 
     private fun unBookmarkPost() {
         viewModelScope.launch {
+            if (isTogglingBookmark) return@launch
+            isTogglingBookmark = true
             val response = postRepository.unBookmarkPost(_postId)
             response.onSuccess {
                 isPostBookmarked.update { false }
+                isTogglingBookmark = false
             }.onFailure {
                 showToast("Failed to unbookmark post")
+                isTogglingBookmark = false
             }
         }
     }
@@ -189,7 +204,7 @@ class PostDetailsViewModel @AssistedInject constructor(
         }
     }
 
-    private suspend fun getComments(reset: Boolean) {
+    suspend fun getComments(reset: Boolean) {
         if (reset) {
             commentsFlow.update { emptyList() }
             commentPage.update { 1 }

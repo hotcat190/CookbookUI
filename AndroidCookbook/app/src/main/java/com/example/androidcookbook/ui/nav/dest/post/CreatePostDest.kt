@@ -110,7 +110,8 @@ fun NavGraphBuilder.createPost(
             createType = CreatePostType.Post,
             onUserClick = { user ->
                 navController.navigate(Routes.App.UserProfile(user.id))
-            }
+            },
+            showErrorMessage = createPostViewModel.showErrorMessage.collectAsState().value,
         )
         if (createPostViewModel.isAddStepDialogOpen.collectAsState().value) {
             AddStepDialog(
