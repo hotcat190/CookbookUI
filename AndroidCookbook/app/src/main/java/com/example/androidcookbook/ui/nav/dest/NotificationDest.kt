@@ -50,7 +50,9 @@ fun NavGraphBuilder.notification(
 
         LaunchedEffect(isClearing) {
             if (isClearing) {
-                delay(1000)
+                notificationViewModel.clearAllNotifications()
+                delay(600)
+                notificationViewModel.updateEmpty()
                 isClearing = false
             }
         }
@@ -62,7 +64,6 @@ fun NavGraphBuilder.notification(
                     { navController.navigateUp() },
                     onClearAllClick = {
                         isClearing = true
-                        notificationViewModel.clearAllNotifications()
                     }
                 )
             }

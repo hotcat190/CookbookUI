@@ -41,7 +41,7 @@ fun NotificationScreen(
         modifier = modifier,
         contentPadding = contentPadding
     ) { index, notification ->
-        val itemDelay = (index * 50).coerceAtMost(500) // Calculate delay (50ms per item, max 500ms)
+        val itemDelay = (index * 30).coerceAtMost(180) // Calculate delay (50ms per item, max 500ms)
         AnimatedVisibility(
             visible = !isClearing,
             exit = slideOutHorizontally(
