@@ -46,6 +46,7 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.example.androidcookbook.domain.model.ingredient.Ingredient
 import com.example.androidcookbook.domain.model.user.User
@@ -112,6 +113,7 @@ fun CreatePostScreen(
                 author = author,
                 createdAt = LocalDate.now().toString(),
                 onUserClick = onUserClick,
+                authorFontSize = 19.sp,
             )
 
             Spacer(modifier = Modifier.height(8.dp))

@@ -26,11 +26,13 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
 import androidx.navigation.toRoute
+import com.example.androidcookbook.domain.model.user.GUEST_ID
 import com.example.androidcookbook.domain.model.user.User
 import com.example.androidcookbook.ui.CookbookUiState
 import com.example.androidcookbook.ui.CookbookViewModel
 import com.example.androidcookbook.ui.common.containers.RefreshableScreen
 import com.example.androidcookbook.ui.common.screens.FailureScreen
+import com.example.androidcookbook.ui.common.screens.GuestLoginScreen
 import com.example.androidcookbook.ui.common.screens.LoadingScreen
 import com.example.androidcookbook.ui.features.follow.FollowListScreenType
 import com.example.androidcookbook.ui.features.follow.FollowViewModel
@@ -45,6 +47,7 @@ import com.example.androidcookbook.ui.features.userprofile.UserPostPortionType
 import com.example.androidcookbook.ui.features.userprofile.userPostPortion
 import com.example.androidcookbook.ui.nav.CustomNavTypes
 import com.example.androidcookbook.ui.nav.Routes
+import com.example.androidcookbook.ui.nav.utils.guestNavToAuth
 import kotlin.reflect.typeOf
 
 fun NavGraphBuilder.userProfile(
@@ -61,6 +64,13 @@ fun NavGraphBuilder.userProfile(
         cookbookViewModel.updateCanNavigateBack(false)
 
         val currentUser = cookbookViewModel.user.collectAsState().value
+
+        if (currentUser.id == GUEST_ID) {
+            GuestLoginScreen {
+                navController.guestNavToAuth()
+            }
+            return@composable
+        }
 
         val userId = it.toRoute<Routes.App.UserProfile>().userId
 

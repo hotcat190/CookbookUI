@@ -188,7 +188,8 @@ private fun PostDetailsInfo(
             author = post.author,
             createdAt = LocalDate.parse(post.createdAt, apiDateFormatter).toString(),
             onUserClick = onUserClick,
-            modifier = Modifier.padding(start = 15.dp)
+            modifier = Modifier.padding(start = 15.dp),
+            authorFontSize = 19.sp
         )
         Spacer(Modifier.weight(1F))
         PostOptionsButton(
