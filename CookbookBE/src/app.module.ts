@@ -1,5 +1,5 @@
 // src/app.module.ts
-import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
+import { MiddlewareConsumer, Module, NestModule, RequestMethod } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import configuration from './config/configuration';
@@ -48,6 +48,13 @@ export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
     consumer
       .apply(LoggerMiddleware)
-      .forRoutes('*');
+      .forRoutes(
+      { path: 'follows/:userId', method: RequestMethod.POST },
+      { path: 'follows/:userId', method: RequestMethod.DELETE },
+      { path: 'like/:postId', method: RequestMethod.POST },
+      { path: 'like/:postId', method: RequestMethod.DELETE }, 
+      { path: 'comment/like/:commentId', method: RequestMethod.POST },
+      { path: 'comment/like/:commentId', method: RequestMethod.DELETE }
+      );
   }
 }

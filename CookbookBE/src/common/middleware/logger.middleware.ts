@@ -6,8 +6,8 @@ import { HttpException, HttpStatus } from '@nestjs/common';
 @Injectable()
 export class LoggerMiddleware implements NestMiddleware {
   private requestMap = new Map<string, number[]>();
-  private readonly WINDOW_MS = 100;
-  private readonly MAX_REQUESTS = 3;
+  private readonly WINDOW_MS = 200;
+  private readonly MAX_REQUESTS = 1;
 
   private getDeviceId(req: Request): string {
     // Try to get device identifier from common headers
@@ -33,7 +33,7 @@ export class LoggerMiddleware implements NestMiddleware {
 
     if (recentRequests.length >= this.MAX_REQUESTS) {
       throw new HttpException(
-        'Too many requests from this device',
+        'Too fast request from this device',
         HttpStatus.TOO_MANY_REQUESTS
       );
     }
@@ -45,7 +45,7 @@ export class LoggerMiddleware implements NestMiddleware {
     console.log(`[${new Date().toISOString()}] ${req.method} ${req.originalUrl}`);
     
     // Dọn dẹp requestMap định kỳ để tránh memory leak
-    if (Math.random() < 0.1) { // 10% chance to cleanup
+    if (Math.random() < 0.05) { 
       this.cleanup();
     }
     next();
