@@ -30,6 +30,7 @@ class DataStoreManager(private val context: Context) {
     private val USERNAME = stringPreferencesKey("username")
     private val PASSWORD = stringPreferencesKey("password")
     private val THEME_KEY = stringPreferencesKey("theme")
+    private val NOTIFICATION_KEY = booleanPreferencesKey("notification")
 
     // Save token
     suspend fun saveToken(token: String) {
@@ -50,6 +51,12 @@ class DataStoreManager(private val context: Context) {
         context.dataStore.edit {
             preferences ->
             preferences[PASSWORD] = password
+        }
+    }
+
+    suspend fun saveNotification(notice: Boolean) {
+        context.dataStore.edit { preferences ->
+            preferences[NOTIFICATION_KEY] = notice
         }
     }
 
@@ -84,6 +91,10 @@ class DataStoreManager(private val context: Context) {
     val theme: Flow<ThemeType> = context.dataStore.data.map { preferences ->
         val themeString = preferences[THEME_KEY] ?: ThemeType.Default.name
         ThemeType.fromString(themeString)
+    }
+
+    val canSendNotification: Flow<Boolean> = context.dataStore.data.map { preferences ->
+        preferences[NOTIFICATION_KEY] ?: false
     }
 
 

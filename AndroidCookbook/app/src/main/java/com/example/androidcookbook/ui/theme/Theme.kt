@@ -1,10 +1,19 @@
 package com.example.androidcookbook.ui.theme
 
+import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.darkColorScheme
+import androidx.compose.material3.dynamicDarkColorScheme
+import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
+import androidx.hilt.navigation.compose.hiltViewModel
+import com.example.androidcookbook.data.providers.ThemeType
+import com.example.androidcookbook.ui.CookbookViewModel
 
 private val DarkColorScheme = darkColorScheme(
 //    primary = Dark.Primary,
@@ -43,16 +52,20 @@ fun AndroidCookbookTheme(
     dynamicColor: Boolean = true,
     content: @Composable () -> Unit
 ) {
-    val colorScheme = when {
+    val viewModel = hiltViewModel<CookbookViewModel>()
+    val theme = viewModel.themeType.collectAsState().value
+
+    val colorScheme = when(theme) {
 //        dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
 //            val context = LocalContext.current
 //            if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
 //        }
-
-        darkTheme -> DarkColorScheme
-        else -> LightColorScheme
-//        darkTheme -> darkColorScheme()
-//        else -> lightColorScheme()
+        ThemeType.Default -> {
+            if (darkTheme) DarkColorScheme
+            else LightColorScheme
+        }
+        ThemeType.Light -> LightColorScheme
+        ThemeType.Dark -> DarkColorScheme
     }
 
     MaterialTheme(
