@@ -73,26 +73,38 @@ fun CookbookApp(
 
     val focusManager = LocalFocusManager.current
 
+    val darkTheme = when(viewModel.themeType.collectAsState().value) {
+        ThemeType.Default -> isSystemInDarkTheme()
+        ThemeType.Dark -> true
+        ThemeType.Light -> false
+    }
+
     Scaffold(
         modifier = Modifier
             .nestedScroll(scrollBehavior.nestedScrollConnection),
         topBar = {
             when (uiState.topBarState) {
                 is CookbookUiState.TopBarState.Auth -> {
-                    SignLayoutTheme {
+                    SignLayoutTheme(
+                        darkTheme
+                    ) {
+
                         updateSystemBarColors(
                             MaterialTheme.colorScheme.onBackground.toArgb(),
                             MaterialTheme.colorScheme.surfaceContainerLowest.toArgb(),
-                            true
+                            darkTheme
                         )
                     }
                 }
                 is CookbookUiState.TopBarState.Custom -> (uiState.topBarState as CookbookUiState.TopBarState.Custom).topAppBar.invoke()
                 is CookbookUiState.TopBarState.Default -> {
-                    AppBarTheme {
+                    AppBarTheme(
+                        darkTheme
+                    ) {
                         updateSystemBarColors(
                             Color.TRANSPARENT,
                             MaterialTheme.colorScheme.background.toArgb(),
+                            darkTheme
                         )
                         CookbookAppBarDefault(
                             showBackButton = uiState.canNavigateBack,
@@ -230,7 +242,9 @@ fun CookbookApp(
                         noticeChecked = notice,
                         onNoticeCheckedChange = { viewModel.updateUserNotice(it) },
                         themeTypeSelected = themeType,
-                        onThemeTypeChange = { viewModel.updateUserTheme(it) }
+                        onThemeTypeChange = {
+                            viewModel.updateUserTheme(it)
+                        }
                     )
                 }
             }

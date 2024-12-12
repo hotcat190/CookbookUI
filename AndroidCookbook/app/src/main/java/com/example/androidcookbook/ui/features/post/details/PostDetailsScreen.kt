@@ -353,6 +353,16 @@ private fun PostDetailsInfo(
                 }
 
                 DetailState.Ingredient -> {
+                    if (checkedStates.isEmpty()) {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.Center,
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            Text("No ingredients")
+                        }
+                    }
+
                     checkedStates.forEachIndexed { index, checked ->
                         if (index == post.ingredient?.size) return@forEachIndexed
                         val ingredientText: String =
@@ -388,6 +398,16 @@ private fun PostDetailsInfo(
                 }
 
                 DetailState.Recipe -> {
+                    if (checkedStates.isEmpty()) {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.Center,
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            Text("No recipe")
+                        }
+                    }
+
                     post.steps?.forEachIndexed { index, stepText ->
                         Text(
                             text = "${index + 1}. $stepText\n",

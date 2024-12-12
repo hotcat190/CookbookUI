@@ -73,7 +73,7 @@ class PostDetailsViewModel @AssistedInject constructor(
             //        postUiState.update { PostUiState.Success(post = _post) }
             queryPostLike(_postId)
             queryPostBookmark(_postId)
-            getComments(false)
+            getComments(true)
             getPostLikes()
         }.invokeOnCompletion {
             isRefreshing.update { false }

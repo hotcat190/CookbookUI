@@ -213,6 +213,7 @@ class CategoryViewModel @Inject constructor(
 
     private fun getCategoriesAndRandomMeals() {
         viewModelScope.launch {
+            isRefreshing.update { true }
             updateUiStateLoading()
             try {
                 val recipeList: MutableList<Recipe> = mutableListOf()
@@ -264,16 +265,13 @@ class CategoryViewModel @Inject constructor(
                     )
                 }
             }
+        }.invokeOnCompletion {
+            isRefreshing.update { false }
         }
     }
 
 
     fun refresh() {
-        isRefreshing.update { true }
-        viewModelScope.launch {
-            getCategoriesAndRandomMeals()
-        }.invokeOnCompletion {
-            isRefreshing.update { false }
-        }
+        getCategoriesAndRandomMeals()
     }
 }

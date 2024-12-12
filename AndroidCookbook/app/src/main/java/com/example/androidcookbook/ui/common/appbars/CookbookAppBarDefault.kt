@@ -103,7 +103,7 @@ fun CookbookAppBarDefault(
                     Icon(
                         imageVector = Icons.Default.Notifications,
                         contentDescription = "Notifications",
-                        tint = MaterialTheme.colorScheme.secondary
+                        tint = MaterialTheme.colorScheme.onSurface
                     )
                 }
             }
