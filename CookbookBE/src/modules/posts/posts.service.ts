@@ -357,17 +357,16 @@ export class PostsService {
         .getOne();
         console.log('getNewsfeed2');
       const followedUserIds = user.following.map(f => f.following.id);
-      const queryBuilder = this.postsRepository.createQueryBuilder('post')
+      const posts = await this.postsRepository.createQueryBuilder('post')
         .leftJoinAndSelect('post.author', 'author')
         .where('post.id NOT IN (:...viewedPostIds)', { 
           viewedPostIds: user.viewedPosts.map(p => p.id) 
         })
         .orWhere('(post.authorId = :userId AND post.totalComment > 0)', { 
           userId 
-        });
+        }).getMany();
       console.log('getNewsfeed3');
       // Get posts and calculate scores
-      const posts = await queryBuilder.getMany();
       const scoredPosts = posts.map(post => {
         const isFollowed = followedUserIds.includes(post.author.id) ? 5 : 1; // 5x boost for followed users
     
