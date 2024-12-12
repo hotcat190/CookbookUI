@@ -2,7 +2,6 @@ package com.example.androidcookbook.ui.nav.dest.profile
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -30,9 +29,6 @@ import com.example.androidcookbook.ui.features.userprofile.EditProfileButton
 import com.example.androidcookbook.ui.features.userprofile.userPostPortion
 import com.example.androidcookbook.ui.nav.CustomNavTypes
 import com.example.androidcookbook.ui.nav.Routes
-import com.example.androidcookbook.ui.nav.utils.navigateIfNotOn
-import com.example.androidcookbook.ui.nav.utils.navigateToProfile
-import com.example.androidcookbook.ui.nav.utils.sharedViewModel
 import kotlin.reflect.typeOf
 
 fun NavGraphBuilder.userProfile(
@@ -48,20 +44,22 @@ fun NavGraphBuilder.userProfile(
         cookbookViewModel.updateBottomBarState(CookbookUiState.BottomBarState.Default)
         cookbookViewModel.updateCanNavigateBack(false)
 
-        val user = it.toRoute<Routes.App.UserProfile>().user
+        val currentUser = cookbookViewModel.user.collectAsState().value
+
+        val userId = it.toRoute<Routes.App.UserProfile>().userId
 
         val userProfileViewModel =
             hiltViewModel<UserProfileViewModel, UserProfileViewModel.UserProfileViewModelFactory>(
 //                it, navController, Routes.App
             ) { factory ->
-                factory.create(user)
+                factory.create(userId)
             }
 
         val userProfileUiState = userProfileViewModel.uiState.collectAsState().value
         val followViewModel = hiltViewModel<FollowViewModel, FollowViewModel.FollowViewModelFactory>(
 //            it, navController, Routes.App.UserProfile(user)
         ) { factory ->
-            factory.create(user, user)
+            factory.create(currentUser, userId)
         }
 
         LaunchedEffect(Unit) {
@@ -124,7 +122,7 @@ fun NavGraphBuilder.userProfile(
                                         userProfileViewModel.deletePost(post)
                                     },
                                     onPostSeeDetailsClick = { post ->
-                                        navController.navigate(Routes.App.PostDetails(post))
+                                        navController.navigate(Routes.App.PostDetails(post.id))
                                     },
                                     onUserClick = { },
                                     currentUser = userProfileUiState.user,

@@ -94,29 +94,30 @@ fun NotificationItem(
                     style = MaterialTheme.typography.bodyMedium
                 )
 
-                Row(
-                    modifier = Modifier.padding(top = 8.dp),
-                ) {
-                    when (notification.type) {
-                        NotificationType.NEW_FOLLOWER -> {}
-                        NotificationType.NEW_POST_LIKE -> {
-//                    val post: Post = getPost(notification.relatedId)
-                            val post = SamplePosts.posts.find { it.id == notification.relatedId }!!
-                            NotificationSupportingText(
-                                text = "${post.title} ${post.mainImage ?: ""}",
-                                modifier = Modifier
-                            )
-                        }
-
-                        NotificationType.NEW_COMMENT_LIKE -> {
-//                        val comment = getComment(notification.relatedId)
-                            val comment =
-                                SamplePosts.posts.find { it.id == notification.relatedId }!!
-                        }
-
-                        NotificationType.NEW_POST_COMMENT -> {}
-                    }
-                }
+                // TODO maybe
+//                Row(
+//                    modifier = Modifier.padding(top = 8.dp),
+//                ) {
+//                    when (notification.type) {
+//                        NotificationType.NEW_FOLLOWER -> {}
+//                        NotificationType.NEW_POST_LIKE -> {
+////                    val post: Post = getPost(notification.relatedId)
+//                            val post = SamplePosts.posts.find { it.id == notification.relatedId }!!
+//                            NotificationSupportingText(
+//                                text = "${post.title} ${post.mainImage ?: ""}",
+//                                modifier = Modifier
+//                            )
+//                        }
+//
+//                        NotificationType.NEW_COMMENT_LIKE -> {
+////                        val comment = getComment(notification.relatedId)
+//                            val comment =
+//                                SamplePosts.posts.find { it.id == notification.relatedId }!!
+//                        }
+//
+//                        NotificationType.NEW_POST_COMMENT -> {}
+//                    }
+//                }
             }
         }
     }

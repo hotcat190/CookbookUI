@@ -15,12 +15,11 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 
 @HiltViewModel(assistedFactory = FollowViewModel.FollowViewModelFactory::class)
 class FollowViewModel @AssistedInject constructor(
     @Assisted("currentUser") private val currentUser: User,
-    @Assisted("targetUser") private val targetUser: User,
+    @Assisted("targetUserId") private val targetUserId: Int,
     private val userRepository: UserRepository,
     private val makeToastUseCase: MakeToastUseCase,
 
@@ -42,7 +41,7 @@ class FollowViewModel @AssistedInject constructor(
     interface FollowViewModelFactory {
         fun create(
             @Assisted("currentUser") currentUser: User,
-            @Assisted("targetUser") targetUser: User,
+            @Assisted("targetUserId") targetUserId: Int,
         ): FollowViewModel
     }
 
@@ -106,7 +105,7 @@ class FollowViewModel @AssistedInject constructor(
 
     private fun getFollowers() {
         viewModelScope.launch {
-            val response = userRepository.getUserFollowers(targetUser.id)
+            val response = userRepository.getUserFollowers(targetUserId)
             response.onSuccess {
                     _followers.update { data.followers }
                     _isFollowing.update { checkFollowing() }
@@ -121,7 +120,7 @@ class FollowViewModel @AssistedInject constructor(
 
     private fun getFollowing() {
         viewModelScope.launch {
-            userRepository.getUserFollowing(targetUser.id)
+            userRepository.getUserFollowing(targetUserId)
                 .onSuccess {
                     _following.update { data.following }
                 }

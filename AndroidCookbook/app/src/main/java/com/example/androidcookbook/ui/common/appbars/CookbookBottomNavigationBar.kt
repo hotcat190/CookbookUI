@@ -2,22 +2,16 @@ package com.example.androidcookbook.ui.common.appbars
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.consumeWindowInsets
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.windowInsetsBottomHeight
-import androidx.compose.material.LocalContentAlpha
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.AddCircle
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -34,15 +28,11 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.fragment.app.FragmentManager.BackStackEntry
 import androidx.navigation.NavDestination
-import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.rememberNavController
 import com.example.androidcookbook.R
 import com.example.androidcookbook.domain.model.user.User
 import com.example.androidcookbook.ui.nav.Routes
 import com.example.androidcookbook.ui.nav.utils.hasRoute
-import com.example.androidcookbook.ui.theme.AndroidCookbookTheme
 
 @Composable
 fun CookbookBottomNavigationBar(
@@ -143,7 +133,7 @@ private fun RowScope.UserProfileNavigationBarItem(
 ) {
     CookbookNavigationBarItem(
         currentDestination = currentDestination,
-        route = Routes.App.UserProfile(currentUser),
+        route = Routes.App.UserProfile(currentUser.id),
         onClick = onUserProfileClick,
         icon = {
             Icon(

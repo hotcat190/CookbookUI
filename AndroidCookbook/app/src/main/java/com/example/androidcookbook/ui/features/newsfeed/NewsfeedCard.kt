@@ -64,7 +64,7 @@ fun NewsfeedCard(
     val postDetailsViewModel = hiltViewModel<PostDetailsViewModel, PostDetailsViewModel.PostDetailsViewModelFactory>(
         key = post.id.toString(),
     ){ factory ->
-        factory.create(post, currentUser)
+        factory.create(post.id, currentUser)
     }
     Column(
         modifier = modifier

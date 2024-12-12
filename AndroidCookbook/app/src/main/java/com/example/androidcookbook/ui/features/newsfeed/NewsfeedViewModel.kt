@@ -65,7 +65,7 @@ class NewsfeedViewModel @Inject constructor(
 
     fun deletePost(post: Post) {
         viewModelScope.launch {
-            deletePostUseCase(post).onSuccess {
+            deletePostUseCase(post.id).onSuccess {
                 refresh()
             }.onFailure {
                 viewModelScope.launch {

@@ -6,6 +6,7 @@ import com.example.androidcookbook.data.network.AiGenService
 import com.example.androidcookbook.data.network.AllSearcherService
 import com.example.androidcookbook.data.network.AuthService
 import com.example.androidcookbook.data.network.NewsfeedService
+import com.example.androidcookbook.data.network.NotificationService
 import com.example.androidcookbook.data.network.PostService
 import com.example.androidcookbook.data.network.UploadService
 import com.example.androidcookbook.data.network.UserService
@@ -13,6 +14,7 @@ import com.example.androidcookbook.data.repositories.AiGenRepository
 import com.example.androidcookbook.data.repositories.AllSearcherRepository
 import com.example.androidcookbook.data.repositories.AuthRepository
 import com.example.androidcookbook.data.repositories.NewsfeedRepository
+import com.example.androidcookbook.data.repositories.NotificationRepository
 import com.example.androidcookbook.data.repositories.PostRepository
 import com.example.androidcookbook.data.repositories.UploadRepository
 import com.example.androidcookbook.data.repositories.UserRepository
@@ -102,4 +104,14 @@ class FakeCookbookBEModule {
     @Singleton
     fun provideAllSearcherRepository(allSearcherService: AllSearcherService): AllSearcherRepository =
         AllSearcherRepository(allSearcherService)
+
+    @Provides
+    @Singleton
+    fun provideNotificationService(): NotificationService =
+        mockk(relaxed = true)
+
+    @Provides
+    @Singleton
+    fun provideNotificationRepository(notificationService: NotificationService): NotificationRepository =
+        NotificationRepository(notificationService)
 }

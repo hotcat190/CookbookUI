@@ -44,10 +44,10 @@ object Routes {
         object Newsfeed
 
         @Serializable
-        data class UserProfile(val user: User)
+        data class UserProfile(val userId: Int)
 
         @Serializable
-        data class PostDetails(val post: Post)
+        data class PostDetails(val postId: Int)
     }
 
     @Serializable
@@ -66,7 +66,7 @@ object Routes {
     data class EditProfile(val user: User)
 
     @Serializable
-    data class OtherProfile(val user: User)
+    data class OtherProfile(val userId: Int)
 
     @Serializable
     data class Follow(val user: User, val type: FollowListScreenType)

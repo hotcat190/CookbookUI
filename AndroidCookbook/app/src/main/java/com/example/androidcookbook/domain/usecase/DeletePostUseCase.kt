@@ -11,8 +11,8 @@ import javax.inject.Singleton
 class DeletePostUseCase @Inject constructor(
     @IoDispatcher private val coroutineDispatcher: CoroutineDispatcher,
     private val postRepository: PostRepository
-): UseCase<Post, Unit>(coroutineDispatcher) {
-    override suspend fun execute(parameters: Post) {
-        postRepository.deletePost(parameters.id)
+): UseCase<Int, Unit>(coroutineDispatcher) {
+    override suspend fun execute(parameters: Int) {
+        postRepository.deletePost(parameters)
     }
 }

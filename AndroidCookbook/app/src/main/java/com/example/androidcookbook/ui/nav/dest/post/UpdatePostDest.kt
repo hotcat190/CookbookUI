@@ -87,7 +87,7 @@ fun NavGraphBuilder.updatePost(
                 createPostViewModel.updatePost(
                     onSuccessNavigate = { post ->
                         navController.popBackStack()
-                        navController.navigate(Routes.App.PostDetails(post))
+                        navController.navigate(Routes.App.PostDetails(post.id))
                     }
                 )
             },
@@ -99,8 +99,8 @@ fun NavGraphBuilder.updatePost(
                 createPostViewModel.updateCookTime(it)
             },
             createType = CreatePostType.Update,
-            onUserClick = {
-                navController.navigate(Routes.App.UserProfile(it))
+            onUserClick = { user ->
+                navController.navigate(Routes.App.UserProfile(user.id))
             }
         )
         if (createPostViewModel.isAddStepDialogOpen.collectAsState().value) {

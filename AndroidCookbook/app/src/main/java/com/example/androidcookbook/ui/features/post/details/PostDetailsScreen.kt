@@ -72,6 +72,7 @@ import com.example.androidcookbook.ui.components.post.PostHeader
 import com.example.androidcookbook.ui.components.post.PostTitle
 import com.example.androidcookbook.ui.features.comment.CommentRow
 import com.example.androidcookbook.ui.features.comment.WriteCommentRow
+import com.example.androidcookbook.ui.features.newsfeed.PostOptionsButton
 import java.time.LocalDate
 
 enum class DetailState {
@@ -139,6 +140,7 @@ fun PostDetailsScreen(
                         onUserClick,
                         checkedStates,
                         postLikes,
+                        currentUser,
                     )
                     HorizontalDivider()
                 }
@@ -174,15 +176,29 @@ private fun PostDetailsInfo(
     onUserClick: (User) -> Unit,
     checkedStates: SnapshotStateList<Boolean>,
     postLikes: List<User>,
+    currentUser: User,
     modifier: Modifier = Modifier
 ) {
     var state by remember { mutableStateOf(DetailState.Description) }
-    PostHeader(
-        author = post.author,
-        createdAt = LocalDate.parse(post.createdAt, apiDateFormatter).toString(),
-        onUserClick = onUserClick,
-        modifier = Modifier.padding(start = 15.dp)
-    )
+    Row (
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = Modifier
+    ) {
+        PostHeader(
+            author = post.author,
+            createdAt = LocalDate.parse(post.createdAt, apiDateFormatter).toString(),
+            onUserClick = onUserClick,
+            modifier = Modifier.padding(start = 15.dp)
+        )
+        Spacer(Modifier.weight(1F))
+        PostOptionsButton(
+            post,
+            onEditPost,
+            onDeletePost,
+            currentUser.id == post.author.id
+        )
+    }
+
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -197,19 +213,6 @@ private fun PostDetailsInfo(
                 .padding(bottom = 16.dp)
         )
         if (post.mainImage != null) {
-//            AsyncImage(
-//                model = ImageRequest.Builder(LocalContext.current)
-//                    .data(post.mainImage)
-//                    .crossfade(true)
-//                    .build(),
-//                contentDescription = null,
-//                modifier = Modifier
-//                    .fillMaxWidth()
-//                    .height(200.dp)
-//                    .clip(RoundedCornerShape(5)),
-//
-//                contentScale = ContentScale.Crop,
-//            )
             AsyncImage(
                 model = ImageRequest.Builder(LocalContext.current)
                     .data(post.mainImage)

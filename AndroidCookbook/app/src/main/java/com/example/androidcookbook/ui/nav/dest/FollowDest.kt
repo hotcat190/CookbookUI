@@ -16,12 +16,9 @@ import com.example.androidcookbook.ui.features.follow.BaseFollowListScreen
 import com.example.androidcookbook.ui.features.follow.FollowListScreenType
 import com.example.androidcookbook.ui.features.follow.FollowScreenViewModel
 import com.example.androidcookbook.ui.features.follow.FollowViewModel
-import com.example.androidcookbook.ui.features.follow.FollowButtonState
 import com.example.androidcookbook.ui.nav.CustomNavTypes
 import com.example.androidcookbook.ui.nav.Routes
 import com.example.androidcookbook.ui.nav.utils.navigateToProfile
-import com.example.androidcookbook.ui.nav.utils.sharedViewModel
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlin.reflect.typeOf
 
 fun NavGraphBuilder.follow(
@@ -50,7 +47,7 @@ fun NavGraphBuilder.follow(
 //                else Routes.OtherProfile(targetUser)
 //            )
         ) { factory ->
-            factory.create(currentUser, targetUser)
+            factory.create(currentUser, targetUser.id)
         }
 
         val currentUserFollowing = followViewModel.currentUserFollowing.collectAsState().value

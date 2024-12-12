@@ -1,7 +1,6 @@
 package com.example.androidcookbook.ui.nav.dest
 
 import android.util.Log
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
@@ -16,7 +15,7 @@ import com.example.androidcookbook.ui.common.state.ScreenUiState
 import com.example.androidcookbook.ui.features.newsfeed.NewsfeedScreen
 import com.example.androidcookbook.ui.features.newsfeed.NewsfeedViewModel
 import com.example.androidcookbook.ui.nav.Routes
-import com.example.androidcookbook.ui.nav.utils.navigateToProfile
+import com.example.androidcookbook.ui.nav.utils.guestNavToAuth
 import com.example.androidcookbook.ui.nav.utils.sharedViewModel
 
 fun NavGraphBuilder.newsfeed(
@@ -36,11 +35,7 @@ fun NavGraphBuilder.newsfeed(
         when (val newsfeedUiState = newsfeedViewModel.screenUiState.collectAsState().value) {
             is ScreenUiState.Failure -> FailureScreen(message = newsfeedUiState.message) { newsfeedViewModel.refresh() }
             ScreenUiState.Guest -> GuestLoginScreen {
-                navController.navigate(Routes.Auth) {
-                    popUpTo(Routes.App) {
-                        inclusive = true
-                    }
-                }
+                navController.guestNavToAuth()
             }
             ScreenUiState.Loading -> LoadingScreen()
             is ScreenUiState.Success ->
@@ -61,13 +56,13 @@ fun NavGraphBuilder.newsfeed(
                                 newsfeedViewModel.deletePost(post)
                             },
                             onSeeDetailsClick = { post ->
-                                navController.navigate(Routes.App.PostDetails(post))
+                                navController.navigate(Routes.App.PostDetails(post.id))
                             },
                             onUserClick = { user ->
                                 if (user.id == cookbookViewModel.user.value.id) {
-                                    navController.navigate(Routes.App.UserProfile(user))
+                                    navController.navigate(Routes.App.UserProfile(user.id))
                                 } else {
-                                    navController.navigate(Routes.OtherProfile(user))
+                                    navController.navigate(Routes.OtherProfile(user.id))
                                 }
                             },
                             onLoadMore = {

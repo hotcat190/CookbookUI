@@ -7,7 +7,6 @@ import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -49,9 +48,6 @@ import com.example.androidcookbook.ui.nav.dest.post.postDetails
 import com.example.androidcookbook.ui.nav.dest.post.updatePost
 import com.example.androidcookbook.ui.nav.dest.profile.editProfile
 import com.example.androidcookbook.ui.nav.dest.profile.otherProfile
-import com.example.androidcookbook.ui.nav.graphs.AppEntryPoint
-import com.example.androidcookbook.ui.nav.graphs.appScreens
-import com.example.androidcookbook.ui.nav.graphs.authScreens
 import com.example.androidcookbook.ui.nav.graphs.AppEntryPoint
 import com.example.androidcookbook.ui.nav.graphs.appScreens
 import com.example.androidcookbook.ui.nav.graphs.authScreens
@@ -142,7 +138,7 @@ fun CookbookApp(
                                 navController.navigateIfNotOn(Routes.App.Newsfeed, true)
                             },
                             onUserProfileClick = {
-                                navController.navigateIfNotOn(Routes.App.UserProfile(currentUser), true)
+                                navController.navigateIfNotOn(Routes.App.UserProfile(currentUser.id), true)
                             },
                             onCreatePostClick = {
                                 navController.navigateIfNotOn(Routes.CreatePost)
