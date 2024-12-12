@@ -7,6 +7,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.androidcookbook.data.repositories.AuthRepository
 import com.example.androidcookbook.domain.model.auth.ForgotPasswordRequest
 import com.example.androidcookbook.domain.model.auth.OtpValidationRequest
+import com.example.androidcookbook.domain.model.auth.OtpValidationResponse
 import com.example.androidcookbook.domain.model.auth.ResetPasswordRequest
 import com.example.androidcookbook.domain.network.ErrorBody
 import com.example.androidcookbook.domain.network.SuccessMessageBody
@@ -91,13 +92,12 @@ class ForgotPasswordViewModel @Inject constructor(
                 updateDialogMessage(data.message)
                 updateSuccessSubmit(true)
                 Log.d("API OK", "Raw Response")
+                token.value = data.token
                 onSucces()
-            }.onErrorDeserialize<SuccessMessageBody, ErrorBody> {
+            }.onErrorDeserialize<OtpValidationResponse, ErrorBody> {
                     errorBody ->
                 run {
                     val rawResponse = errorBody.error
-                    Log.e("API Error", "Raw Response: $rawResponse")
-                    Log.e("API Error", "Raw Response: ${email.value} ${otpCode.value}")
                     updateOpenDialog(true)
                     updateDialogMessage(errorBody.message.joinToString(".\n\n") ?: "Error")
                 }
@@ -124,7 +124,7 @@ class ForgotPasswordViewModel @Inject constructor(
             val response = authRepository.sendPasswordResetRequest(
                 ResetPasswordRequest(
                     email = email.value,
-                    token = otpCode.value,
+                    token = token.value,
                     password = password.value,
                 )
             )
