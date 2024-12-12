@@ -22,7 +22,7 @@ export class LoggingInterceptor implements NestInterceptor {
       .pipe(
         tap(() =>
           console.log(
-            `${method} ${url} - User: ${userId} - ${Date.now() - now}ms`,
+            `${method} ${url} - User: ${userId} - IP: ${request.ip} - ${Date.now() - now}ms`,
           ),
         ),
       );

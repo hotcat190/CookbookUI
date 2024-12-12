@@ -104,7 +104,7 @@ export class NotificationsService {
           noti.relatedID = relatedId;
           noti.imageURL = imageU;
           noti.updatedAt = new Date();
-          await this.notificationsRepository.save(noti);
+          this.notificationsRepository.save(noti);
         }
         else{
           const notification = this.notificationsRepository.create({
@@ -116,7 +116,7 @@ export class NotificationsService {
             isRead: false,
             updatedAt: new Date(),
           });
-          await this.notificationsRepository.save(notification);
+          this.notificationsRepository.save(notification);
         }
       }
 
@@ -139,7 +139,7 @@ export class NotificationsService {
           noti.relatedID = relatedId;
           noti.imageURL = imageU;
           noti.updatedAt = new Date();
-          await this.notificationsRepository.save(noti);
+          this.notificationsRepository.save(noti);
         }
         else{
           const notification = this.notificationsRepository.create({
@@ -151,7 +151,7 @@ export class NotificationsService {
             isRead: false,
             updatedAt: new Date(),
           });
-          await this.notificationsRepository.save(notification);
+          this.notificationsRepository.save(notification);
         }
       }
       if(type_noti == "NEW_POST_COMMENT"){
@@ -172,7 +172,7 @@ export class NotificationsService {
           noti.relatedID = relatedId;
           noti.imageURL = imageU;
           noti.updatedAt = new Date();
-          await this.notificationsRepository.save(noti);
+          this.notificationsRepository.save(noti);
         }
         else{
           const notification = this.notificationsRepository.create({
@@ -184,7 +184,7 @@ export class NotificationsService {
             isRead: false,
             updatedAt: new Date(),
           });
-          await this.notificationsRepository.save(notification);
+          this.notificationsRepository.save(notification);
         }
       }
       if(type_noti == "NEW_COMMENT_LIKE"){
@@ -205,7 +205,7 @@ export class NotificationsService {
           noti.relatedID = relatedId;
           noti.imageURL = imageU;
           noti.updatedAt = new Date();
-          await this.notificationsRepository.save(noti);
+          this.notificationsRepository.save(noti);
         }
         else{
           const notification = this.notificationsRepository.create({
@@ -217,7 +217,7 @@ export class NotificationsService {
             isRead: false,
             updatedAt: new Date(),
           });
-          await this.notificationsRepository.save(notification);
+          this.notificationsRepository.save(notification);
         }
       }
 
@@ -270,7 +270,7 @@ export class NotificationsService {
       throw new NotFoundException('Thông báo không tồn tại.');
     }
     notification.isRead = true;
-    await this.notificationsRepository.save(notification);
+    this.notificationsRepository.save(notification);
     return { message: 'Đánh dấu thông báo là đã đọc.' };
   }
 
@@ -281,7 +281,7 @@ export class NotificationsService {
     if (!notification) {
       throw new NotFoundException('Thông báo không tồn tại.');
     }
-    await this.notificationsRepository.remove(notification);
+    this.notificationsRepository.remove(notification);
     return { message: 'Đã xóa thông báo thành công.' };
   }
 }
