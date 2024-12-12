@@ -281,8 +281,8 @@ private fun PostDetailsInfo(
                     .wrapContentSize()
 
             ) {
-                for (index in 0..2) {
-                    if (index >= postLikes.size) break
+                for (index in 0..postLikes.size) {
+                    if (index > 2 || index >= postLikes.size) break
 
 //            AsyncImage(
 //                model = ImageRequest.Builder(LocalContext.current)
