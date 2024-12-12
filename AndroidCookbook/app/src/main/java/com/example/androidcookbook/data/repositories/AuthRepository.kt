@@ -3,6 +3,7 @@ package com.example.androidcookbook.data.repositories
 import com.example.androidcookbook.data.network.AuthService
 import com.example.androidcookbook.domain.model.auth.ForgotPasswordRequest
 import com.example.androidcookbook.domain.model.auth.OtpValidationRequest
+import com.example.androidcookbook.domain.model.auth.OtpValidationResponse
 import com.example.androidcookbook.domain.model.auth.RegisterRequest
 import com.example.androidcookbook.domain.model.auth.RegisterResponse
 import com.example.androidcookbook.domain.model.auth.ResetPasswordRequest
@@ -37,7 +38,7 @@ class AuthRepository @Inject constructor(
     suspend fun sendLogOutRequest() =
         authService.sendLogOutRequest()
 
-    suspend fun sendOtpValidationRequest(request: OtpValidationRequest): ApiResponse<SuccessMessageBody> =
+    suspend fun sendOtpValidationRequest(request: OtpValidationRequest): ApiResponse<OtpValidationResponse> =
         authService.sendOtpValidationRequest(request)
 }
 

@@ -11,3 +11,7 @@ data class OtpValidationRequest(
     val code: String,
 )
 
+data class OtpValidationResponse(
+    val token: String,
+    val message: String
+)

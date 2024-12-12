@@ -37,6 +37,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.example.androidcookbook.ui.features.search.RequestAudioPermission
 import com.example.androidcookbook.ui.features.search.SpeechToTextViewModel
 import com.example.androidcookbook.ui.theme.AndroidCookbookTheme
 
@@ -67,6 +68,7 @@ fun SearchBar(
 
     var isListening by remember { mutableStateOf(false) }
 
+    var isPermissionGranted by remember { mutableStateOf(false) }
 
     TopAppBar(
         colors = TopAppBarDefaults.topAppBarColors(containerColor = MaterialTheme.colorScheme.primary),
@@ -112,7 +114,14 @@ fun SearchBar(
                             }
                         ) {
                             if (isListening) {
-                                Icon(Icons.Outlined.Mic, null)
+                                if (!isPermissionGranted) {
+                                    RequestAudioPermission {
+                                        isPermissionGranted = true
+                                    }
+                                    Icon(Icons.Filled.Mic, null)
+                                } else {
+                                    Icon(Icons.Outlined.Mic, null)
+                                }
                             } else {
                                 Icon(Icons.Filled.Mic, null)
                             }
