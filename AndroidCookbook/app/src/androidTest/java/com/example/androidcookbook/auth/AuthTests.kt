@@ -25,6 +25,7 @@ import com.example.androidcookbook.domain.model.auth.SignInResponse
 import com.example.androidcookbook.domain.model.user.User
 import com.example.androidcookbook.ui.CookbookUiState
 import com.example.androidcookbook.ui.CookbookViewModel
+import com.example.androidcookbook.ui.features.auth.AuthRequestState
 import com.example.androidcookbook.ui.features.auth.AuthViewModel
 import com.example.androidcookbook.ui.features.auth.screens.LoginScreen
 import com.example.androidcookbook.ui.features.auth.screens.PASSWORD_TEXT_FIELD_TEST_TAG
@@ -67,7 +68,8 @@ class AuthTests {
                 onSignInClick = {username, password -> authViewModel.signIn(username, password) {
 
                 } },
-                onUseAsGuest = {}
+                onUseAsGuest = {},
+                requestState = authViewModel.authRequestState.collectAsState().value
             )
         }
     }
