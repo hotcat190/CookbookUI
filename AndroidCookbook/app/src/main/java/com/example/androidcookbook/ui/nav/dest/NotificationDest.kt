@@ -1,6 +1,7 @@
 package com.example.androidcookbook.ui.nav.dest
 
 import android.util.Log
+import androidx.activity.compose.BackHandler
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -39,15 +40,29 @@ fun NavGraphBuilder.notification(
     navController: NavHostController,
 ) {
     composable<Routes.Notifications> {
+        var isClearing by remember { mutableStateOf(false) }
+
         cookbookViewModel.updateBottomBarState(CookbookUiState.BottomBarState.NoBottomBar)
         cookbookViewModel.updateCanNavigateBack(true)
 
         val notificationViewModel = hiltViewModel<NotificationViewModel>()
 
+        cookbookViewModel.updateTopBarState(CookbookUiState.TopBarState.Custom {
+            AppBarTheme(getDarkThemeConfig()) {
+                NotificationScreenTopBar(
+                    onBackButtonClick =
+                    {
+                        navController.navigateUp()
+                    },
+                    onClearAllClick = {
+                        isClearing = true
+                    }
+                )
+            }
+        })
+
         val uiState = notificationViewModel.notificationUiState.collectAsState().value
         Log.d("Notification", "notificationUiState: $uiState")
-
-        var isClearing by remember { mutableStateOf(false) }
 
         LaunchedEffect(isClearing) {
             if (isClearing) {
@@ -57,19 +72,7 @@ fun NavGraphBuilder.notification(
                 isClearing = false
             }
         }
-        val darkTheme = getDarkThemeConfig(cookbookViewModel)
 
-        cookbookViewModel.updateTopBarState(CookbookUiState.TopBarState.Custom {
-            AppBarTheme(darkTheme) {
-                NotificationScreenTopBar(
-                    onBackButtonClick =
-                    { navController.navigateUp() },
-                    onClearAllClick = {
-                        isClearing = true
-                    }
-                )
-            }
-        })
         if (cookbookViewModel.user.collectAsState().value.id == GUEST_ID) {
             GuestLoginScreen {
                 navController.guestNavToAuth()

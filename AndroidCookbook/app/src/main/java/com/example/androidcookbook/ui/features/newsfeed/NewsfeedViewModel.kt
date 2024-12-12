@@ -35,7 +35,7 @@ class NewsfeedViewModel @Inject constructor(
     var posts = MutableStateFlow<List<Post>>(emptyList())
         private set
 
-    private val newsfeedLimit = 10
+    private val newsfeedLimit = 5
     private var newsfeedOffset = newsfeedLimit
     val isLoadingMore: MutableStateFlow<Boolean> = MutableStateFlow(false)
 

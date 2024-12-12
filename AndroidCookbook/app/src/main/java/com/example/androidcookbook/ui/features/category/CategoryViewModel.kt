@@ -1,6 +1,7 @@
 package com.example.androidcookbook.ui.features.category
 
 import android.util.Log
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -16,6 +17,7 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
@@ -33,7 +35,7 @@ class CategoryViewModel @Inject constructor(
         private set
 
     private val _isTopBarSet = MutableStateFlow(false)
-    val isTopBarSet: StateFlow<Boolean> = _isTopBarSet
+    val isTopBarSet: StateFlow<Boolean> = _isTopBarSet.asStateFlow()
 
     fun setTopBarState(set: Boolean) {
         _isTopBarSet.value = set

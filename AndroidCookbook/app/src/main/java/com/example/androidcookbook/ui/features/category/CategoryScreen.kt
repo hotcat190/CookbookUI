@@ -107,6 +107,9 @@ fun CategoryScreen(
                 onRefresh = { categoryViewModel.refresh() }
             ) {
                 if (categoryUiState.value.isLoading) {
+                    cookbookViewModel.updateTopBarState(CookbookUiState.TopBarState.Default)
+                    cookbookViewModel.updateBottomBarState(CookbookUiState.BottomBarState.Default)
+                    cookbookViewModel.updateCanNavigateBack(false)
                     CategoryScreenLoading()
                 } else if (categoryUiState.value.isCategory) {
                     CategoryListScreen(
@@ -146,7 +149,7 @@ fun CategoryScreen(
                 navController.navigate("categoryList")
             }
             val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
-            if (!categoryViewModel.isTopBarSet.value) {
+            if (!categoryViewModel.isTopBarSet.collectAsState().value) {
                 cookbookViewModel.updateTopBarState(CookbookUiState.TopBarState.Custom {
                     AppBarTheme(darkTheme) {
                         SimpleNavigateUpTopBar(
@@ -185,7 +188,7 @@ fun CategoryScreen(
 
         composable("recipeDetail") {
 
-            if (!categoryViewModel.isTopBarSet.value) {
+            if (!categoryViewModel.isTopBarSet.collectAsState().value) {
                 cookbookViewModel.updateTopBarState(CookbookUiState.TopBarState.Custom {
 
                 })
@@ -218,7 +221,7 @@ fun CategoryScreen(
 
         composable("randomRecipeDetail") {
 
-            if (!categoryViewModel.isTopBarSet.value) {
+            if (!categoryViewModel.isTopBarSet.collectAsState().value) {
                 cookbookViewModel.updateTopBarState(CookbookUiState.TopBarState.Custom {
 
                 })

@@ -115,6 +115,9 @@ fun NavGraphBuilder.postDetails(viewModel: CookbookViewModel, navController: Nav
                             navController.navigateToProfile(viewModel.user.value, user)
                         },
                         postLikes = postDetailsViewModel.postLikes.collectAsState().value,
+                        onLikeCountClick = {
+                            postDetailsViewModel.updateShowLikeCountDialog(true)
+                        },
                         modifier = Modifier
                     )
 
@@ -174,6 +177,9 @@ fun NavGraphBuilder.postDetails(viewModel: CookbookViewModel, navController: Nav
                         }
 
                         is EditCommentState.NotEditing -> {}
+                    }
+                    if (postDetailsViewModel.showLikeCountDialog.collectAsState().value) {
+
                     }
                 }
             }

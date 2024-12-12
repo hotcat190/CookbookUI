@@ -77,9 +77,13 @@ fun AIGenScreen(
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
 
-    val uiState by aiGenViewModel.aiGenUiState.collectAsState()
+    val uiState = aiGenViewModel.aiGenUiState.collectAsState().value
     val selectedImageUri by aiGenViewModel.selectedImageUri.collectAsState()
 
+    if (uiState.isTakingInput) {
+        cookbookViewModel.updateTopBarState(CookbookUiState.TopBarState.Default)
+        cookbookViewModel.updateBottomBarState(CookbookUiState.BottomBarState.Default)
+    }
 
     LazyColumn(horizontalAlignment = Alignment.CenterHorizontally, modifier = modifier) {
 

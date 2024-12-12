@@ -125,7 +125,7 @@ fun CookbookAppBarDefault(
                         expanded = menuExpanded,
                         onDismissRequest = { menuExpanded = false }, // Close the menu when clicked outside
                         modifier = Modifier
-                            .background(MaterialTheme.colorScheme.surface) // Set background to white
+                            .background(MaterialTheme.colorScheme.surfaceContainer) // Set background to white
                             .clip(RoundedCornerShape(12.dp)) // Consistent corner rounding
                     ) {
                         DropdownMenuItem(

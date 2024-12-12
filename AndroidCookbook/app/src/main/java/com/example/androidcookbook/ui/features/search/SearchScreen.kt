@@ -74,6 +74,7 @@ import com.example.androidcookbook.ui.features.category.CategoryDetail
 import com.example.androidcookbook.ui.features.newsfeed.NewsfeedCard
 import com.example.androidcookbook.ui.features.newsfeed.NewsfeedScreen
 import com.example.androidcookbook.ui.features.post.details.PostDetailsScreen
+import com.example.androidcookbook.ui.getDarkThemeConfig
 
 
 @Composable
@@ -191,7 +192,7 @@ fun SearchScreen(
                                 2 -> {
                                     if (searchUiState.foodTabState.state != TabState.Idle) {
                                         items(searchUiState.foodTabState.result) { item ->
-                                            ResultCardTheme {
+                                            ResultCardTheme(getDarkThemeConfig()) {
                                                 ResultCard(
                                                     onClick = {
                                                         viewModel.ChangeScreenState(SearchScreenState.Detail)
