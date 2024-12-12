@@ -5,6 +5,7 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -26,6 +27,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -40,13 +42,17 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.example.androidcookbook.R
+import com.example.androidcookbook.data.providers.ThemeType
 import com.example.androidcookbook.domain.model.post.Post
 import com.example.androidcookbook.domain.model.recipe.Recipe
 import com.example.androidcookbook.domain.model.user.User
+import com.example.androidcookbook.ui.CookbookViewModel
 import com.example.androidcookbook.ui.features.newsfeed.NewsfeedCard
+import com.example.androidcookbook.ui.theme.AndroidCookbookTheme
 
 @Composable
 fun ResultCard(
@@ -136,7 +142,7 @@ fun UserCard(
             }
     ) {
         Row(
-            modifier = Modifier.height(120.dp)
+            modifier = Modifier.height(140.dp)
         ) {
             AsyncImage(
                 modifier = Modifier
@@ -155,7 +161,7 @@ fun UserCard(
             )
             Column(
                 modifier = Modifier
-                    .wrapContentHeight()
+                    .fillMaxHeight()
                     .weight(2f)
                     .padding(10.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
@@ -216,7 +222,13 @@ fun PostCard(
     post: Post,
     onSeeDetailsClick: (Post) -> Unit
 ) {
-    ResultCardTheme {
+    val cookbookViewModel = hiltViewModel<CookbookViewModel>()
+    val darkTheme = when(cookbookViewModel.themeType.collectAsState().value) {
+        ThemeType.Default -> isSystemInDarkTheme()
+        ThemeType.Dark -> true
+        ThemeType.Light -> false
+    }
+    ResultCardTheme(darkTheme) {
         NewsfeedCard(
             post = post,
             onSeeDetailsClick = onSeeDetailsClick,

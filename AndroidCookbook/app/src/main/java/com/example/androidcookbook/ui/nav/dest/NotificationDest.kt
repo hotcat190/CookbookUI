@@ -25,6 +25,7 @@ import com.example.androidcookbook.ui.common.screens.LoadingScreen
 import com.example.androidcookbook.ui.common.state.ScreenUiState
 import com.example.androidcookbook.ui.features.notification.NotificationScreen
 import com.example.androidcookbook.ui.features.notification.NotificationScreenTopBar
+import com.example.androidcookbook.ui.getDarkThemeConfig
 import com.example.androidcookbook.ui.nav.Routes
 import com.example.androidcookbook.ui.nav.utils.guestNavToAuth
 import kotlinx.coroutines.delay
@@ -56,9 +57,10 @@ fun NavGraphBuilder.notification(
                 isClearing = false
             }
         }
+        val darkTheme = getDarkThemeConfig(cookbookViewModel)
 
         cookbookViewModel.updateTopBarState(CookbookUiState.TopBarState.Custom {
-            AppBarTheme {
+            AppBarTheme(darkTheme) {
                 NotificationScreenTopBar(
                     onBackButtonClick =
                     { navController.navigateUp() },

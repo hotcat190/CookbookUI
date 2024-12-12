@@ -56,7 +56,7 @@ fun CookbookBottomNavigationBar(
 
         Column {
             HorizontalDivider(
-                color = DividerDefaults.color.copy(alpha = 0.25F)
+                color = DividerDefaults.color.copy(alpha = 0.5F)
             )
 
             NavigationBar(

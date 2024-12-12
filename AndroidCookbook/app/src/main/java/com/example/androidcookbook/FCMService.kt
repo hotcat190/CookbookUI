@@ -57,6 +57,7 @@ class FCMService : FirebaseMessagingService() {
                 else NotificationManager.IMPORTANCE_NONE
             )
         )
+        CookbookViewModel.updateNotificationCount(CookbookViewModel.notificationCount.value+1)
 
         val intent = Intent(this, MainActivity::class.java)
         val pendingIntentFlag = PendingIntent.FLAG_IMMUTABLE

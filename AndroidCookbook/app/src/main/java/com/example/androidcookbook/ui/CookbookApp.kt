@@ -77,11 +77,7 @@ fun CookbookApp(
 
     val focusManager = LocalFocusManager.current
 
-    val darkTheme = when(viewModel.themeType.collectAsState().value) {
-        ThemeType.Default -> isSystemInDarkTheme()
-        ThemeType.Dark -> true
-        ThemeType.Light -> false
-    }
+    val darkTheme = getDarkThemeConfig(viewModel)
 
     Scaffold(
         modifier = Modifier
@@ -114,10 +110,10 @@ fun CookbookApp(
                             onSearchButtonClick = {
                                 navController.navigate(Routes.Search)
                             },
-                            notificationCount = if (CookbookViewModel.isNotificationBadgeDisplayed.collectAsState().value) 1 else 0, // TODO: Get notification count from server
+                            notificationCount = CookbookViewModel.notificationCount.collectAsState().value,
                             onNotificationClick = {
                                 navController.navigate(Routes.Notifications)
-                                CookbookViewModel.isNotificationBadgeDisplayed.update { false }
+                                CookbookViewModel.updateNotificationCount(0)
                             },
                             onSettingsClick = {
                                 navController.navigate(Routes.Settings)
@@ -278,6 +274,16 @@ fun CookbookApp(
             }
         }
     }
+}
+
+@Composable
+fun getDarkThemeConfig(viewModel: CookbookViewModel): Boolean {
+    val darkTheme = when (viewModel.themeType.collectAsState().value) {
+        ThemeType.Default -> isSystemInDarkTheme()
+        ThemeType.Dark -> true
+        ThemeType.Light -> false
+    }
+    return darkTheme
 }
 
 @Composable

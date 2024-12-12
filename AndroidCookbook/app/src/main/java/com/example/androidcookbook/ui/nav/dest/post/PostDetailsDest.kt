@@ -1,7 +1,9 @@
 package com.example.androidcookbook.ui.nav.dest.post
 
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.rememberModalBottomSheetState
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
@@ -10,6 +12,7 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
 import androidx.navigation.toRoute
+import com.example.androidcookbook.data.providers.ThemeType
 import com.example.androidcookbook.domain.model.post.Post
 import com.example.androidcookbook.ui.CookbookUiState
 import com.example.androidcookbook.ui.CookbookViewModel
@@ -41,12 +44,28 @@ fun NavGraphBuilder.postDetails(viewModel: CookbookViewModel, navController: Nav
         viewModel.updateBottomBarState(CookbookUiState.BottomBarState.NoBottomBar)
         viewModel.updateCanNavigateBack(true)
 
+        val darkTheme = when(viewModel.themeType.collectAsState().value) {
+            ThemeType.Default -> isSystemInDarkTheme()
+            ThemeType.Dark -> true
+            ThemeType.Light -> false
+        }
+
         val postRoute = backStackEntry.toRoute<Routes.App.PostDetails>()
 
         val postDetailsViewModel =
             hiltViewModel<PostDetailsViewModel, PostDetailsViewModel.PostDetailsViewModelFactory> { factory ->
                 factory.create(postRoute.postId, viewModel.user.value)
             }
+
+        LaunchedEffect(Unit) {
+            postDetailsViewModel.getPost()
+            postDetailsViewModel.getPostLikes()
+            postDetailsViewModel.getComments(true)
+        }
+
+        LaunchedEffect(postDetailsViewModel.isPostLiked.collectAsState().value) {
+            postDetailsViewModel.getPostLikes()
+        }
 
         when (val postUiState = postDetailsViewModel.postUiState.collectAsState().value) {
             is PostUiState.Success -> {
@@ -104,7 +123,7 @@ fun NavGraphBuilder.postDetails(viewModel: CookbookViewModel, navController: Nav
                             skipPartiallyExpanded = true
                         )
                         val scope = rememberCoroutineScope()
-                        CommentBottomSheetTheme {
+                        CommentBottomSheetTheme(darkTheme) {
                             CommentBottomSheet(
                                 comments = postDetailsViewModel.commentsFlow.collectAsState().value,
                                 user = viewModel.user.collectAsState().value,
@@ -138,7 +157,7 @@ fun NavGraphBuilder.postDetails(viewModel: CookbookViewModel, navController: Nav
                                 skipPartiallyExpanded = true
                             )
                             val scope = rememberCoroutineScope()
-                            CommentBottomSheetTheme {
+                            CommentBottomSheetTheme(darkTheme) {
                                 EditCommentBottomSheet(
                                     comment = editCommentState.comment,
                                     user = viewModel.user.collectAsState().value,

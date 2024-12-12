@@ -43,14 +43,13 @@ class CookbookViewModel @Inject constructor(
     private val _user = MutableStateFlow(User())
     val user = _user.asStateFlow()
 
-    private val _themeType = MutableStateFlow(ThemeType.Default)
+    val _themeType = MutableStateFlow(ThemeType.Default)
     val themeType = _themeType.asStateFlow()
 
     private val _notice = MutableStateFlow(true)
     val notice = _notice.asStateFlow()
 
-    var notificationCount = MutableStateFlow(0) // TODO: Get notification count from server
-        private set
+
 
     init {
         viewModelScope.launch {
@@ -112,9 +111,7 @@ class CookbookViewModel @Inject constructor(
         _uiState.update { it.copy(bottomBarState = bottomBarState) }
     }
 
-    fun updateNotificationCount(count: Int) {
-        notificationCount.update { count }
-    }
+
 
     fun updateUser(response: SignInResponse, username: String, password: String) {
         _user.update { response.user }
@@ -152,5 +149,11 @@ class CookbookViewModel @Inject constructor(
 
     companion object {
         var isNotificationBadgeDisplayed = MutableStateFlow(false)
+        var notificationCount = MutableStateFlow(0) // TODO: Get notification count from server
+            private set
+
+        fun updateNotificationCount(count: Int) {
+            notificationCount.update { count }
+        }
     }
 }

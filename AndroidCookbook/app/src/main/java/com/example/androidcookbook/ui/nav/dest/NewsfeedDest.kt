@@ -77,7 +77,8 @@ fun NavGraphBuilder.newsfeed(
                             },
                             onLoadMore = {
                                 newsfeedViewModel.loadMore()
-                            }
+                            },
+                            isLoadingMore = newsfeedViewModel.isLoadingMore.collectAsState().value
                         )
                     }
                 }
