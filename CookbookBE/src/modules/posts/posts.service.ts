@@ -381,7 +381,6 @@ export class PostsService {
           Math.sqrt(post.totalLike + post.totalComment + Math.sqrt(post.totalView)) * 
           isFollowed*isMine - (1-isMine)
         ) ;
-        console.log({post, baseScore});
         return { post, score: baseScore };
       });
       console.log('getNewsfeed4');
