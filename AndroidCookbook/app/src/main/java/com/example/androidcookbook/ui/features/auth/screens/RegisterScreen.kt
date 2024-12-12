@@ -144,6 +144,6 @@ fun SignUpComponents(
             imeAction = ImeAction.Done
         )
 
-        SignButton(onClick = onSignUpClick, actionText = "Sign Up")
+        SignButton(onClick = onSignUpClick, actionText = "Sign Up", enabled = true)
     }
 }

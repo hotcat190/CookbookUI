@@ -19,12 +19,19 @@ fun AppEntryPoint(
 
     LaunchedEffect(isLoggedIn) {
         if (isLoggedIn) {
-            navController.navigate(Routes.App.Newsfeed)
+            navController.navigate(Routes.App.Newsfeed) {
+                popUpTo("check_auth") {
+                    inclusive = true
+                }
+            }
 
 
         } else {
-            navController.navigate(Routes.Auth.Login)
-
+            navController.navigate(Routes.Auth) {
+                popUpTo("check_auth") {
+                    inclusive = true
+                }
+            }
         }
     }
 }

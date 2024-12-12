@@ -5,15 +5,19 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.absoluteOffset
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.requiredWidth
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -24,6 +28,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalViewConfiguration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.androidcookbook.ui.features.auth.theme.SignLayoutTheme
@@ -33,51 +39,80 @@ fun SignLayout(
     modifier: Modifier = Modifier,
     content: @Composable () -> Unit,
 ) {
-    SignLayoutTheme {
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(
-                    brush = Brush.verticalGradient(
-                        colors = listOf(
-                            MaterialTheme.colorScheme.surfaceContainerHigh,
-                            MaterialTheme.colorScheme.surfaceContainerLow,
-                            MaterialTheme.colorScheme.surfaceContainerLowest
-                        )
-                    )
-                )
-        ) {
-            val ovalColor = MaterialTheme.colorScheme.onBackground
-            // Background and layout setup
-            Canvas(
-                modifier = Modifier
-                    .height(275.dp)
-                    .requiredWidth(500.dp)
-                    .absoluteOffset(
-                        y = (-100).dp,
-                    )
-            ) {
-                drawOval(
-                    color = ovalColor,
-//                    topLeft = Offset(-215f, -300f),
-//                    size = Size(1500f, 750f)
-                )
-            }
-
+    Column (
+        modifier = Modifier
+            .fillMaxSize()
+            .verticalScroll(rememberScrollState())
+    ) {
+        SignLayoutTheme {
+            Column(
+                modifier = Modifier.weight(0.01F)
+            ){}
             Column(
                 modifier = Modifier
-                    .wrapContentWidth()
-                    .wrapContentHeight()
-                    .padding(11.dp)
-                    .align(Alignment.TopCenter)
-                    .offset(y = 60.dp),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(15.dp)
+                    .weight(1F)
+                    .background(
+                        brush = Brush.verticalGradient(
+                            colors = listOf(
+                                MaterialTheme.colorScheme.surfaceContainerHigh,
+                                MaterialTheme.colorScheme.surfaceContainerLow,
+                                MaterialTheme.colorScheme.surfaceContainerLowest
+                            )
+                        )
+                    )
             ) {
-                AppLogo()
+                val ovalColor = MaterialTheme.colorScheme.onBackground
+                // Background and layout setup
+                val configuration = LocalConfiguration.current
+                val ovalWidth = configuration.screenWidthDp.dp.times(1.25f)
+                val ovalHeight = configuration.screenHeightDp.dp.times(0.25f)
 
-                content()
+                    Column(
+                        modifier = Modifier
+                            .wrapContentSize()
+                    ) {
+
+                        Box (
+                            modifier = Modifier
+                                .offset(
+                                    y = (40).dp
+                                )
+                        ) {
+                            Canvas(
+                                modifier = Modifier
+                                    .height(ovalHeight)
+                                    .requiredWidth(ovalWidth)
+                                    .offset(
+                                        y = (-115).dp
+                                    )
+                            ) {
+                                drawOval(
+                                    color = ovalColor,
+    //                    topLeft = Offset(-215f, -300f),
+    //                    size = Size(1500f, 750f)
+                                )
+                            }
+                            AppLogo(
+                                modifier = Modifier
+                                    .align(Alignment.Center)
+
+                            )
+                        }
+                    }
+
+                Spacer(Modifier.height(40.dp))
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(11.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.spacedBy(15.dp)
+                ) {
+                    content()
+                }
+                Spacer(modifier = Modifier.weight(1F))
             }
+
         }
     }
 }

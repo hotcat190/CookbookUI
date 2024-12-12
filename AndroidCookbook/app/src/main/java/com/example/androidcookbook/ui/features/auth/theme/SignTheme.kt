@@ -11,6 +11,7 @@ import com.example.androidcookbook.ui.theme.Typography
 val LightTitle = Color(52, 108, 151)
 val LightText = Color(13, 27, 38)
 val LightButtonColor = Color(64, 120, 170)
+val LightDisabledButtonColor = Color(38, 91, 136, 255)
 val LightClickableText = Color(48, 122, 43)
 val LightBackground = Color(217, 231, 242)
 val LightOval = Color(179, 207, 229)
@@ -36,12 +37,14 @@ val LightSignLayout = lightColorScheme(
     surfaceContainerHighest = LightGradientHighest,
     surfaceContainerLow = LightGradientLow,
     surfaceContainerLowest = LightGradientLowest,
-    surface = LightLogo
+    surface = LightLogo,
+    surfaceDim = LightDisabledButtonColor,
 )
 
 val DarkTitle = Color(217, 231, 242)
 val DarkText = Color(217, 231, 242)
-val DarkButtonColor = Color(201, 230, 255)
+val DarkButtonColor = Color(64, 120, 170)
+val DarkDisabledButtonColor = Color(38, 91, 136, 255)
 val DarkClickableText = Color(134, 147, 95)
 val DarkBackground = Color(25, 87, 135)
 val DarkOval = Color(26, 54, 76)
@@ -66,7 +69,8 @@ val DarkSignLayout = darkColorScheme(
     surfaceContainerHighest = DarkGradientHighest,
     surfaceContainerLow = DarkGradientLow,
     surfaceContainerLowest = DarkGradientLowest,
-    surface = DarkLogo
+    surface = DarkLogo,
+    surfaceDim = DarkDisabledButtonColor
 )
 
 @Composable
