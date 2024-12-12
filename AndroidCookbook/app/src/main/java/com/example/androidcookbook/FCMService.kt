@@ -33,18 +33,21 @@ class FCMService : FirebaseMessagingService() {
             // Do something with the customKey value
             Log.d("test",customKey.toString())
         }
-        Log.d("FCMService", "isNotificationBadgeDisplayed: ${CookbookViewModel.isNotificationBadgeDisplayed}")
-        CookbookViewModel.isNotificationBadgeDisplayed.update { true }
-        Log.d("FCMService", "isNotificationBadgeDisplayed: ${CookbookViewModel.isNotificationBadgeDisplayed}")
 
         val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         val notificationId = 1
         val requestCode = 1
 
+        Log.d("FCMService", "isNotificationBadgeDisplayed: ${CookbookViewModel.isNotificationBadgeDisplayed}")
+        CookbookViewModel.isNotificationBadgeDisplayed.update { true }
+        Log.d("FCMService", "isNotificationBadgeDisplayed: ${CookbookViewModel.isNotificationBadgeDisplayed}")
+
+        notificationManager.cancelAll()
+
         val channelId = "Firebase Messaging ID"
         val channelName = "Firebase Messaging"
         notificationManager.createNotificationChannel(
-            NotificationChannel(channelId, channelName, NotificationManager.IMPORTANCE_HIGH)
+            NotificationChannel(channelId, channelName, NotificationManager.IMPORTANCE_NONE)
         )
 
         val intent = Intent(this, MainActivity::class.java)
