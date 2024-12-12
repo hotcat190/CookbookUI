@@ -15,6 +15,7 @@ import com.google.firebase.messaging.RemoteMessage
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.flow.update
 
 class FCMService : FirebaseMessagingService() {
 
@@ -48,6 +49,12 @@ class FCMService : FirebaseMessagingService() {
         val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         val notificationId = 1
         val requestCode = 1
+
+        Log.d("FCMService", "isNotificationBadgeDisplayed: ${CookbookViewModel.isNotificationBadgeDisplayed}")
+        CookbookViewModel.isNotificationBadgeDisplayed.update { true }
+        Log.d("FCMService", "isNotificationBadgeDisplayed: ${CookbookViewModel.isNotificationBadgeDisplayed}")
+
+        notificationManager.cancelAll()
 
         val channelId = "Firebase Messaging ID"
         val channelName = "Firebase Messaging"

@@ -64,7 +64,8 @@ fun OtpCodeScreen(
                     onSubmit()
                 }
             },
-            actionText = "Continue"
+            actionText = "Continue",
+            enabled = otpCode.length == 6
         )
 
         //TODO: ClickableText("Input the wrong email? Go back")

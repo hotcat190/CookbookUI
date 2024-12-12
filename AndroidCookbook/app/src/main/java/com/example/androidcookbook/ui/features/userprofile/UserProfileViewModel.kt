@@ -11,6 +11,7 @@ import com.example.androidcookbook.domain.model.user.GUEST_ID
 import com.example.androidcookbook.domain.model.user.User
 import com.example.androidcookbook.domain.usecase.DeletePostUseCase
 import com.example.androidcookbook.domain.usecase.MakeToastUseCase
+import com.skydoves.sandwich.message
 import com.skydoves.sandwich.onFailure
 import com.skydoves.sandwich.onSuccess
 import dagger.assisted.Assisted
@@ -34,7 +35,7 @@ class UserProfileViewModel @AssistedInject constructor(
         fun create(user: User): UserProfileViewModel
     }
 
-    var isRefreshing: Boolean by mutableStateOf(false)
+    var isRefreshing = MutableStateFlow(false)
         private set
 
     var uiState: MutableStateFlow<UserProfileUiState> = MutableStateFlow(
@@ -69,7 +70,7 @@ class UserProfileViewModel @AssistedInject constructor(
                 getUserPosts(userId)
             }
             .onFailure {
-                uiState.update { UserProfileUiState.Failure }
+                uiState.update { UserProfileUiState.Failure(message()) }
             }
     }
 
@@ -90,10 +91,18 @@ class UserProfileViewModel @AssistedInject constructor(
 
     fun refresh() {
         if (user.id == GUEST_ID) return
+        isRefreshing.update { true }
         viewModelScope.launch {
-            isRefreshing = true
             getUser(userId = user.id)
-            isRefreshing = false
+        }.invokeOnCompletion {
+            isRefreshing.update { false }
+        }
+    }
+
+    fun refreshNoIndicator() {
+        if (user.id == GUEST_ID) return
+        viewModelScope.launch {
+            getUser(userId = user.id)
         }
     }
 

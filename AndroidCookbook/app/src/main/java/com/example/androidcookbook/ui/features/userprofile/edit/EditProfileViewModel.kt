@@ -118,6 +118,7 @@ class EditProfileViewModel @AssistedInject constructor(
             val request = UpdateUserRequest(
                 avatar = avatarPath,
                 banner = bannerPath,
+                name = name.value.text,
                 bio = bio.value.text,
             )
 

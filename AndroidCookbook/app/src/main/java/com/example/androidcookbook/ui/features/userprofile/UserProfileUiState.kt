@@ -6,7 +6,7 @@ import com.example.androidcookbook.domain.model.user.User
 sealed interface UserProfileUiState {
     data object Guest: UserProfileUiState
     data object Loading : UserProfileUiState
-    data object Failure: UserProfileUiState
+    data class Failure(val message: String): UserProfileUiState
     data class Success(
         val user: User,
     ) : UserProfileUiState

@@ -26,7 +26,7 @@ import com.example.androidcookbook.ui.nav.utils.sharedViewModel
 fun NavGraphBuilder.authScreens(
     navController: NavController,
     updateAppBar: () -> Unit,
-    updateUser: (SignInResponse,String,String) -> Unit,
+    updateUser: (SignInResponse, String, String) -> Unit,
 ) {
     navigation<Routes.Auth>(
         startDestination = Routes.Auth.Login
@@ -48,7 +48,7 @@ fun NavGraphBuilder.authScreens(
                 onSignInClick = { username, password ->
                     authViewModel.signIn(username, password) { response ->
                         run {
-                            updateUser(response,username,password)
+                            updateUser(response, username, password)
                             navController.navigate(Routes.App) {
                                 popUpTo<Routes.Auth> {
                                     inclusive = true
@@ -63,6 +63,7 @@ fun NavGraphBuilder.authScreens(
                         popUpTo<Routes.Auth> { inclusive = true }
                     }
                 },
+                requestState = authViewModel.authRequestState.collectAsState().value,
                 supportingText = uiState.dialogMessage
             )
         }

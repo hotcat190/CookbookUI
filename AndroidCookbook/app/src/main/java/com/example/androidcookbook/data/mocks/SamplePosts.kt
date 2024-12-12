@@ -21,7 +21,7 @@ object SamplePosts {
                     title = "Shrimp salad cooking :)",
                     description = "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard.",
                     cookTime = "",
-                    mainImage = null,
+                    mainImage = "https://example.com/image${it}.jpg",
                     createdAt = "2024-01-28T00:00:00.000Z",
                     totalView = 0,
                     totalLike = 0,

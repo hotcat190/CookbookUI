@@ -1,8 +1,6 @@
 package com.example.androidcookbook.ui.nav.dest.profile
 
-import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.runtime.collectAsState
-import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController

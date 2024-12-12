@@ -66,7 +66,7 @@ class CookbookViewModel @Inject constructor(
                 }
                 _isLoggedIn.value = isLoggedIn
 
-                launch {
+//                launch {
                     dataStoreManager.username.combine(dataStoreManager.password) { username, password ->
                         Pair(
                             username,
@@ -80,7 +80,7 @@ class CookbookViewModel @Inject constructor(
                             }
                         }
                     }
-                }
+//                }
             }
 
         }
@@ -148,5 +148,8 @@ class CookbookViewModel @Inject constructor(
         viewModelScope.launch {
             dataStoreManager.saveTheme(theme)
         }
+    }
+    companion object {
+        var isNotificationBadgeDisplayed = MutableStateFlow(false)
     }
 }

@@ -1,5 +1,6 @@
 package com.example.androidcookbook.ui.nav.dest.post
 
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.collectAsState
@@ -14,6 +15,9 @@ import com.example.androidcookbook.domain.model.post.Post
 import com.example.androidcookbook.ui.CookbookUiState
 import com.example.androidcookbook.ui.CookbookViewModel
 import com.example.androidcookbook.ui.common.containers.RefreshableScreen
+import com.example.androidcookbook.ui.common.screens.FailureScreen
+import com.example.androidcookbook.ui.common.screens.GuestLoginScreen
+import com.example.androidcookbook.ui.common.screens.LoadingScreen
 import com.example.androidcookbook.ui.features.comment.CommentBottomSheet
 import com.example.androidcookbook.ui.features.comment.CommentBottomSheetTheme
 import com.example.androidcookbook.ui.features.comment.EditCommentBottomSheet
@@ -47,6 +51,7 @@ fun NavGraphBuilder.postDetails(viewModel: CookbookViewModel, navController: Nav
         when (val postUiState = postDetailsViewModel.postUiState.collectAsState().value) {
             is PostUiState.Success -> {
                 RefreshableScreen(
+                    isRefreshing = postDetailsViewModel.isRefreshing.collectAsState().value,
                     onRefresh = { postDetailsViewModel.refresh() }
                 ) {
                     PostDetailsScreen(
@@ -90,6 +95,7 @@ fun NavGraphBuilder.postDetails(viewModel: CookbookViewModel, navController: Nav
                         onUserClick = { user ->
                             navController.navigateToProfile(viewModel.user.value, user)
                         },
+                        postLikes = postDetailsViewModel.postLikes.collectAsState().value,
                         modifier = Modifier
                     )
 
@@ -154,11 +160,21 @@ fun NavGraphBuilder.postDetails(viewModel: CookbookViewModel, navController: Nav
             }
 
             is PostUiState.Error -> {
-                // TODO
+                FailureScreen(
+                    message = postUiState.message,
+                    onRetryClick = { postDetailsViewModel.refresh() }
+                )
             }
 
             is PostUiState.Loading -> {
-                // TODO
+                LoadingScreen()
+            }
+            is PostUiState.Guest -> GuestLoginScreen {
+                navController.navigate(Routes.Auth) {
+                    popUpTo(Routes.App) {
+                        inclusive = true
+                    }
+                }
             }
         }
     }

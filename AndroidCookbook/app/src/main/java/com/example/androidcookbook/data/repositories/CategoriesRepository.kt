@@ -12,5 +12,7 @@ class CategoriesRepository @Inject constructor(
     suspend fun getRandomMeal() = categoriesService.getRandomMeal()
 
     suspend fun getMealByCategories(category: String) = categoriesService.getMealByCategories(category)
+
+    suspend fun getMealById(id: Int) = categoriesService.getMealById(id)
 }
 

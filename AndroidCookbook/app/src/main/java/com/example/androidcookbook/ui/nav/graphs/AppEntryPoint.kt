@@ -27,7 +27,7 @@ fun AppEntryPoint(
 
 
         } else {
-            navController.navigate(Routes.Auth.Login) {
+            navController.navigate(Routes.Auth) {
                 popUpTo("check_auth") {
                     inclusive = true
                 }
