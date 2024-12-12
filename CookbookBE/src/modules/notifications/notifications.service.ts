@@ -224,7 +224,7 @@ export class NotificationsService {
 
 
       const token = user.tokenFCM;
-      if(user.tokenFCM == null) {
+      if(!user.tokenFCM) {
         return;
       }
       await admin.messaging().send({
