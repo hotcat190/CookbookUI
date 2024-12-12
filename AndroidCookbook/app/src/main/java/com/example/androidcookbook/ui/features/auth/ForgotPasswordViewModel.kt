@@ -1,10 +1,12 @@
 package com.example.androidcookbook.ui.features.auth
 
 import android.util.Log
+import android.widget.Toast
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.androidcookbook.data.repositories.AuthRepository
 import com.example.androidcookbook.domain.model.auth.ForgotPasswordRequest
+import com.example.androidcookbook.domain.model.auth.OtpValidationRequest
 import com.example.androidcookbook.domain.model.auth.ResetPasswordRequest
 import com.example.androidcookbook.domain.network.ErrorBody
 import com.example.androidcookbook.domain.network.SuccessMessageBody
@@ -42,6 +44,7 @@ class ForgotPasswordViewModel @Inject constructor(
 
     fun updateEmail(email: String) = this.email.update { email }
     fun updateOtpCode(otpCode: String) = this.otpCode.update { otpCode }
+    fun updateToken(token: String) = this.token.update { token }
     fun updatePassword(password: String) = this.password.update { password }
     fun updateRetypePassword(retypePassword: String) = this.retypePassword.update { retypePassword }
     fun updateOpenDialog(open: Boolean) = this.openDialog.update { open }
@@ -74,8 +77,40 @@ class ForgotPasswordViewModel @Inject constructor(
         }
     }
 
-    fun submitOtpRequest() {
+    fun submitOtpRequest(onSucces: () -> Unit) {
         //TODO("Not yet implemented")
+        viewModelScope.launch {
+            val response = authRepository.sendOtpValidationRequest(
+                OtpValidationRequest(
+                    email = email.value,
+                    code = otpCode.value
+                )
+            )
+            response.onSuccess {
+                updateOpenDialog(true)
+                updateDialogMessage(data.message)
+                updateSuccessSubmit(true)
+                Log.d("API OK", "Raw Response")
+                onSucces()
+            }.onErrorDeserialize<SuccessMessageBody, ErrorBody> {
+                    errorBody ->
+                run {
+                    val rawResponse = errorBody.error
+                    Log.e("API Error", "Raw Response: $rawResponse")
+                    Log.e("API Error", "Raw Response: ${email.value} ${otpCode.value}")
+                    updateOpenDialog(true)
+                    updateDialogMessage(errorBody.message.joinToString(".\n\n") ?: "Error")
+                }
+            }.onException {
+                when (throwable) {
+                    is SocketTimeoutException ->
+                        run {
+                            updateOpenDialog(true)
+                            updateDialogMessage("Request timed out.\nPlease try again.")
+                        }
+                }
+            }
+        }
     }
 
     fun submitPasswordResetRequest(onSucces: () -> Unit) {
@@ -89,7 +124,7 @@ class ForgotPasswordViewModel @Inject constructor(
             val response = authRepository.sendPasswordResetRequest(
                 ResetPasswordRequest(
                     email = email.value,
-                    token = token.value,
+                    token = otpCode.value,
                     password = password.value,
                 )
             )
