@@ -357,24 +357,31 @@ export class PostsService {
         .getOne();
         console.log('getNewsfeed2');
       const followedUserIds = user.following.map(f => f.following.id);
-      const posts = await this.postsRepository.createQueryBuilder('post')
-        .leftJoinAndSelect('post.author', 'author')
-        .where('post.id NOT IN (:...viewedPostIds)', { 
-          viewedPostIds: user.viewedPosts.map(p => p.id) 
-        })
-        .orWhere('(post.authorId = :userId AND post.totalComment > 0)', { 
-          userId 
-        }).getMany();
+      const viewedPostIds = user.viewedPosts.map(p => p.id);
+
+      const query = this.postsRepository.createQueryBuilder('post')
+        .leftJoinAndSelect('post.author', 'author');
+
+      if (viewedPostIds.length > 0) {
+        query.where('post.id NOT IN (:viewedPostIds)', { viewedPostIds });
+      } else {
+        query.where('1=1');
+      }
+
+      query.orWhere('post.authorId = :userId AND post.totalComment > 0', { userId });
+
+      const posts = await query.getMany();
       console.log('getNewsfeed3');
       // Get posts and calculate scores
       const scoredPosts = posts.map(post => {
+        const isMine = (post.author.id==userId) ? 0 : 1;
         const isFollowed = followedUserIds.includes(post.author.id) ? 5 : 1; // 5x boost for followed users
     
         const baseScore = (
           Math.sqrt(post.totalLike + post.totalComment + Math.sqrt(post.totalView)) * 
-          isFollowed
+          isFollowed*isMine - (1-isMine)
         ) ;
-    
+        console.log({post, baseScore});
         return { post, score: baseScore };
       });
       console.log('getNewsfeed4');
