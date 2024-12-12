@@ -6,7 +6,7 @@ import { HttpException, HttpStatus } from '@nestjs/common';
 @Injectable()
 export class LoggerMiddleware implements NestMiddleware {
   private requestMap = new Map<string, number[]>();
-  private readonly WINDOW_MS = 1000;
+  private readonly WINDOW_MS = 100;
   private readonly MAX_REQUESTS = 3;
 
   private getDeviceId(req: Request): string {
