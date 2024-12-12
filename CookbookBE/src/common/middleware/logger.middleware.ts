@@ -22,7 +22,6 @@ export class LoggerMiddleware implements NestMiddleware {
 
   use(req: Request, res: Response, next: NextFunction) {
     const now = Date.now();
-    console.log(req.headers);
     // Use device identifier instead of just IP
     const deviceId = this.getDeviceId(req);
     const key = `${deviceId}-${req.method}-${req.originalUrl}`;
