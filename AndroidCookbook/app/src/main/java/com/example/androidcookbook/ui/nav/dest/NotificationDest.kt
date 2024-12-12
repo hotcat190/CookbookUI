@@ -62,7 +62,7 @@ fun NavGraphBuilder.notification(
                     { navController.navigateUp() },
                     onClearAllClick = {
                         isClearing = true
-//                            notificationViewModel.clearAllNotifications()
+                        notificationViewModel.clearAllNotifications()
                     }
                 )
             }
