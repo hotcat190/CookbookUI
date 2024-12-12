@@ -12,7 +12,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material.icons.filled.MoreHoriz
 import androidx.compose.material.icons.outlined.Bookmark
 import androidx.compose.material.icons.outlined.BookmarkBorder
 import androidx.compose.material3.DropdownMenu
@@ -28,15 +28,14 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.ViewModelStore
-import androidx.lifecycle.ViewModelStoreOwner
-import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.example.androidcookbook.data.mocks.SampleComments
@@ -48,7 +47,6 @@ import com.example.androidcookbook.ui.common.utils.apiDateFormatter
 import com.example.androidcookbook.ui.components.post.PostHeader
 import com.example.androidcookbook.ui.components.post.PostTitle
 import com.example.androidcookbook.ui.features.post.details.PostDetailsViewModel
-import com.example.androidcookbook.ui.features.post.details.ShareButton
 import com.example.androidcookbook.ui.theme.AndroidCookbookTheme
 import java.time.LocalDate
 
@@ -78,7 +76,8 @@ fun NewsfeedCard(
                 post.author,
                 LocalDate.parse(post.createdAt, apiDateFormatter).toString(),
                 onUserClick = onUserClick,
-                modifier = Modifier.padding(start = 16.dp, top = 16.dp)
+                modifier = Modifier.padding(start = 16.dp, top = 16.dp),
+                16.sp
             )
             Spacer(Modifier.weight(1F))
             PostOptionsButton(
@@ -129,7 +128,8 @@ fun NewsfeedCard(
                 // Bookmark button
                 IconButton(onClick = {postDetailsViewModel.togglePostBookmark()}) {
                     Icon(
-                        imageVector = if (postDetailsViewModel.isPostBookmarked.collectAsState().value) {
+                        imageVector =
+                        if (postDetailsViewModel.isPostBookmarked.collectAsState().value) {
                             Icons.Outlined.Bookmark
                         } else {
                             Icons.Outlined.BookmarkBorder
@@ -151,7 +151,8 @@ fun NewsfeedCard(
         }
     }
     HorizontalDivider(
-        modifier = Modifier.padding(horizontal = 16.dp),
+        thickness = 1.dp,
+        modifier = Modifier.alpha(0.75F),
     )
 }
 
@@ -169,7 +170,7 @@ fun PostOptionsButton(
         },
     ) {
         Icon(
-            imageVector = Icons.Default.MoreVert,
+            imageVector = Icons.Default.MoreHoriz,
             contentDescription = "Open Options",
             tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.4f),
             modifier = Modifier

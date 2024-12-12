@@ -16,5 +16,7 @@ sealed interface UserPostState {
     data object Guest: UserPostState
     data object Loading : UserPostState
     data object Failure: UserPostState
-    data class Success(val userPosts: List<Post>) : UserPostState
+    data class Success(
+        val userPosts: List<Post>,
+    ) : UserPostState
 }

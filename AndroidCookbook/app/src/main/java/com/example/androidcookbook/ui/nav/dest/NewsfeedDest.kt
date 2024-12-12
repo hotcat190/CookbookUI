@@ -5,6 +5,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
+import com.example.androidcookbook.domain.model.user.GUEST_ID
 import com.example.androidcookbook.ui.CookbookUiState
 import com.example.androidcookbook.ui.CookbookViewModel
 import com.example.androidcookbook.ui.common.containers.RefreshableScreen
@@ -26,6 +27,15 @@ fun NavGraphBuilder.newsfeed(
         cookbookViewModel.updateTopBarState(CookbookUiState.TopBarState.Default)
         cookbookViewModel.updateBottomBarState(CookbookUiState.BottomBarState.Default)
         cookbookViewModel.updateCanNavigateBack(false)
+
+        val currentUser = cookbookViewModel.user.collectAsState().value
+
+        if (currentUser.id == GUEST_ID) {
+            GuestLoginScreen {
+                navController.guestNavToAuth()
+            }
+            return@composable
+        }
 
         val newsfeedViewModel = sharedViewModel<NewsfeedViewModel>(it, navController, Routes.App)
         val posts = newsfeedViewModel.posts.collectAsState().value

@@ -6,6 +6,8 @@ import com.example.androidcookbook.domain.model.post.Post
 import com.example.androidcookbook.domain.model.user.User
 import com.example.androidcookbook.domain.network.SuccessMessageBody
 import com.example.androidcookbook.domain.network.UpdateUserRequest
+import com.example.androidcookbook.domain.network.UserFavoritesResponse
+import com.example.androidcookbook.domain.network.UserLikesResponse
 import com.skydoves.sandwich.ApiResponse
 import retrofit2.http.Body
 import retrofit2.http.DELETE
@@ -35,5 +37,11 @@ interface UserService {
 
     @DELETE("follows/{userId}")
     suspend fun unfollowUser(@Path("userId") userId: Int): ApiResponse<SuccessMessageBody>
+
+    @GET("favorite/{page}")
+    suspend fun getUserFavoritePosts(@Path("page") page: Int): ApiResponse<UserFavoritesResponse>
+
+    @GET("like/{page}")
+    suspend fun getUserLikedPosts(@Path("page") page: Int): ApiResponse<UserLikesResponse>
 
 }

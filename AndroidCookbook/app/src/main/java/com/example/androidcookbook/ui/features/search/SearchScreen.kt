@@ -64,6 +64,7 @@ import com.example.androidcookbook.R
 import com.example.androidcookbook.data.mocks.SamplePosts
 import com.example.androidcookbook.domain.model.post.Post
 import com.example.androidcookbook.domain.model.recipe.Recipe
+import com.example.androidcookbook.domain.model.user.GUEST_ID
 import com.example.androidcookbook.domain.model.user.User
 import com.example.androidcookbook.ui.features.newsfeed.NewsfeedCard
 import com.example.androidcookbook.ui.features.newsfeed.NewsfeedScreen
@@ -72,6 +73,7 @@ import com.example.androidcookbook.ui.features.post.details.PostDetailsScreen
 
 @Composable
 fun SearchScreen(
+    currentUser: User,
     viewModel: SearchViewModel,
     searchUiState: SearchUiState,
     onBackButtonClick: () -> Unit,

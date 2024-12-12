@@ -15,6 +15,8 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.androidcookbook.data.providers.ThemeType
 import com.example.androidcookbook.ui.CookbookViewModel
 
+val WHITE = Color(0xFFFFFFFF)
+
 private val DarkColorScheme = darkColorScheme(
 //    primary = Dark.Primary,
 //    secondary = Dark.Secondary,
@@ -24,6 +26,7 @@ private val DarkColorScheme = darkColorScheme(
 ////    primaryContainer = Color.Transparent,
 //    onSecondary = Dark.OnSecondary,
 
+    primary = WHITE
 )
 
 private val LightColorScheme = lightColorScheme(
@@ -34,15 +37,19 @@ private val LightColorScheme = lightColorScheme(
 ////    primaryContainer = Light.PrimaryContainer,
 //    primaryContainer = Color.Transparent,
 //    onSecondary = Light.OnSecondary,
-//    /* Other default colors to override
-//    background = Color(0xFFFFFBFE),
-//    surface = Color(0xFFFFFBFE),
-//    onPrimary = Color.White,
-//    onSecondary = Color.White,
-//    onTertiary = Color.White,
-//    onBackground = Color(0xFF1C1B1F),
-//    onSurface = Color(0xFF1C1B1F),
+    /* Other default colors to override
+    background = Color(0xFFFFFBFE),
+    surface = Color(0xFFFFFBFE),
+    onPrimary = Color.White,
+    onSecondary = Color.White,
+    onTertiary = Color.White,
+    onBackground = Color(0xFF1C1B1F),
+    onSurface = Color(0xFF1C1B1F),
 //    */
+    primary = Color.Black,
+    surface = WHITE,
+    background = WHITE,
+    scrim = Color.Transparent,
 )
 
 @Composable

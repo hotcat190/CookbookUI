@@ -21,5 +21,8 @@ class UserRepository @Inject constructor(
 
     suspend fun unfollowUser(userId: Int) = userService.unfollowUser(userId)
 
+    suspend fun getUserLikedPosts(userId: Int) = userService.getUserLikedPosts(userId)
+
+    suspend fun getUserFavoritePosts(page: Int) = userService.getUserFavoritePosts(page)
 
 }

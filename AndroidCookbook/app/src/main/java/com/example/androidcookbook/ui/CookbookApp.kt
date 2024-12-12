@@ -32,10 +32,12 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.dialog
 import androidx.navigation.compose.rememberNavController
 import com.example.androidcookbook.data.providers.ThemeType
+import com.example.androidcookbook.domain.model.user.GUEST_ID
 import com.example.androidcookbook.ui.common.appbars.AppBarTheme
 import com.example.androidcookbook.ui.common.appbars.CookbookAppBarDefault
 import com.example.androidcookbook.ui.common.appbars.CookbookBottomNavigationBar
 import com.example.androidcookbook.ui.common.appbars.SearchBar
+import com.example.androidcookbook.ui.common.screens.GuestLoginScreen
 import com.example.androidcookbook.ui.features.auth.theme.SignLayoutTheme
 import com.example.androidcookbook.ui.nav.dest.follow
 import com.example.androidcookbook.ui.features.search.SearchScreen
@@ -51,6 +53,7 @@ import com.example.androidcookbook.ui.nav.dest.profile.otherProfile
 import com.example.androidcookbook.ui.nav.graphs.AppEntryPoint
 import com.example.androidcookbook.ui.nav.graphs.appScreens
 import com.example.androidcookbook.ui.nav.graphs.authScreens
+import com.example.androidcookbook.ui.nav.utils.guestNavToAuth
 import com.example.androidcookbook.ui.nav.utils.navigateIfNotOn
 import com.example.androidcookbook.ui.nav.utils.navigateToProfile
 import kotlinx.coroutines.flow.update
@@ -81,6 +84,7 @@ fun CookbookApp(
     }
 
     Scaffold(
+        containerColor = MaterialTheme.colorScheme.background,
         modifier = Modifier
             .nestedScroll(scrollBehavior.nestedScrollConnection),
         topBar = {
@@ -104,7 +108,7 @@ fun CookbookApp(
                     ) {
                         updateSystemBarColors(
                             Color.TRANSPARENT,
-                            MaterialTheme.colorScheme.background.toArgb(),
+                            Color.WHITE,
                             darkTheme
                         )
                         CookbookAppBarDefault(
@@ -127,7 +131,8 @@ fun CookbookApp(
                             onLogoutClick = {
                                 viewModel.logout()
                                 navController.navigateIfNotOn(Routes.Auth)
-                            }
+                            },
+                            currentUser = currentUser
                         )
                     }
                 }
@@ -139,7 +144,7 @@ fun CookbookApp(
             when (uiState.bottomBarState) {
                 is CookbookUiState.BottomBarState.NoBottomBar -> {}
                 is CookbookUiState.BottomBarState.Default -> {
-                    AppBarTheme{
+                    AppBarTheme(darkTheme){
                         CookbookBottomNavigationBar(
                             onCategoryClick = {
                                 navController.navigateIfNotOn(Routes.App.Category, true)
@@ -195,11 +200,21 @@ fun CookbookApp(
             appScreens(navController = navController, cookbookViewModel = viewModel)
 
             composable<Routes.Search> {
+
+
                 val searchViewModel = hiltViewModel<SearchViewModel>()
                 val searchUiState = searchViewModel.uiState.collectAsState().value
 
                 viewModel.updateBottomBarState(CookbookUiState.BottomBarState.NoBottomBar)
                 viewModel.updateCanNavigateBack(true)
+
+                if (currentUser.id == GUEST_ID) {
+                    GuestLoginScreen {
+                        navController.guestNavToAuth()
+                    }
+                    return@composable
+                }
+
                 viewModel.updateTopBarState(CookbookUiState.TopBarState.Custom {
                     AppBarTheme(darkTheme) {
                         SearchBar(
@@ -210,7 +225,11 @@ fun CookbookApp(
                         )
                     }
                 })
+
+
+
                 SearchScreen(
+                    currentUser = currentUser,
                     viewModel = searchViewModel,
                     searchUiState = searchUiState,
                     onBackButtonClick = {
