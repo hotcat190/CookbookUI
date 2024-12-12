@@ -6,29 +6,39 @@ import { HttpException, HttpStatus } from '@nestjs/common';
 @Injectable()
 export class LoggerMiddleware implements NestMiddleware {
   private requestMap = new Map<string, number[]>();
-  private readonly WINDOW_MS = 1000; // 1 giây
-  private readonly MAX_REQUESTS = 5; // Số request tối đa trong 1 giây
+  private readonly WINDOW_MS = 1000;
+  private readonly MAX_REQUESTS = 3;
+
+  private getDeviceId(req: Request): string {
+    // Try to get device identifier from common headers
+    return (
+      req.headers['x-device-id'] as string || 
+      req.headers['x-forwarded-for'] as string ||
+      req.headers['user-agent'] as string ||
+      req.headers['authorization'] as string ||
+      req.ip
+    );
+  }
+
   use(req: Request, res: Response, next: NextFunction) {
     const now = Date.now();
-    const key = `${req.ip}-${req.method}-${req.originalUrl}`;
+    console.log(req.headers);
+    // Use device identifier instead of just IP
+    const deviceId = this.getDeviceId(req);
+    const key = `${deviceId}-${req.method}-${req.originalUrl}`;
 
-    // Lấy danh sách timestamps của request trước đó
     const requestTimestamps = this.requestMap.get(key) || [];
-    
-    // Lọc ra những timestamps trong cửa sổ thời gian
     const recentRequests = requestTimestamps.filter(
       timestamp => now - timestamp < this.WINDOW_MS
     );
 
-    // Nếu có quá nhiều request, trả về lỗi 429
     if (recentRequests.length >= this.MAX_REQUESTS) {
       throw new HttpException(
-        'Quá nhiều request. Vui lòng thử lại sau.',
+        'Too many requests from this device',
         HttpStatus.TOO_MANY_REQUESTS
       );
     }
 
-    // Thêm timestamp mới vào danh sách
     recentRequests.push(now);
     this.requestMap.set(key, recentRequests);
 
