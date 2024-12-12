@@ -221,7 +221,6 @@ private fun PostDetailsInfo(
                 color = MaterialTheme.colorScheme.onSurface,
             ),
             modifier = Modifier
-                .padding(horizontal = 8.dp)
         )
 
         if (post.mainImage != null) {
