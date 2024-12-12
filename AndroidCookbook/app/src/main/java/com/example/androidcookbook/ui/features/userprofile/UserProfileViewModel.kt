@@ -1,14 +1,10 @@
 package com.example.androidcookbook.ui.features.userprofile
 
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.androidcookbook.data.repositories.UserRepository
 import com.example.androidcookbook.domain.model.post.Post
 import com.example.androidcookbook.domain.model.user.GUEST_ID
-import com.example.androidcookbook.domain.model.user.User
 import com.example.androidcookbook.domain.usecase.DeletePostUseCase
 import com.example.androidcookbook.domain.usecase.MakeToastUseCase
 import com.skydoves.sandwich.message
@@ -24,7 +20,7 @@ import kotlinx.coroutines.launch
 
 @HiltViewModel(assistedFactory = UserProfileViewModel.UserProfileViewModelFactory::class)
 class UserProfileViewModel @AssistedInject constructor(
-    @Assisted private val user: User,
+    @Assisted private val userId: Int,
     private val userRepository: UserRepository,
     private val deletePostUseCase: DeletePostUseCase,
     private val makeToastUseCase: MakeToastUseCase,
@@ -32,20 +28,20 @@ class UserProfileViewModel @AssistedInject constructor(
 
     @AssistedFactory
     interface UserProfileViewModelFactory {
-        fun create(user: User): UserProfileViewModel
+        fun create(user: Int): UserProfileViewModel
     }
 
     var isRefreshing = MutableStateFlow(false)
         private set
 
     var uiState: MutableStateFlow<UserProfileUiState> = MutableStateFlow(
-        if (user.id == GUEST_ID) UserProfileUiState.Guest
-        else UserProfileUiState.Success(user = user)
+        if (userId == GUEST_ID) UserProfileUiState.Guest
+        else UserProfileUiState.Loading
     )
         private set
 
     var userPostState: MutableStateFlow<UserPostState> = MutableStateFlow(
-        if (user.id == GUEST_ID) UserPostState.Guest
+        if (userId == GUEST_ID) UserPostState.Guest
         else UserPostState.Loading
     )
 
@@ -53,13 +49,13 @@ class UserProfileViewModel @AssistedInject constructor(
 
     init {
         viewModelScope.launch {
-            getUser(userId = user.id)
-            getUserPosts(userId = user.id)
+            getUser(userId = userId)
+            getUserPosts(userId = userId)
         }
     }
 
     private suspend fun getUser(userId: Int) {
-        if (user.id == GUEST_ID) {
+        if (userId == GUEST_ID) {
             uiState.update { UserProfileUiState.Guest }
             return
         }
@@ -75,7 +71,7 @@ class UserProfileViewModel @AssistedInject constructor(
     }
 
     private fun getUserPosts(userId: Int) {
-        if (user.id == GUEST_ID) {
+        if (userId == GUEST_ID) {
             userPostState.update { UserPostState.Guest }
             return
         }
@@ -90,25 +86,25 @@ class UserProfileViewModel @AssistedInject constructor(
     }
 
     fun refresh() {
-        if (user.id == GUEST_ID) return
+        if (userId == GUEST_ID) return
         isRefreshing.update { true }
         viewModelScope.launch {
-            getUser(userId = user.id)
+            getUser(userId = userId)
         }.invokeOnCompletion {
             isRefreshing.update { false }
         }
     }
 
     fun refreshNoIndicator() {
-        if (user.id == GUEST_ID) return
+        if (userId == GUEST_ID) return
         viewModelScope.launch {
-            getUser(userId = user.id)
+            getUser(userId = userId)
         }
     }
 
     fun deletePost(post: Post) {
         viewModelScope.launch {
-            deletePostUseCase(post).onSuccess {
+            deletePostUseCase(post.id).onSuccess {
                 refresh()
             }.onFailure {
                 viewModelScope.launch {

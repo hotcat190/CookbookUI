@@ -130,7 +130,7 @@ fun UserCard(
             colors = CardDefaults.cardColors(MaterialTheme.colorScheme.surfaceContainer)
         ) {
             Row(
-                modifier = Modifier.height(150.dp)
+                modifier = Modifier.height(120.dp)
             ) {
                 AsyncImage(
                     modifier = Modifier
@@ -195,17 +195,17 @@ fun UserCard(
                             fontSize = 15.sp
                         )
                     }
-                    if (user.bio == null) {
-                        return@Column
-                    }
-                    Text(
-                        text = user.bio,
-                        modifier = Modifier
-                            .weight(1f)
-                            .fillMaxWidth()
-                            .wrapContentHeight(),
-                        fontSize = 15.sp
-                    )
+//                    if (user.bio == null) {
+//                        return@Column
+//                    }
+//                    Text(
+//                        text = user.bio,
+//                        modifier = Modifier
+//                            .weight(1f)
+//                            .fillMaxWidth()
+//                            .wrapContentHeight(),
+//                        fontSize = 15.sp
+//                    )
                 }
             }
         }
@@ -227,14 +227,9 @@ fun PostCard(
             onUserClick = {},
             modifier = Modifier
                 .wrapContentHeight()
+                .fillMaxWidth()
                 .background(
-                    color = MaterialTheme.colorScheme.surfaceContainer,
-                    shape = RoundedCornerShape(8.dp)
-                )
-                .border(
-                    color = MaterialTheme.colorScheme.outline,
-                    width = 2.dp,
-                    shape = RoundedCornerShape(8.dp)
+                    color = Color.Transparent
                 )
         )
     }

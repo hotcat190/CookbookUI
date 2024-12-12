@@ -1,20 +1,17 @@
 package com.example.androidcookbook.ui.features.newsfeed
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.compose.ui.unit.dp
 import com.example.androidcookbook.data.mocks.SamplePosts
 import com.example.androidcookbook.domain.model.post.Post
 import com.example.androidcookbook.domain.model.user.User
 import com.example.androidcookbook.ui.components.EndlessLazyColumn
-import com.example.androidcookbook.ui.features.post.details.PostDetailsViewModel
 import com.example.androidcookbook.ui.theme.AndroidCookbookTheme
 
 @Composable
@@ -43,7 +40,6 @@ fun NewsfeedScreen(
             onUserClick = onUserClick,
             onSeeDetailsClick = onSeeDetailsClick,
         )
-        HorizontalDivider()
     }
 }
 

@@ -5,7 +5,6 @@ import androidx.navigation.NavDestination.Companion.hasRoute
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavHostController
 import androidx.navigation.NavOptionsBuilder
-import androidx.navigation.navOptions
 import com.example.androidcookbook.domain.model.user.User
 import com.example.androidcookbook.ui.nav.Routes
 
@@ -45,8 +44,16 @@ fun <T: Any> NavDestination.hasParent(route: T): Boolean =
  */
 fun NavHostController.navigateToProfile(currentUser: User, targetUser: User) {
     if (currentUser.id == targetUser.id) {
-        navigate(Routes.App.UserProfile(currentUser))
+        navigate(Routes.App.UserProfile(currentUser.id))
     } else {
-        navigate(Routes.OtherProfile(targetUser))
+        navigate(Routes.OtherProfile(targetUser.id))
+    }
+}
+
+fun NavHostController.guestNavToAuth() {
+    navigate(Routes.Auth) {
+        popUpTo<Routes.App> {
+            inclusive = true
+        }
     }
 }

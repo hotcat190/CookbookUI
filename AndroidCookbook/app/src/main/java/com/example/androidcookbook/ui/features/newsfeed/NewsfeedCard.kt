@@ -17,6 +17,7 @@ import androidx.compose.material.icons.outlined.Bookmark
 import androidx.compose.material.icons.outlined.BookmarkBorder
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -64,7 +65,7 @@ fun NewsfeedCard(
     val postDetailsViewModel = hiltViewModel<PostDetailsViewModel, PostDetailsViewModel.PostDetailsViewModelFactory>(
         key = post.id.toString(),
     ){ factory ->
-        factory.create(post, currentUser)
+        factory.create(post.id, currentUser)
     }
     Column(
         modifier = modifier
@@ -149,6 +150,9 @@ fun NewsfeedCard(
             }
         }
     }
+    HorizontalDivider(
+        modifier = Modifier.padding(horizontal = 16.dp),
+    )
 }
 
 @Composable

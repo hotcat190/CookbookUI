@@ -44,7 +44,7 @@ fun NavGraphBuilder.otherProfile(
             typeOf<User>() to CustomNavTypes.UserType
         )
     ) {
-        val user = it.toRoute<Routes.OtherProfile>().user
+        val userId = it.toRoute<Routes.OtherProfile>().userId
 
         cookbookViewModel.updateCanNavigateBack(true)
         cookbookViewModel.updateTopBarState(CookbookUiState.TopBarState.Default)
@@ -56,7 +56,7 @@ fun NavGraphBuilder.otherProfile(
             hiltViewModel<UserProfileViewModel, UserProfileViewModel.UserProfileViewModelFactory>(
 
             ) { factory ->
-                factory.create(user)
+                factory.create(userId)
             }
 
         val followViewModel = hiltViewModel<FollowViewModel, FollowViewModel.FollowViewModelFactory>(
@@ -64,7 +64,7 @@ fun NavGraphBuilder.otherProfile(
         ) { factory ->
             factory.create(
                 currentUser,
-                user,
+                userId,
             )
         }
 
@@ -136,7 +136,7 @@ fun NavGraphBuilder.otherProfile(
                                         userProfileViewModel.deletePost(post)
                                     },
                                     onPostSeeDetailsClick = { post ->
-                                        navController.navigate(Routes.App.PostDetails(post))
+                                        navController.navigate(Routes.App.PostDetails(post.id))
                                     },
                                     onUserClick = {
                                     },

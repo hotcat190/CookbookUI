@@ -1,6 +1,5 @@
 package com.example.androidcookbook.ui.nav.dest.post
 
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.collectAsState
@@ -27,6 +26,7 @@ import com.example.androidcookbook.ui.features.post.details.PostDetailsViewModel
 import com.example.androidcookbook.ui.features.post.details.PostUiState
 import com.example.androidcookbook.ui.nav.CustomNavTypes
 import com.example.androidcookbook.ui.nav.Routes
+import com.example.androidcookbook.ui.nav.utils.guestNavToAuth
 import com.example.androidcookbook.ui.nav.utils.navigateToProfile
 import kotlin.reflect.typeOf
 
@@ -45,7 +45,7 @@ fun NavGraphBuilder.postDetails(viewModel: CookbookViewModel, navController: Nav
 
         val postDetailsViewModel =
             hiltViewModel<PostDetailsViewModel, PostDetailsViewModel.PostDetailsViewModelFactory> { factory ->
-                factory.create(postRoute.post, viewModel.user.value)
+                factory.create(postRoute.postId, viewModel.user.value)
             }
 
         when (val postUiState = postDetailsViewModel.postUiState.collectAsState().value) {
@@ -124,7 +124,7 @@ fun NavGraphBuilder.postDetails(viewModel: CookbookViewModel, navController: Nav
                                     postDetailsViewModel.updateShowBottomCommentSheet(false)
                                 },
                                 onUserClick = { user ->
-                                    navController.navigate(Routes.App.UserProfile(user))
+                                    navController.navigate(Routes.App.UserProfile(user.id))
                                 },
                                 sheetState = sheetState,
                                 modifier = Modifier
@@ -170,11 +170,7 @@ fun NavGraphBuilder.postDetails(viewModel: CookbookViewModel, navController: Nav
                 LoadingScreen()
             }
             is PostUiState.Guest -> GuestLoginScreen {
-                navController.navigate(Routes.Auth) {
-                    popUpTo(Routes.App) {
-                        inclusive = true
-                    }
-                }
+                navController.guestNavToAuth()
             }
         }
     }

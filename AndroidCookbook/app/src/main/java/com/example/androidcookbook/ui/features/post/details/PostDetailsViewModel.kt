@@ -28,7 +28,7 @@ import kotlinx.coroutines.launch
 @HiltViewModel(assistedFactory = PostDetailsViewModel.PostDetailsViewModelFactory::class)
 class PostDetailsViewModel @AssistedInject constructor(
     @ApplicationContext private val context: Context,
-    @Assisted private val _post: Post,
+    @Assisted private val _postId: Int,
     @Assisted private val currentUser: User,
     private val postRepository: PostRepository,
     private val deletePostUseCase: DeletePostUseCase,
@@ -38,7 +38,7 @@ class PostDetailsViewModel @AssistedInject constructor(
     @AssistedFactory
     interface PostDetailsViewModelFactory {
         fun create(
-            post: Post,
+            postId: Int,
             currentUser: User,
         ): PostDetailsViewModel
     }
@@ -71,9 +71,9 @@ class PostDetailsViewModel @AssistedInject constructor(
         viewModelScope.launch {
             getPost()
             //        postUiState.update { PostUiState.Success(post = _post) }
-            queryPostLike(_post.id)
-            queryPostBookmark(_post.id)
-            getComments(false)
+            queryPostLike(_postId)
+            queryPostBookmark(_postId)
+            getComments(true)
             getPostLikes()
         }.invokeOnCompletion {
             isRefreshing.update { false }
@@ -81,7 +81,7 @@ class PostDetailsViewModel @AssistedInject constructor(
     }
 
     private suspend fun getPostLikes() {
-        val response = postRepository.getPostLikes(_post.id, 1)
+        val response = postRepository.getPostLikes(_postId, 1)
         response.onSuccess {
             postLikes.update { data.likes }
         }.onFailure {
@@ -95,7 +95,7 @@ class PostDetailsViewModel @AssistedInject constructor(
     }
 
     private suspend fun getPost() {
-        val response = postRepository.getPost(_post.id)
+        val response = postRepository.getPost(_postId)
         response.onSuccess {
             postUiState.update { PostUiState.Success(post = data) }
         }.onFailure {
@@ -129,7 +129,7 @@ class PostDetailsViewModel @AssistedInject constructor(
 
     private fun likePost() {
         viewModelScope.launch {
-            val response = postRepository.likePost(_post.id)
+            val response = postRepository.likePost(_postId)
             response.onSuccess {
                 isPostLiked.update { true }
             }.onFailure {
@@ -141,7 +141,7 @@ class PostDetailsViewModel @AssistedInject constructor(
 
     private fun unlikePost() {
         viewModelScope.launch {
-            val response = postRepository.unlikePost(_post.id)
+            val response = postRepository.unlikePost(_postId)
             response.onSuccess {
                 isPostLiked.update { false }
             }.onFailure {
@@ -161,7 +161,7 @@ class PostDetailsViewModel @AssistedInject constructor(
 
     private fun bookmarkPost() {
         viewModelScope.launch {
-            val response = postRepository.bookmarkPost(_post.id)
+            val response = postRepository.bookmarkPost(_postId)
             response.onSuccess {
                 isPostBookmarked.update { true }
             }.onFailure {
@@ -172,7 +172,7 @@ class PostDetailsViewModel @AssistedInject constructor(
 
     private fun unBookmarkPost() {
         viewModelScope.launch {
-            val response = postRepository.unBookmarkPost(_post.id)
+            val response = postRepository.unBookmarkPost(_postId)
             response.onSuccess {
                 isPostBookmarked.update { false }
             }.onFailure {
@@ -194,7 +194,7 @@ class PostDetailsViewModel @AssistedInject constructor(
             commentsFlow.update { emptyList() }
             commentPage.update { 1 }
         }
-        val response = postRepository.getComments(_post.id, currentUser.id, commentPage.value)
+        val response = postRepository.getComments(_postId, currentUser.id, commentPage.value)
         response.onSuccess {
             commentsFlow.update { it + data.comments }
             commentPage.update { it + 1 }
@@ -209,7 +209,7 @@ class PostDetailsViewModel @AssistedInject constructor(
     fun sendComment(content: String) {
         viewModelScope.launch {
             val response = postRepository.sendComment(
-                postId = _post.id,
+                postId = _postId,
                 request = SendCommentRequest(content),
             )
             response.onSuccess {
@@ -332,7 +332,7 @@ class PostDetailsViewModel @AssistedInject constructor(
 
     fun deletePost(onSuccessNavigate: () -> Unit) {
         viewModelScope.launch {
-            val response = deletePostUseCase(_post)
+            val response = deletePostUseCase(_postId)
             response.onSuccess {
                 onSuccessNavigate()
             }.onFailure {

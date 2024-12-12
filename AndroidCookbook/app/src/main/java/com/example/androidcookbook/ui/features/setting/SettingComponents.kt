@@ -96,7 +96,10 @@ fun SettingContainer(
                 RadioButton(
                     selected = (theme == themeTypeSelected),
                     onClick = { onThemeTypeChange(theme) },
-                    colors = RadioButtonDefaults.colors(objectColor)
+                    colors = RadioButtonDefaults.colors(
+                        selectedColor = objectColor,
+                        unselectedColor = objectColor
+                    )
                 )
             }
 

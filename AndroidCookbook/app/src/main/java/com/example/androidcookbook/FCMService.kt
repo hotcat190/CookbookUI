@@ -7,20 +7,31 @@ import android.content.Context
 import android.content.Intent
 import android.util.Log
 import androidx.core.app.NotificationCompat
+import androidx.hilt.navigation.compose.hiltViewModel
+import com.example.androidcookbook.data.providers.DataStoreManager
 import com.example.androidcookbook.ui.CookbookViewModel
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
-import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 class FCMService : FirebaseMessagingService() {
 
     override fun onNewToken(token: String) {
         super.onNewToken(token)
     }
+    private val dataStoreManager by lazy { DataStoreManager(this) }
+    var notice = false
 
     override fun onMessageReceived(message: RemoteMessage) {
         super.onMessageReceived(message)
 
+        CoroutineScope(Dispatchers.IO).launch {
+            dataStoreManager.canSendNotification.collect {
+                notice = it
+            }
+        }
 
         // Get the data payload from the message
         val data = message.data
@@ -38,16 +49,13 @@ class FCMService : FirebaseMessagingService() {
         val notificationId = 1
         val requestCode = 1
 
-        Log.d("FCMService", "isNotificationBadgeDisplayed: ${CookbookViewModel.isNotificationBadgeDisplayed}")
-        CookbookViewModel.isNotificationBadgeDisplayed.update { true }
-        Log.d("FCMService", "isNotificationBadgeDisplayed: ${CookbookViewModel.isNotificationBadgeDisplayed}")
-
-        notificationManager.cancelAll()
-
         val channelId = "Firebase Messaging ID"
         val channelName = "Firebase Messaging"
         notificationManager.createNotificationChannel(
-            NotificationChannel(channelId, channelName, NotificationManager.IMPORTANCE_NONE)
+            NotificationChannel(channelId, channelName,
+                if (notice) NotificationManager.IMPORTANCE_HIGH
+                else NotificationManager.IMPORTANCE_NONE
+            )
         )
 
         val intent = Intent(this, MainActivity::class.java)

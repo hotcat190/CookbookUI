@@ -1,5 +1,6 @@
 package com.example.androidcookbook.ui.components
 
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
@@ -10,6 +11,7 @@ import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 
 internal fun LazyListState.reachedBottom(buffer: Int = 1): Boolean {
     val lastVisibleItem = this.layoutInfo.visibleItemsInfo.lastOrNull()
@@ -23,17 +25,22 @@ internal fun <T> EndlessLazyColumn(
     loadMore: () -> Unit,
     modifier: Modifier = Modifier,
     listState: LazyListState = rememberLazyListState(),
+    contentPadding: PaddingValues = PaddingValues(0.dp),
     itemContent: @Composable (T) -> Unit,
 ) {
 
     val reachedBottom: Boolean by remember { derivedStateOf { listState.reachedBottom() } }
 
     // load more if scrolled to bottom
-    LaunchedEffect(reachedBottom) {
-        if (reachedBottom) loadMore()
+    LaunchedEffect(reachedBottom && items.size > 10) {
+        if (reachedBottom && items.size > 10) loadMore()
     }
 
-    LazyColumn(modifier = modifier, state = listState) {
+    LazyColumn(
+        modifier = modifier,
+        state = listState,
+        contentPadding = contentPadding,
+    ) {
         items(
             items = items,
             key = { item: T -> itemKey(item) },

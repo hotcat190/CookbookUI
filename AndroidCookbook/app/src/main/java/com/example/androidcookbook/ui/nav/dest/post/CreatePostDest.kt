@@ -82,9 +82,9 @@ fun NavGraphBuilder.createPost(
             onPostButtonClick = {
                 createPostViewModel.createPost(
                     onSuccessNavigate = { post ->
-                        navController.navigate(Routes.App.PostDetails(post)) {
-                            popUpTo<Routes.App.Newsfeed> {
-                                inclusive = false
+                        navController.navigate(Routes.App.PostDetails(post.id)) {
+                            popUpTo<Routes.CreatePost> {
+                                inclusive = true
                             }
                         }
                     }
@@ -98,8 +98,8 @@ fun NavGraphBuilder.createPost(
                 createPostViewModel.updateCookTime(it)
             },
             createType = CreatePostType.Post,
-            onUserClick = {
-                navController.navigate(Routes.App.UserProfile(it))
+            onUserClick = { user ->
+                navController.navigate(Routes.App.UserProfile(user.id))
             }
         )
         if (createPostViewModel.isAddStepDialogOpen.collectAsState().value) {

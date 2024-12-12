@@ -7,7 +7,6 @@ import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -52,10 +51,8 @@ import com.example.androidcookbook.ui.nav.dest.profile.otherProfile
 import com.example.androidcookbook.ui.nav.graphs.AppEntryPoint
 import com.example.androidcookbook.ui.nav.graphs.appScreens
 import com.example.androidcookbook.ui.nav.graphs.authScreens
-import com.example.androidcookbook.ui.nav.graphs.AppEntryPoint
-import com.example.androidcookbook.ui.nav.graphs.appScreens
-import com.example.androidcookbook.ui.nav.graphs.authScreens
 import com.example.androidcookbook.ui.nav.utils.navigateIfNotOn
+import com.example.androidcookbook.ui.nav.utils.navigateToProfile
 import kotlinx.coroutines.flow.update
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -77,26 +74,38 @@ fun CookbookApp(
 
     val focusManager = LocalFocusManager.current
 
+    val darkTheme = when(viewModel.themeType.collectAsState().value) {
+        ThemeType.Default -> isSystemInDarkTheme()
+        ThemeType.Dark -> true
+        ThemeType.Light -> false
+    }
+
     Scaffold(
         modifier = Modifier
             .nestedScroll(scrollBehavior.nestedScrollConnection),
         topBar = {
             when (uiState.topBarState) {
                 is CookbookUiState.TopBarState.Auth -> {
-                    SignLayoutTheme {
+                    SignLayoutTheme(
+                        darkTheme
+                    ) {
+
                         updateSystemBarColors(
                             MaterialTheme.colorScheme.onBackground.toArgb(),
                             MaterialTheme.colorScheme.surfaceContainerLowest.toArgb(),
-                            true
+                            darkTheme
                         )
                     }
                 }
                 is CookbookUiState.TopBarState.Custom -> (uiState.topBarState as CookbookUiState.TopBarState.Custom).topAppBar.invoke()
                 is CookbookUiState.TopBarState.Default -> {
-                    AppBarTheme {
+                    AppBarTheme(
+                        darkTheme
+                    ) {
                         updateSystemBarColors(
                             Color.TRANSPARENT,
                             MaterialTheme.colorScheme.background.toArgb(),
+                            darkTheme
                         )
                         CookbookAppBarDefault(
                             showBackButton = uiState.canNavigateBack,
@@ -142,7 +151,7 @@ fun CookbookApp(
                                 navController.navigateIfNotOn(Routes.App.Newsfeed, true)
                             },
                             onUserProfileClick = {
-                                navController.navigateIfNotOn(Routes.App.UserProfile(currentUser), true)
+                                navController.navigateIfNotOn(Routes.App.UserProfile(currentUser.id), true)
                             },
                             onCreatePostClick = {
                                 navController.navigateIfNotOn(Routes.CreatePost)
@@ -162,6 +171,7 @@ fun CookbookApp(
                 .fillMaxSize()
                 .padding(innerPadding)
                 .consumeWindowInsets(innerPadding)
+                .safeDrawingPadding()
                 .pointerInput(Unit) {
                     detectTapGestures(onTap = {
                         focusManager.clearFocus()
@@ -191,7 +201,7 @@ fun CookbookApp(
                 viewModel.updateBottomBarState(CookbookUiState.BottomBarState.NoBottomBar)
                 viewModel.updateCanNavigateBack(true)
                 viewModel.updateTopBarState(CookbookUiState.TopBarState.Custom {
-                    AppBarTheme {
+                    AppBarTheme(darkTheme) {
                         SearchBar(
                             onSearch = { searchViewModel.searchAll(it) },
                             navigateBackAction = {
@@ -206,8 +216,15 @@ fun CookbookApp(
                     onBackButtonClick = {
                         navController.navigateUp()
                     },
-                    onSeeMoreClick = {
-                        //Click to see user profile
+                    onSeeMoreClick = { user ->
+                        if (user.id == viewModel.user.value.id) {
+                            navController.navigate(Routes.App.UserProfile(user.id))
+                        } else {
+                            navController.navigate(Routes.OtherProfile(user.id))
+                        }
+                    },
+                    onSeeDetailsClick = { post ->
+                        navController.navigate(Routes.App.PostDetails(post.id))
                     }
                 )
             }
@@ -226,12 +243,16 @@ fun CookbookApp(
             notification(viewModel, navController)
 
             dialog<Routes.Settings> {
+                val notice = viewModel.notice.collectAsState().value
+                val themeType = viewModel.themeType.collectAsState().value
                 AppBarTheme {
                     SettingContainer(
-                        noticeChecked = true,
-                        onNoticeCheckedChange = { },
-                        themeTypeSelected = ThemeType.Default,
-                        onThemeTypeChange = {}
+                        noticeChecked = notice,
+                        onNoticeCheckedChange = { viewModel.updateUserNotice(it) },
+                        themeTypeSelected = themeType,
+                        onThemeTypeChange = {
+                            viewModel.updateUserTheme(it)
+                        }
                     )
                 }
             }
