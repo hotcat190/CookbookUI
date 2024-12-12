@@ -50,4 +50,8 @@ export class FollowsController {
   checkFollow(@Param('followerId') followerId: number, @Param('followingId') followingId: number) {
     return this.followsService.checkFollow(followerId,followingId);
   }
+  @Get('follow/init')
+  initFollow() {
+    return this.followsService.initFollow();
+  }
 }

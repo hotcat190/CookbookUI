@@ -55,7 +55,12 @@ import {
   
     @OneToMany(() => Follow, (follow) => follow.following)
     followers: Follow[];
+
+    @Column({default: 0})
+    totalFollowers: number;
     
+    @Column({default: 0})
+    totalFollowing: number;
 
     @ManyToMany(() => Post)
     @JoinTable()

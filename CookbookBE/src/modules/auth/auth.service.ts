@@ -257,16 +257,15 @@ export class AuthService {
     ({
       where: {
         username: Like(`%${username}%`)
-      },
-      relations: ['followers', 'following'],
+      }
     })
     const itemsPerPage = 10;
     const startIndex = (page - 1) * itemsPerPage;
     if (users.length > itemsPerPage*page) {
-      return {nextPage: true, users: users.slice(startIndex, startIndex + itemsPerPage).map(user => new ReponseUserProfileDto(user, user.followers.length, user.following.length))};
+      return {nextPage: true, users: users.slice(startIndex, startIndex + itemsPerPage).map(user => new ReponseUserProfileDto(user, user.totalFollowing, user.totalFollowers))};
     }
     else{
-      return {nextPage: false, users: users.slice(startIndex, startIndex + itemsPerPage).map(user => new ReponseUserProfileDto(user, user.followers.length, user.following.length))};
+      return {nextPage: false, users: users.slice(startIndex, startIndex + itemsPerPage).map(user => new ReponseUserProfileDto(user, user.totalFollowing, user.totalFollowers))};
     }
   }
   async searchUserByName(name: string, page: number): Promise<any> {
@@ -274,16 +273,15 @@ export class AuthService {
     ({
       where: {
         name: Like(`%${name}%`)
-      },
-      relations: ['followers', 'following'],
+      }
     })
     const itemsPerPage = 10;
     const startIndex = (page - 1) * itemsPerPage;
     if (users.length > itemsPerPage*page) {
-      return {nextPage: true, users: users.slice(startIndex, startIndex + itemsPerPage).map(user => new ReponseUserProfileDto(user, user.followers.length, user.following.length))};
+      return {nextPage: true, users: users.slice(startIndex, startIndex + itemsPerPage).map(user => new ReponseUserProfileDto(user, user.totalFollowing, user.totalFollowers))};
     }
     else{
-      return {nextPage: false, users: users.slice(startIndex, startIndex + itemsPerPage).map(user => new ReponseUserProfileDto(user, user.followers.length, user.following.length))};
+      return {nextPage: false, users: users.slice(startIndex, startIndex + itemsPerPage).map(user => new ReponseUserProfileDto(user, user.totalFollowing, user.totalFollowers))};
     }
   }
   async addToFavorites(postId: any, userId: number): Promise<any> {
