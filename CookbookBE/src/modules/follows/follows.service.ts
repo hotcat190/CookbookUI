@@ -15,37 +15,31 @@ export class FollowsService {
   ) {}
 
   async followUser(targetUserId: number, currentUserId: number): Promise<any> {
-    try {
-      if (targetUserId == currentUserId) {
-      throw new BadRequestException('Bạn không thể theo dõi chính mình.');
-      }
-
-      const targetUser = await this.usersRepository.findOne({ where: { id: targetUserId }, relations: ['followers']  });
-      if (!targetUser) {
-      throw new NotFoundException('Người dùng không tồn tại.');
-      }
-
-      const existingFollow = await this.followsRepository.findOne({
-      where: { follower: { id: currentUserId }, following: { id: targetUserId } },
-      });
-      if (existingFollow) {
-      throw new BadRequestException('Bạn đã theo dõi người dùng này trước đó.');
-      }
-
-      const follower = await this.usersRepository.findOne({ where: { id: currentUserId }});
-      const follow = this.followsRepository.create({ follower, following: targetUser });
-      await this.followsRepository.save(follow);
-      await this.notificationsService.sendNotificationWithImage(targetUserId, "NEW_FOLLOWER", follower.id, follower.avatar, follower.name, `${targetUser.numberFollowers}`)
-      return { message: 'Đã theo dõi người dùng.'};
-
-    } catch (error) {
-      throw error;
+    if (targetUserId == currentUserId) {
+    throw new BadRequestException('Bạn không thể theo dõi chính mình.');
     }
 
-    // Gửi thông báo đến người được theo dõi
-    //await this.notificationsService.sendNotification(targetUserId, 'Bạn có người mới theo dõi.', follow.id, 'follow');
+    const targetUser = await this.usersRepository.createQueryBuilder('user')
+      .leftJoinAndSelect('user.followers', 'followers')
+      .where('user.id = :id', { id: targetUserId })
+      .getOne();
+    if (!targetUser) {
+    throw new NotFoundException('Người dùng không tồn tại.');
+    }
 
-    
+    const existingFollow = await this.followsRepository.findOne({
+    where: { follower: { id: currentUserId }, following: { id: targetUserId } },
+    });
+    if (existingFollow) {
+    throw new BadRequestException('Bạn đã theo dõi người dùng này trước đó.');
+    }
+
+    const follower = await this.usersRepository.findOne({ where: { id: currentUserId }});
+    const follow = this.followsRepository.create({ follower, following: targetUser });
+    await this.followsRepository.save(follow);
+    await this.notificationsService.sendNotificationWithImage(targetUserId, "NEW_FOLLOWER", follower.id, follower.avatar, follower.name, `${targetUser.numberFollowers}`)
+    return { message: 'Đã theo dõi người dùng.'};
+
   }
 
   async unfollowUser(targetUserId: number, currentUserId: number): Promise<any> {

@@ -221,9 +221,8 @@ export class NotificationsService {
       }
 
 
-
       const token = user.tokenFCM;
-      if(!user.tokenFCM) {
+      if(!user.tokenFCM || user.tokenFCM == "string"){ 
         return;
       }
       await admin.messaging().send({
@@ -245,7 +244,7 @@ export class NotificationsService {
       });
     } catch (error) {
       console.log(error);
-      throw error;
+      return;
     }
   }
   async getNotifications(userId: number, page: number): Promise<any> {

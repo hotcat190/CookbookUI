@@ -49,7 +49,7 @@ import {
   
     @OneToMany(() => Post, (post) => post.author)
     posts: Post[];
-  
+    
     @OneToMany(() => Follow, (follow) => follow.follower)
     following: Follow[];
   
@@ -78,5 +78,19 @@ import {
     @Column({ nullable: true })
     tokenFCM: string;
 
+    @ManyToMany(() => Post)
+    @JoinTable({
+        name: 'user_viewed_posts',
+        joinColumn: {
+            name: 'userId',
+            referencedColumnName: 'id',
+        },
+        inverseJoinColumn: {
+            name: 'postId', 
+            referencedColumnName: 'id',
+        },
+    })
+    viewedPosts: Post[];
+    
   }
   

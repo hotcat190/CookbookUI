@@ -283,6 +283,7 @@ export class PostsService {
       return {nextPage: false, posts: posts.slice(startIndex, startIndex + itemsPerPage).map(post => new LiteReponsePostDto(post))};
     }
   }
+  /*
   async getNewsfeed(userId: number, limit: number): Promise<any> {
     const currentTime = new Date();
     const posts = await this.postsRepository.find();
@@ -305,7 +306,96 @@ export class PostsService {
     
     return scoredPosts.slice(0, limit).map(sp => new LiteReponsePostDto(sp.post));
   } 
+  */
+ /*
+ async getNewsfeed(userId: number, limit: number): Promise<any> {
+    const user = await this.usersRepository.findOne({ 
+        where: { id: userId },
+        relations: ['viewedPosts']
+    });
+    const currentTime = new Date();
+    const posts = await this.postsRepository.find();
+    
+    const scoredPosts = posts.map(post => {
+        const isFollow = 0; // TODO: Implement follow check
+        const isRead = user.viewedPosts.some(p => p.id === post.id) ? 1 : 0;
+        const hoursAway = (currentTime.getTime() - post.createdAt.getTime()) / (1000 * 60 * 60);
+
+        const baseScore = (Math.sqrt(post.totalLike + post.totalComment + Math.sqrt(post.totalView)) *
+            (1 + isFollow) *
+            (1 - isRead * 0.9) +
+            isFollow * 2) /
+            Math.sqrt(hoursAway / 2 + 1);
+            
+        return { post, score: baseScore };
+    });
+
+    // Sort posts by score
+    scoredPosts.sort((a, b) => b.score - a.score);
+    
+    // Get top posts by limit
+    const topPosts = scoredPosts.slice(0, limit);
+
+    // Track viewed posts
+    const newViewedPosts = topPosts.map(sp => sp.post);
+    user.viewedPosts = [...user.viewedPosts, ...newViewedPosts];
+    await this.usersRepository.save(user);
+
+    return topPosts.map(sp => new LiteReponsePostDto(sp.post));
+  }
+  */
+  async getNewsfeed(userId: number, limit: number): Promise<any> {
+
+    const user = await this.usersRepository
+      .createQueryBuilder('user')
+      .leftJoinAndSelect('user.viewedPosts', 'viewedPosts')
+      .leftJoinAndSelect('user.following', 'following')
+      .leftJoinAndSelect('following.following', 'followingUser')
+      .select(['user.id', 'viewedPosts', 'following', 'followingUser.id'])
+      .where('user.id = :userId', { userId })
+      .getOne();
+    
+    const followedUserIds = user.following.map(f => f.following.id);
+    const queryBuilder = this.postsRepository.createQueryBuilder('post')
+      .leftJoinAndSelect('post.author', 'author')
+      .where('post.id NOT IN (:...viewedPostIds)', { 
+        viewedPostIds: user.viewedPosts.map(p => p.id) 
+      })
+      .orWhere('(post.authorId = :userId AND post.totalComment > 0)', { 
+        userId 
+      });
   
+    // Get posts and calculate scores
+    const posts = await queryBuilder.getMany();
+    const currentTime = new Date();
+    const scoredPosts = posts.map(post => {
+      const isFollowed = followedUserIds.includes(post.author.id) ? 5 : 1; // 5x boost for followed users
+      const hoursAway = (currentTime.getTime() - post.createdAt.getTime()) / (1000 * 60 * 60);
+  
+      const baseScore = (
+        Math.sqrt(post.totalLike + post.totalComment + Math.sqrt(post.totalView)) * 
+        isFollowed
+      ) / Math.sqrt(hoursAway / 2 + 1);
+  
+      return { post, score: baseScore };
+    });
+  
+    // Sort by score and get top posts
+    scoredPosts.sort((a, b) => b.score - a.score);
+    const topPosts = scoredPosts.slice(0, limit);
+  
+    // Add new posts to viewed posts
+    const newViewedPosts = topPosts
+      .filter(sp => sp.post.author.id !== userId) // Don't track own posts
+      .map(sp => sp.post);
+      
+    if (newViewedPosts.length > 0) {
+      user.viewedPosts.push(...newViewedPosts);
+      await this.usersRepository.save(user);
+    }
+  
+    return topPosts.map(sp => new LiteReponsePostDto(sp.post));
+  }
   async createComment(postId: number, createCommentDto: CreateCommentDto, userId: number): Promise<any> {
     const post = await this.postsRepository.findOne({ where: { id: postId } });
     if (!post) {
