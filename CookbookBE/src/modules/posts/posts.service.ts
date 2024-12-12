@@ -4,7 +4,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Post } from './entities/post.entity';
 import { Comment } from './entities/comment.entity';
 import { Like, Repository } from 'typeorm';
-import { CreateCommentDto, CreatePostDto, FullReponseCommentDto, FullReponsePostDto, LiteReponsePostDto, ReponseUserDto } from './dtos/create-post.dto';
+import { CreateCommentDto, CreatePostDto, FullReponseCommentDto, FullReponsePostDto, LiteReponsePostDto, ReponseUserDto, ReponseUserProfileDto } from './dtos/create-post.dto';
 import { UpdatePostDto } from './dtos/update-post.dto';
 import { User } from '../auth/entities/user.entity';
 import { MailerService } from '../mailer/mailer.service';
@@ -268,12 +268,11 @@ export class PostsService {
         { name: Like(`%${query}%`) },
       ],
       take: 10,
-      relations: ['followers', 'following'],
     });
 
     return {
       posts: posts.map(post => new LiteReponsePostDto(post)),
-      users: users.map(user => new ReponseUserDto(user)),
+      users: users.map(user => new ReponseUserProfileDto(user,user.totalFollowing,user.totalFollowers)),
     };
   }
   async searchPost(query: string, page: number): Promise<any> {

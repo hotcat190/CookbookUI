@@ -19,25 +19,33 @@ export class FollowsService {
     throw new BadRequestException('Bạn không thể theo dõi chính mình.');
     }
 
-    const targetUser = await this.usersRepository.createQueryBuilder('user')
+    const [follower, targetUser, existingFollow] = await Promise.all([
+      this.usersRepository.findOne({ where: { id: currentUserId } }),
+
+      this.usersRepository.createQueryBuilder('user')
       .leftJoinAndSelect('user.followers', 'followers')
       .where('user.id = :id', { id: targetUserId })
-      .getOne();
-    if (!targetUser) {
-    throw new NotFoundException('Người dùng không tồn tại.');
-    }
+      .getOne(),
 
-    const existingFollow = await this.followsRepository.findOne({
-    where: { follower: { id: currentUserId }, following: { id: targetUserId } },
-    });
+      this.followsRepository.findOne({
+      where: { follower: { id: currentUserId }, following: { id: targetUserId } },
+      })
+    ]);
+
+    if (!targetUser) {
+      throw new NotFoundException('Người dùng không tồn tại.');
+      }
     if (existingFollow) {
     throw new BadRequestException('Bạn đã theo dõi người dùng này trước đó.');
     }
 
-    const follower = await this.usersRepository.findOne({ where: { id: currentUserId }});
+    follower.totalFollowing += 1;
+    targetUser.totalFollowers += 1;
+    this.usersRepository.save(follower);
+    this.usersRepository.save(targetUser);
     const follow = this.followsRepository.create({ follower, following: targetUser });
-    await this.followsRepository.save(follow);
-    await this.notificationsService.sendNotificationWithImage(targetUserId, "NEW_FOLLOWER", follower.id, follower.avatar, follower.name)
+    this.followsRepository.save(follow);
+    this.notificationsService.sendNotificationWithImage(targetUserId, "NEW_FOLLOWER", follower.id, follower.avatar, follower.name)
     return { message: 'Đã theo dõi người dùng.'};
 
   }
@@ -45,11 +53,18 @@ export class FollowsService {
   async unfollowUser(targetUserId: number, currentUserId: number): Promise<any> {
     const follow = await this.followsRepository.findOne({
       where: { follower: { id: currentUserId }, following: { id: targetUserId } },
+      relations: ['follower', 'following']
     });
     if (!follow) {
       throw new BadRequestException('Bạn chưa theo dõi người dùng này.');
     }
-    await this.followsRepository.remove(follow);
+
+    follow.follower.totalFollowing -= 1;
+    follow.following.totalFollowers -= 1;
+
+    this.usersRepository.save(follow.follower);
+    this.usersRepository.save(follow.following);
+    this.followsRepository.remove(follow);
     return { message: 'Đã hủy theo dõi người dùng.'};
   }
 
@@ -90,5 +105,21 @@ export class FollowsService {
       return { isFollowed: false };
     }
     return { isFollowed: true };
+  }
+  async initFollow(): Promise<any> {
+    const followMap = await this.followsRepository
+      .createQueryBuilder('follow')
+      .select(['follow.id', 'follower.id', 'following.id'])
+      .leftJoin('follow.follower', 'follower')
+      .leftJoin('follow.following', 'following')
+      .getMany();
+    const users = await this.usersRepository.find();
+    users.forEach((user) => {
+      user.totalFollowers = followMap.filter((follow) => follow.following.id == user.id).length;
+      user.totalFollowing = followMap.filter((follow) => follow.follower.id == user.id).length;
+      console.log(user.id, user.totalFollowers, user.totalFollowing);
+    });
+    this.usersRepository.save(users);
+    return { message: 'Done' };    
   }
 }
