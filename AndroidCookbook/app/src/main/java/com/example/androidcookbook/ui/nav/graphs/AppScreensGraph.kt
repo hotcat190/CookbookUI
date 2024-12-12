@@ -23,6 +23,7 @@ import com.example.androidcookbook.ui.features.userprofile.UserProfileScreen
 import com.example.androidcookbook.ui.features.userprofile.UserProfileUiState
 import com.example.androidcookbook.ui.features.userprofile.UserProfileViewModel
 import com.example.androidcookbook.ui.features.userprofile.userPostPortion
+import com.example.androidcookbook.ui.getDarkThemeConfig
 import com.example.androidcookbook.ui.nav.CustomNavTypes
 import com.example.androidcookbook.ui.nav.Routes
 import com.example.androidcookbook.ui.nav.dest.newsfeed
@@ -41,7 +42,6 @@ fun NavGraphBuilder.appScreens(
         startDestination = Routes.App.Newsfeed
     ) {
         composable<Routes.App.Category>() {
-//            updaeAppBar()
             val categoryViewModel: CategoryViewModel =
                 sharedViewModel(it, navController, Routes.App)
 
@@ -60,7 +60,7 @@ fun NavGraphBuilder.appScreens(
                 it, navController, Routes.App
             )
 
-            AiScreenTheme {
+            AiScreenTheme(getDarkThemeConfig()) {
                 AIGenScreen(
                     aiGenViewModel,
                     cookbookViewModel

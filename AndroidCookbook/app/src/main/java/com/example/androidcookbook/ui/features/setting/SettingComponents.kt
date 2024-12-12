@@ -32,8 +32,8 @@ fun SettingContainer(
     themeTypeSelected: ThemeType,
     onThemeTypeChange: (ThemeType) -> Unit
 ) {
-    val objectColor: Color = MaterialTheme.colorScheme.primary
-    val backGroundColor: Color = MaterialTheme.colorScheme.primaryContainer
+    val objectColor: Color = MaterialTheme.colorScheme.onBackground
+    val backGroundColor: Color = MaterialTheme.colorScheme.background
     Column(
         modifier = Modifier
             .background(

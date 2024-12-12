@@ -37,7 +37,9 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.androidcookbook.ui.features.search.RequestAudioPermission
+import com.example.androidcookbook.ui.features.search.SearchViewModel
 import com.example.androidcookbook.ui.features.search.SpeechToTextViewModel
 import com.example.androidcookbook.ui.theme.AndroidCookbookTheme
 
@@ -48,13 +50,17 @@ fun SearchBar(
     navigateBackAction: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val searchViewModel = hiltViewModel<SearchViewModel>()
     var searchQuery: String by remember { mutableStateOf("") }
     Log.d("SearchBar", searchQuery)
 
     val focusRequester = remember { FocusRequester() }
 
-    LaunchedEffect (Unit) {
-        focusRequester.requestFocus()
+    LaunchedEffect (searchViewModel.firstCreated) {
+        if (searchViewModel.firstCreated) {
+            focusRequester.requestFocus()
+            searchViewModel.firstCreated = false
+        }
     }
 
     val context = LocalContext.current

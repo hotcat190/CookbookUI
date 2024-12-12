@@ -34,6 +34,7 @@ class SearchViewModel @Inject constructor(
     val uiState: StateFlow<SearchUiState> = _uiState.asStateFlow()
     var currentRecipeDetail = DisplayRecipeDetail()
     var loadCurrentRecipeSuccessful = MutableStateFlow(false)
+    var firstCreated = true
 
     fun searchFood() {
         _uiState.update {

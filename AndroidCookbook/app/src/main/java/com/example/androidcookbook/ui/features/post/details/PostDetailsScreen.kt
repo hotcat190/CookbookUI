@@ -3,6 +3,7 @@ package com.example.androidcookbook.ui.features.post.details
 import android.content.Intent
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -106,6 +107,7 @@ fun PostDetailsScreen(
     onSendComment: (String) -> Unit,
     onUserClick: (User) -> Unit,
     postLikes: List<User>,
+    onLikeCountClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val checkedStates: SnapshotStateList<Boolean> = remember {
@@ -147,6 +149,7 @@ fun PostDetailsScreen(
                         checkedStates,
                         postLikes,
                         currentUser,
+                        onLikeCountClick,
                     )
                     HorizontalDivider()
                 }
@@ -183,6 +186,7 @@ private fun PostDetailsInfo(
     checkedStates: SnapshotStateList<Boolean>,
     postLikes: List<User>,
     currentUser: User,
+    onLikeCountClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     var state by remember { mutableStateOf(DetailState.Description) }
@@ -294,30 +298,26 @@ private fun PostDetailsInfo(
         ShareButton(post)
     }
 
+
+    val textOffsetConst = 8.dp
+    // Likes count
     Row(
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier
             .padding(horizontal = 16.dp)
             .wrapContentSize()
+            .clickable {
+                onLikeCountClick()
+            }
+
     ) {
         if (postLikes.isNotEmpty()) {
             Box(
                 modifier = Modifier
                     .wrapContentSize()
-
             ) {
                 for (index in 0..postLikes.size) {
                     if (index > 2 || index >= postLikes.size) break
-
-//            AsyncImage(
-//                model = ImageRequest.Builder(LocalContext.current)
-//                    .data(it.avatar)
-//                    .crossfade(true)
-//                    .build(),
-//                contentDescription = "null",
-//                placeholder = painterResource(R.drawable.default_avatar),
-//                error = painterResource(R.drawable.default_avatar)
-//            )
                     OverlapCircleImage(
                         data = postLikes[index].avatar,
                         modifier = Modifier
@@ -331,11 +331,13 @@ private fun PostDetailsInfo(
                 }
             }
         }
+        val textOffset = if (postLikes.size > 3) { 3 * textOffsetConst } else { postLikes.size * textOffsetConst }
         Text(
-            text = "${post.totalLike} likes",
+            text = "${postLikes.size} likes",
             fontSize = 15.sp,
             color = MaterialTheme.colorScheme.onSurface,
-            modifier = Modifier.offset(x = (postLikes.size).times(3).dp)
+            modifier = Modifier
+                .offset(x = textOffset)
         )
     }
 
@@ -543,6 +545,7 @@ fun PostDetailsPreview() {
         isBookmarked = false,
         onBookmarkClick = {},
         onUserClick = {},
-        postLikes = SampleUser.users
+        postLikes = SampleUser.users,
+        onLikeCountClick = {}
     )
 }

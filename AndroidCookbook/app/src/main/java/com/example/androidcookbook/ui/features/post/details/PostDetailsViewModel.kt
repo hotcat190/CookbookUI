@@ -61,6 +61,7 @@ class PostDetailsViewModel @AssistedInject constructor(
     var isTogglingLike: MutableStateFlow<Boolean> = MutableStateFlow(false)
         private set
     var isTogglingBookmark = false
+    var showLikeCountDialog: MutableStateFlow<Boolean> = MutableStateFlow(false)
 
     init {
         refresh()
@@ -133,6 +134,7 @@ class PostDetailsViewModel @AssistedInject constructor(
             val response = postRepository.likePost(_postId)
             response.onSuccess {
                 isPostLiked.update { true }
+                getPostLikes()
                 isTogglingLike.update { false }
             }.onFailure {
                 Log.d("PostDetails", message())
@@ -149,6 +151,7 @@ class PostDetailsViewModel @AssistedInject constructor(
             val response = postRepository.unlikePost(_postId)
             response.onSuccess {
                 isPostLiked.update { false }
+                getPostLikes()
                 isTogglingLike.update { false }
             }.onFailure {
                 Log.d("PostDetails", message())
@@ -356,6 +359,10 @@ class PostDetailsViewModel @AssistedInject constructor(
                 }
             }
         }
+    }
+
+    fun updateShowLikeCountDialog(boolean: Boolean) {
+        showLikeCountDialog.update { boolean }
     }
 }
 

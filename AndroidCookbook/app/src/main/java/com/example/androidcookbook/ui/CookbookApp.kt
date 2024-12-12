@@ -77,7 +77,7 @@ fun CookbookApp(
 
     val focusManager = LocalFocusManager.current
 
-    val darkTheme = getDarkThemeConfig(viewModel)
+    val darkTheme = getDarkThemeConfig()
 
     Scaffold(
         modifier = Modifier
@@ -195,7 +195,6 @@ fun CookbookApp(
 
             composable<Routes.Search> {
 
-
                 val searchViewModel = hiltViewModel<SearchViewModel>()
                 val searchUiState = searchViewModel.uiState.collectAsState().value
                 var loadRecipeDetail = searchViewModel.loadCurrentRecipeSuccessful.collectAsState().value
@@ -214,7 +213,10 @@ fun CookbookApp(
                     if (!loadRecipeDetail) {
                         AppBarTheme(darkTheme) {
                             SearchBar(
-                                onSearch = { searchViewModel.searchAll(it) },
+                                onSearch = {
+                                    searchViewModel.searchAll(it)
+                                    focusManager.clearFocus()
+                                },
                                 navigateBackAction = {
                                     navController.navigateUp()
                                 },
@@ -261,7 +263,7 @@ fun CookbookApp(
             dialog<Routes.Settings> {
                 val notice = viewModel.notice.collectAsState().value
                 val themeType = viewModel.themeType.collectAsState().value
-                AppBarTheme {
+                AppBarTheme(getDarkThemeConfig()) {
                     SettingContainer(
                         noticeChecked = notice,
                         onNoticeCheckedChange = { viewModel.updateUserNotice(it) },
@@ -277,7 +279,8 @@ fun CookbookApp(
 }
 
 @Composable
-fun getDarkThemeConfig(viewModel: CookbookViewModel): Boolean {
+fun getDarkThemeConfig(): Boolean {
+    val viewModel = hiltViewModel<CookbookViewModel>()
     val darkTheme = when (viewModel.themeType.collectAsState().value) {
         ThemeType.Default -> isSystemInDarkTheme()
         ThemeType.Dark -> true
