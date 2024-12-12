@@ -355,7 +355,6 @@ export class PostsService {
   */
   async getNewsfeed(userId: number, limit: number): Promise<any> {
     try{
-      console.log('getNewsfeed1');
       const user = await this.usersRepository
         .createQueryBuilder('user')
         .leftJoinAndSelect('user.viewedPosts', 'viewedPosts')
@@ -364,7 +363,6 @@ export class PostsService {
         .select(['user.id', 'viewedPosts', 'following', 'followingUser.id'])
         .where('user.id = :userId', { userId })
         .getOne();
-        console.log('getNewsfeed2');
       const followedUserIds = user.following.map(f => f.following.id);
       const viewedPostIds = user.viewedPosts.map(p => p.id);
 
@@ -380,7 +378,6 @@ export class PostsService {
       query.orWhere('post.authorId = :userId AND post.totalComment > 0', { userId });
 
       const posts = await query.getMany();
-      console.log('getNewsfeed3');
       // Get posts and calculate scores
       const scoredPosts = posts.map(post => {
         const isMine = (post.author.id==userId) ? 0 : 1;
@@ -392,7 +389,6 @@ export class PostsService {
         ) ;
         return { post, score: baseScore };
       });
-      console.log('getNewsfeed4');
       // Sort by score and get top posts
       scoredPosts.sort((a, b) => b.score - a.score);
       const topPosts = scoredPosts.slice(0, limit);
@@ -404,7 +400,7 @@ export class PostsService {
         
       if (newViewedPosts.length > 0) {
         user.viewedPosts.push(...newViewedPosts);
-        await this.usersRepository.save(user);
+        this.usersRepository.save(user);
       }
     
       return topPosts.map(sp => new LiteReponsePostDto(sp.post));

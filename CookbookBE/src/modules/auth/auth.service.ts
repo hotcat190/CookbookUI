@@ -287,18 +287,21 @@ export class AuthService {
     }
   }
   async addToFavorites(postId: any, userId: number): Promise<any> {
-    const user = await this.usersRepository.createQueryBuilder('user')
+    const [user, post] = await Promise.all([
+      this.usersRepository.createQueryBuilder('user')
       .leftJoinAndSelect('user.favorites', 'favorites')
       .where('user.id = :userId', { userId })
       .select(['user.id', 'favorites.id'])
-      .getOne();
+      .getOne(),
+      
+      this.postsRepository.createQueryBuilder('post')
+      .where('post.id = :postId', { postId })
+      .getOne()
+    ]);
+      
     if (!user) {
       throw new NotFoundException('User not found');
     }
-    
-    const post = await this.postsRepository.findOne({
-      where: { id: postId }
-    });
     if (!post) {
       throw new NotFoundException('Bài viết không tồn tại.');
     }
@@ -309,7 +312,7 @@ export class AuthService {
     }
     
     user.favorites.push(post);
-    await this.usersRepository.save(user);
+    this.usersRepository.save(user);
     return { message: 'Đã thêm bài viết vào danh sách yêu thích.'};
   
   }
@@ -331,7 +334,7 @@ export class AuthService {
     }
     user.favorites.splice(favoriteIndex, 1);
 
-    await this.usersRepository.save(user);
+    this.usersRepository.save(user);
     return { message: 'Đã xóa bài viết khỏi danh sách yêu thích.' };
   }
 
