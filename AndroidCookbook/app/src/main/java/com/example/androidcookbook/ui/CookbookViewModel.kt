@@ -82,6 +82,9 @@ class CookbookViewModel @Inject constructor(
                     }
                 }
             }
+
+        }
+        viewModelScope.launch {
             dataStoreManager.theme.combine(dataStoreManager.canSendNotification) { theme, canSendNotification ->
                 Pair(
                     theme, canSendNotification
@@ -91,7 +94,6 @@ class CookbookViewModel @Inject constructor(
                 _notice.value = canSendNotification
             }
         }
-
 
     }
 
