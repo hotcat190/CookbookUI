@@ -2,6 +2,7 @@ package com.example.androidcookbook.ui.nav.dest.profile
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -16,6 +17,8 @@ import com.example.androidcookbook.domain.model.user.User
 import com.example.androidcookbook.ui.CookbookUiState
 import com.example.androidcookbook.ui.CookbookViewModel
 import com.example.androidcookbook.ui.common.containers.RefreshableScreen
+import com.example.androidcookbook.ui.common.screens.FailureScreen
+import com.example.androidcookbook.ui.common.screens.LoadingScreen
 import com.example.androidcookbook.ui.features.follow.FollowListScreenType
 import com.example.androidcookbook.ui.features.follow.FollowViewModel
 import com.example.androidcookbook.ui.features.userprofile.GuestProfile
@@ -62,11 +65,12 @@ fun NavGraphBuilder.userProfile(
         }
 
         LaunchedEffect(Unit) {
-            userProfileViewModel.refresh()
+            userProfileViewModel.refreshNoIndicator()
             followViewModel.refresh()
         }
 
         RefreshableScreen(
+            isRefreshing = userProfileViewModel.isRefreshing.collectAsState().value,
             onRefresh = {
                 userProfileViewModel.refresh()
                 followViewModel.refresh()
@@ -74,9 +78,7 @@ fun NavGraphBuilder.userProfile(
         ) {
             when (userProfileUiState) {
                 is UserProfileUiState.Loading -> {
-                    Text(
-                        "Loading"
-                    )
+                    LoadingScreen()
                 }
 
                 is UserProfileUiState.Success -> {
@@ -109,12 +111,7 @@ fun NavGraphBuilder.userProfile(
                     ) {
                         when (userPostState) {
                             is UserPostState.Loading -> item {
-                                Column(
-                                    horizontalAlignment = Alignment.CenterHorizontally,
-                                    modifier = Modifier.fillMaxSize()
-                                ) {
-                                    Text("Loading user posts")
-                                }
+                                LoadingScreen()
                             }
 
                             is UserPostState.Success -> {
@@ -156,7 +153,13 @@ fun NavGraphBuilder.userProfile(
                 }
 
                 is UserProfileUiState.Failure -> {
-                    GuestProfile("Failed to fetch user profile.")
+                    FailureScreen(
+                        message = userProfileUiState.message,
+                        onRetryClick = {
+                            userProfileViewModel.refresh()
+                            followViewModel.refresh()
+                        }
+                    )
                 }
 
                 is UserProfileUiState.Guest -> {

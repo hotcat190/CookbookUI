@@ -43,6 +43,8 @@ class PostDetailsViewModel @AssistedInject constructor(
         ): PostDetailsViewModel
     }
 
+    var isRefreshing = MutableStateFlow(false)
+        private set
     var postUiState: MutableStateFlow<PostUiState> = MutableStateFlow(PostUiState.Loading)
         private set
     var showBottomCommentSheet: MutableStateFlow<Boolean> = MutableStateFlow(false)
@@ -65,63 +67,64 @@ class PostDetailsViewModel @AssistedInject constructor(
     }
 
     fun refresh() {
-        getPost()
-        //        postUiState.update { PostUiState.Success(post = _post) }
-        queryPostLike(_post.id)
-        queryPostBookmark(_post.id)
-        getComments(false)
-        getPostLikes()
+        isRefreshing.update { true }
+        viewModelScope.launch {
+            getPost()
+            //        postUiState.update { PostUiState.Success(post = _post) }
+            queryPostLike(_post.id)
+            queryPostBookmark(_post.id)
+            getComments(false)
+            getPostLikes()
+        }.invokeOnCompletion {
+            isRefreshing.update { false }
+        }
     }
 
-    private fun getPostLikes() {
-        viewModelScope.launch {
-            val response = postRepository.getPostLikes(_post.id, 1)
-            response.onSuccess {
-                postLikes.update { data.likes }
-            }.onFailure {
-                postLikes.update { emptyList() }
-            }
+    private suspend fun getPostLikes() {
+        val response = postRepository.getPostLikes(_post.id, 1)
+        response.onSuccess {
+            postLikes.update { data.likes }
+        }.onFailure {
+            postLikes.update { emptyList() }
         }
+
     }
 
     fun updateShowBottomCommentSheet(value: Boolean) {
         showBottomCommentSheet.update { value }
     }
 
-    private fun getPost() {
-        viewModelScope.launch {
-            val response = postRepository.getPost(_post.id)
-            response.onSuccess {
-                postUiState.update { PostUiState.Success(post = data) }
-            }.onFailure {
-                postUiState.update { PostUiState.Error(message = message()) }
-            }
-            Log.d("PostDetails", response.toString())
+    private suspend fun getPost() {
+        val response = postRepository.getPost(_post.id)
+        response.onSuccess {
+            postUiState.update { PostUiState.Success(post = data) }
+        }.onFailure {
+            postUiState.update { PostUiState.Error(message = message()) }
         }
+        Log.d("PostDetails", response.toString())
+
     }
 
-    private fun queryPostLike(postId: Int) {
-        viewModelScope.launch {
-            val response = postRepository.queryPostLike(postId, currentUser.id)
-            response.onSuccess {
-                isPostLiked.update { data.isLiked }
-            }.onFailure {
-                isPostLiked.update { false }
-                Log.d("PostDetails", message())
-            }
+    private suspend fun queryPostLike(postId: Int) {
+        val response = postRepository.queryPostLike(postId, currentUser.id)
+        response.onSuccess {
+            isPostLiked.update { data.isLiked }
+        }.onFailure {
+            isPostLiked.update { false }
+            Log.d("PostDetails", message())
         }
+
     }
 
-    private fun queryPostBookmark(postId: Int) {
-        viewModelScope.launch {
-            val response = postRepository.queryPostBookmark(postId, currentUser.id)
-            response.onSuccess {
-                isPostBookmarked.update { data.isFavorited }
-            }.onFailure {
-                isPostBookmarked.update { false }
-                Log.d("PostDetails", message())
-            }
+    private suspend fun queryPostBookmark(postId: Int) {
+        val response = postRepository.queryPostBookmark(postId, currentUser.id)
+        response.onSuccess {
+            isPostBookmarked.update { data.isFavorited }
+        }.onFailure {
+            isPostBookmarked.update { false }
+            Log.d("PostDetails", message())
         }
+
     }
 
     private fun likePost() {
@@ -186,22 +189,21 @@ class PostDetailsViewModel @AssistedInject constructor(
         }
     }
 
-    private fun getComments(reset: Boolean) {
+    private suspend fun getComments(reset: Boolean) {
         if (reset) {
             commentsFlow.update { emptyList() }
             commentPage.update { 1 }
         }
-        viewModelScope.launch {
-            val response = postRepository.getComments(_post.id, currentUser.id, commentPage.value)
-            response.onSuccess {
-                commentsFlow.update { it + data.comments }
-                commentPage.update { it + 1 }
-                Log.d("PostDetails", data.toString())
-            }.onFailure {
-                Log.d("PostDetails", message())
-                showToast("Failed to get comments")
-            }
+        val response = postRepository.getComments(_post.id, currentUser.id, commentPage.value)
+        response.onSuccess {
+            commentsFlow.update { it + data.comments }
+            commentPage.update { it + 1 }
+            Log.d("PostDetails", data.toString())
+        }.onFailure {
+            Log.d("PostDetails", message())
+            showToast("Failed to get comments")
         }
+
     }
 
     fun sendComment(content: String) {
@@ -211,7 +213,9 @@ class PostDetailsViewModel @AssistedInject constructor(
                 request = SendCommentRequest(content),
             )
             response.onSuccess {
-                getComments(true)
+                viewModelScope.launch {
+                    getComments(true)
+                }
                 Log.d("PostDetails", data.toString())
             }.onFailure {
                 Log.d("PostDetails", message())
@@ -227,7 +231,9 @@ class PostDetailsViewModel @AssistedInject constructor(
                 commentId = comment.id, SendCommentRequest(content)
             )
             response.onSuccess {
-                getComments(true)
+                viewModelScope.launch {
+                    getComments(true)
+                }
                 exitEditCommentState()
                 Log.d("PostDetails", data.toString())
             }.onFailure {
@@ -243,7 +249,9 @@ class PostDetailsViewModel @AssistedInject constructor(
                 commentId = comment.id,
             )
             response.onSuccess {
-                getComments(true)
+                viewModelScope.launch {
+                    getComments(true)
+                }
                 Log.d("PostDetails", data.toString())
             }.onFailure {
                 Log.d("PostDetails", message())

@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.androidcookbook.data.repositories.CategoriesRepository
 import com.example.androidcookbook.domain.model.category.Category
 import com.example.androidcookbook.domain.model.recipe.DisplayRecipeDetail
@@ -17,6 +18,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import retrofit2.HttpException
 import java.io.IOException
 import javax.inject.Inject
@@ -26,6 +28,9 @@ import javax.inject.Inject
 class CategoryViewModel @Inject constructor(
     private val categoriesRepository: CategoriesRepository
 ) : ViewModel() {
+
+    var isRefreshing = MutableStateFlow(false)
+        private set
 
     private val _isTopBarSet = MutableStateFlow(false)
     val isTopBarSet: StateFlow<Boolean> = _isTopBarSet
@@ -264,6 +269,11 @@ class CategoryViewModel @Inject constructor(
 
 
     fun refresh() {
-        getCategoriesAndRandomMeals()
+        isRefreshing.update { true }
+        viewModelScope.launch {
+            getCategoriesAndRandomMeals()
+        }.invokeOnCompletion {
+            isRefreshing.update { false }
+        }
     }
 }

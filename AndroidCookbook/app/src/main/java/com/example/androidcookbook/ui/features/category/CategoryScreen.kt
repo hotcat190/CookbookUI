@@ -95,6 +95,7 @@ fun CategoryScreen(
 
         composable("categoryList") {
             RefreshableScreen(
+                isRefreshing = categoryViewModel.isRefreshing.collectAsState().value,
                 onRefresh = { categoryViewModel.refresh() }
             ) {
                 if (categoryUiState.value.isLoading) {

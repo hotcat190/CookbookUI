@@ -33,6 +33,9 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.ViewModelStore
+import androidx.lifecycle.ViewModelStoreOwner
+import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.example.androidcookbook.data.mocks.SampleComments
@@ -58,7 +61,9 @@ fun NewsfeedCard(
     onSeeDetailsClick: (Post) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val postDetailsViewModel = hiltViewModel<PostDetailsViewModel, PostDetailsViewModel.PostDetailsViewModelFactory>{ factory ->
+    val postDetailsViewModel = hiltViewModel<PostDetailsViewModel, PostDetailsViewModel.PostDetailsViewModelFactory>(
+        key = post.id.toString(),
+    ){ factory ->
         factory.create(post, currentUser)
     }
     Column(
