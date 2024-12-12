@@ -35,14 +35,14 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.rememberAsyncImagePainter
 import com.example.androidcookbook.R
-import com.example.androidcookbook.domain.model.aigen.AiRecipe
+import com.example.androidcookbook.domain.model.aigen.AiGenFromImage
 import com.example.androidcookbook.ui.features.aigen.AIGenUiState
 import com.example.androidcookbook.ui.features.aigen.AiGenViewModel
 
 @Composable
 fun AiUploadResultScreen(
     modifier: Modifier = Modifier,
-    result: AiRecipe?,
+    result: AiGenFromImage?,
     imageUri: Uri?,
     uiState: AIGenUiState,
     viewModel: AiGenViewModel,

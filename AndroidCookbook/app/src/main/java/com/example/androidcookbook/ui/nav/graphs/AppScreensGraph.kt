@@ -52,16 +52,19 @@ fun NavGraphBuilder.appScreens(
         }
         composable<Routes.App.AIChef> {
 
-            cookbookViewModel.updateTopBarState(CookbookUiState.TopBarState.Default)
-            cookbookViewModel.updateBottomBarState(CookbookUiState.BottomBarState.Default)
-            cookbookViewModel.updateCanNavigateBack(false)
+//            cookbookViewModel.updateTopBarState(CookbookUiState.TopBarState.Default)
+//            cookbookViewModel.updateBottomBarState(CookbookUiState.BottomBarState.Default)
+//            cookbookViewModel.updateCanNavigateBack(false)
 
             val aiGenViewModel = sharedViewModel<AiGenViewModel>(
                 it, navController, Routes.App
             )
 
             AiScreenTheme {
-                AIGenScreen(aiGenViewModel)
+                AIGenScreen(
+                    aiGenViewModel,
+                    cookbookViewModel
+                )
             }
         }
         newsfeed(cookbookViewModel, navController)

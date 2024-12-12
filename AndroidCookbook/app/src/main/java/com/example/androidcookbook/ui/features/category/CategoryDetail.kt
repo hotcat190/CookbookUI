@@ -1,6 +1,7 @@
 package com.example.androidcookbook.ui.features.category
 
 import android.annotation.SuppressLint
+import android.content.Intent
 import android.util.Log
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Box
@@ -17,6 +18,7 @@ import androidx.compose.material.Divider
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.outlined.Share
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -47,6 +49,7 @@ import coil.request.ImageRequest
 import com.example.androidcookbook.R
 import com.example.androidcookbook.domain.model.recipe.DisplayRecipeDetail
 import com.example.androidcookbook.ui.components.aigen.DashedLine
+import com.example.androidcookbook.ui.features.post.details.OutlinedIconButton
 
 @OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("UnrememberedMutableState")
@@ -133,6 +136,23 @@ fun CategoryDetail(
                     tint = Color.White
                 )
             }
+            val sendIntent: Intent = Intent().apply {
+                action = Intent.ACTION_SEND
+                putExtra(Intent.EXTRA_TEXT, recipeDetail.strSource)
+                type = "text/plain"
+            }
+            val shareIntent = Intent.createChooser(sendIntent, null)
+            val context = LocalContext.current
+
+
+            // Share button
+            OutlinedIconButton(
+                icon = Icons.Outlined.Share,
+                onclick = {
+                    context.startActivity(shareIntent)
+                },
+                modifier = Modifier.align(Alignment.TopEnd),
+            )
         }
 
         LazyColumn(
