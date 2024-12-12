@@ -356,7 +356,6 @@ export class PostsService {
       .getOne();
     
     const followedUserIds = user.following.map(f => f.following.id);
-    console.log(followedUserIds);
     const queryBuilder = this.postsRepository.createQueryBuilder('post')
       .leftJoinAndSelect('post.author', 'author')
       .where('post.id NOT IN (:...viewedPostIds)', { 
@@ -368,7 +367,6 @@ export class PostsService {
   
     // Get posts and calculate scores
     const posts = await queryBuilder.getMany();
-    console.log(posts);
     const currentTime = new Date();
     const scoredPosts = posts.map(post => {
       const isFollowed = followedUserIds.includes(post.author.id) ? 5 : 1; // 5x boost for followed users
