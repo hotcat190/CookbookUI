@@ -13,6 +13,7 @@ import { JwtAuthGuard } from 'src/common/guards/jwt-auth.guard';
 import { ChangePasswordDto } from '../dtos/change-password.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage, memoryStorage } from 'multer';
+import { GetRecipeDto } from '../dtos/aichef.dto';
 
 @ApiTags('auth')
 @Controller('')
@@ -187,7 +188,7 @@ export class AuthController {
   }
 }
 */
-@Post('uploadImage')
+  @Post('uploadImage')
   @UseInterceptors(
     FileInterceptor('image', {
       storage: memoryStorage(), 
@@ -214,8 +215,12 @@ export class AuthController {
     if (!file) {
       throw new BadRequestException('No file provided');
     }
-    console.log("ok");
     return await this.authService.sendImageToAI(file.buffer);
   }
-
+  @Post('airecipe/getRecipe')
+  @ApiOperation({ summary: 'Gen công thức nấu ăn' })
+  async getRecipesByIngredients(@Body() getRecipeDto: GetRecipeDto) {
+    return await this.authService.getRecipesByIngredients(getRecipeDto);
+  }
+  
 }

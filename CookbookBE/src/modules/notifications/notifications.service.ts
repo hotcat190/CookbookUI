@@ -83,7 +83,6 @@ export class NotificationsService {
       let body = "Bạn có thông báo mới";
       const user = await this.usersRepository.findOne({ where: { id: userId } });
       if(!user){
-        console.log("User not found " + userId);
         return;
       }
 
@@ -256,7 +255,6 @@ export class NotificationsService {
       skip: (page - 1) * 10,
       take: 11,
     });
-    console.log(notifications);
     if (notifications.length > 10) {
       return {nextPage: true, notifications: notifications.map(noti =>new ReponseNotificationDto(noti))};
     }
