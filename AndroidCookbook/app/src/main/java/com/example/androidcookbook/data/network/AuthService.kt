@@ -2,6 +2,7 @@ package com.example.androidcookbook.data.network
 
 import com.example.androidcookbook.domain.model.auth.OtpValidationRequest
 import com.example.androidcookbook.domain.model.auth.ForgotPasswordRequest
+import com.example.androidcookbook.domain.model.auth.OtpValidationResponse
 import com.example.androidcookbook.domain.model.auth.RegisterRequest
 import com.example.androidcookbook.domain.model.auth.RegisterResponse
 import com.example.androidcookbook.domain.model.auth.ResetPasswordRequest
@@ -25,7 +26,7 @@ interface AuthService {
     suspend fun sendForgotPasswordRequest(@Body request: ForgotPasswordRequest): ApiResponse<SuccessMessageBody>
 
     @POST("auth/reset-password-code")
-    suspend fun sendOtpValidationRequest(@Body request: OtpValidationRequest): ApiResponse<SuccessMessageBody>
+    suspend fun sendOtpValidationRequest(@Body request: OtpValidationRequest): ApiResponse<OtpValidationResponse>
 
     @POST("auth/reset-password")
     suspend fun sendResetPasswordRequest(@Body request: ResetPasswordRequest): ApiResponse<SuccessMessageBody>
