@@ -30,8 +30,7 @@ export class PostsService {
     if (!post) {
       throw new NotFoundException('Bài viết không tồn tại.');
     }
-    console.log(userId); 
-    console.log(post.likes);
+
     if (post.likes.some((like) => like.id == userId)) {
       return { isLiked: true };
     }

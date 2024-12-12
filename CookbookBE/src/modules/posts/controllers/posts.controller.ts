@@ -51,7 +51,6 @@ import {
     @ApiResponse({ status: 200, description: 'Newsfeed' })
     @ApiResponse({ status: 404, description: 'Error' })
     async getNewsfeed(@Request() req, @Param('limit') limit: number) {
-      console.log(`UserID ${req.user.id} get newsfeed with limit ${limit}`);
       const result = await this.postsService.getNewsfeed(req.user.id, limit);
       return result;
     }

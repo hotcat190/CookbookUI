@@ -19,6 +19,7 @@ import { v2 as cloudinary } from 'cloudinary';
 import { Readable } from 'stream';
 import * as fileType from 'file-type';
 import { randomInt } from 'crypto';
+import { GetRecipeDto } from './dtos/aichef.dto';
 
 @Injectable()
 export class AuthService {
@@ -499,22 +500,18 @@ export class AuthService {
         ],
       });
       const prompt = 
-      `
-
-      Bạn là trợ lý AI chuyên phân tích nguyên liệu và nấu ăn. Tôi sẽ gửi cho bạn một hình ảnh là các nguyên liệu nấu ăn, tôi cần bạn phân tích hình ảnh đó và tìm những món ăn nấu được ngay từ những nguyên liệu đó mà không cần mua thêm. Khi nhận hình ảnh nguyên liệu, bạn phải phân tích và liệt kê chính xác các nguyên liệu có trong ảnh (bao gồm số lượng cụ thể như "1kg", "2 thìa canh", "3 quả").
-      Sau đó hãy tạo ra 3-6 món ăn nấu được luôn với những nguyên liệu đã có, không cần chuẩn bị thêm, chỉ dùng những nguyên liệu đã có để tạo món ăn, không tạo những món ăn mà thiếu nguyên liệ.
-      Mỗi món ăn tạo ra phải thật hợp lý, thực tế, ăn được. Chỉ dùng những nguyên liệu đã có để tạo món ăn, không tạo những món ăn mà thiếu nguyên liệu.
-      Kết quả trả về là tiếng việt.
-
-      `
+`
+Bạn là trợ lý AI chuyên phân tích nguyên liệu và nấu ăn. Tôi sẽ gửi cho bạn một hình ảnh là các nguyên liệu nấu ăn, tôi cần bạn phân tích hình ảnh đó và tìm những món ăn nấu được ngay từ những nguyên liệu đó mà không cần mua thêm. Khi nhận hình ảnh nguyên liệu, bạn phải phân tích và liệt kê chính xác các nguyên liệu có trong ảnh (bao gồm số lượng cụ thể như "1kg", "2 thìa canh", "3 quả").
+Sau đó hãy tạo ra 3-6 món ăn nấu được luôn với những nguyên liệu đã có, không cần chuẩn bị thêm, chỉ dùng những nguyên liệu đã có để tạo món ăn, không tạo những món ăn mà thiếu nguyên liệ.
+Mỗi món ăn tạo ra phải thật hợp lý, thực tế, ăn được. Chỉ dùng những nguyên liệu đã có để tạo món ăn, không tạo những món ăn mà thiếu nguyên liệu.
+Kết quả trả về là tiếng việt.
+`
       
       //const result = await model.generateContent([prompt, ...imageParts]);
       const result = await chatSession.sendMessage([prompt, ...imageParts]);
 
       const data = result.response.text();
-      console.log(data);
       const parsedData = JSON.parse(data);
-      console.log(parsedData);
       return parsedData;
     } catch (error) {
       console.log(error);
@@ -522,6 +519,116 @@ export class AuthService {
     }
 
   }
-  
+  async getRecipesByIngredients(getRecipeDto: GetRecipeDto ): Promise<any> {
+    try{
+      const { GoogleGenerativeAI } = require("@google/generative-ai");
+      
+      const genAI = new GoogleGenerativeAI("AIzaSyBEEXfHU_NM0mQUIrqitWBcc-JzIR-3ccw");
+      const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+      const generationConfig = {
+        temperature: 1,
+        topP: 0.5,
+        topK: 40,
+        maxOutputTokens: 8192,
+        responseMimeType: "application/json",
+        responseSchema: {
+          type: "object",
+          properties: {
+            recipes: {
+              type: "array",
+              description: "Danh sách công thức nấu ăn",
+              items: {
+                type: "object",
+                description: "Công thức nấu ăn",
+                properties: {
+                  name: {
+                    type: "string",
+                    description: "Tên món ăn, phải thật lém lỉnh, hài hước, thú vị"
+                  },
+                  ingredients: {
+                    type: "array",
+                    description: "Danh sách nguyên liệu, số lượng nguyên liệu cần chế biến món ăn",
+                    items: {
+                      type: "object",
+                      properties: {
+                        name: {
+                          type: "string",
+                          description: "Tên nguyên liệu"
+                        },
+                        quantity: {
+                          type: "string",
+                          description: "Số lượng nguyên liệu"
+                        }
+                      },
+                      required: [
+                        "name",
+                        "quantity"
+                      ]
+                    }
+                  },
+                  steps: {
+                    type: "array",
+                    description: "Danh sách các bước nấu ăn, hướng dẫn cách chế biến món ăn",
+                    items: {
+                      type: "string",
+                      description: "Bước nấu ăn, phải thật lém lỉnh, hài hước, thú vị"
+                    }
+                  }
+                },
+                required: [
+                  "name",
+                  "ingredients",
+                  "steps"
+                ]
+              }
+            }
+          },
+          required: [
+            "recipes"
+          ]
+        },
+      };
+      
+      const chatSession = model.startChat({
+        generationConfig,
+        history: [
+        ],
+      });
+      const prompt = 
+`
+Nhập vai thành một đầu bếp chuyên nghiệp, hãy giúp tôi xây dựng các công thức nấu ăn chỉ với những nguyên liệu của tôi, không được sử dụng thêm nguyên liệu nào khác.
+Các món ăn phải thực tế, có thật, ăn được.
+Dưới đây là danh sách nguyên liệu của tôi:
+${JSON.stringify(getRecipeDto.ingredients, null, 2)}
+Chỉ được sử dụng những nguyên liệu trên, tạo cho tôi những nguyên liệu và các bước để nấu từng món ăn sau:
+${JSON.stringify(getRecipeDto.recipes, null, 2)}
+Các bước nấu ăn phải đủ: sơ chế nguyên liệu, chế biến món ăn, trình bày món ăn.
+Các bước hướng dẫn phải thật hài hước, thú vị, lém lỉnh, bắt chước cách nói chuyện hài hước của giới trẻ, bắt chước cách sử dụng những từ ngữ trending, những từ giới trẻ hay dùng. 
+Pha các trò đùa, câu chuyện, tình huống hài hước vào bước chế biến món ăn.
+Có thể ẩn dụ trêu đùa (nội dung người lớn nhưng tế nhị).
+
+`
+      //const result = await model.generateContent([prompt, ...imageParts]); 
+
+      let result: any;
+      if(getRecipeDto.note){
+        const note = 
+`
+Ghi chú cho món ăn:
+${JSON.stringify(getRecipeDto.note, null, 2)}
+`
+        result = await chatSession.sendMessage([prompt,...note]);
+      }
+      else 
+      {
+        result = await chatSession.sendMessage(prompt);
+      }
+      const data = result.response.text();
+      const parsedData = JSON.parse(data);
+      return parsedData;
+    } catch (error) {
+      throw new Error('Failed get recipes by ingredients');
+    }
+  }
 }
 
