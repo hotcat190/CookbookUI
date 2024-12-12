@@ -1,11 +1,13 @@
 package com.example.androidcookbook.domain.model.aigen
 
-
 import com.example.androidcookbook.domain.model.ingredient.Ingredient
-import com.google.gson.annotations.Expose
 
+data class AiResult (
+    val recipes: List<cookingInstruction>
+)
 
-data class AiRecipe(
+data class cookingInstruction (
     val ingredients: List<Ingredient>,
-    val recipes: List<String>
+    val name: String,
+    val steps: List<String>
 )
