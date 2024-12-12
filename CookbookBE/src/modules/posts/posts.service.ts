@@ -360,9 +360,7 @@ export class PostsService {
       const viewedPostIds = user.viewedPosts.map(p => p.id);
 
       const query = this.postsRepository.createQueryBuilder('post')
-        .leftJoinAndSelect('post.author', 'author')
-        .orderBy('RAND()')
-        .limit(100);
+        .leftJoinAndSelect('post.author', 'author');
 
       if (viewedPostIds.length > 0) {
         query.where('post.id NOT IN (:viewedPostIds)', { viewedPostIds });
