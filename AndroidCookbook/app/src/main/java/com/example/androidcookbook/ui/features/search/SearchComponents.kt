@@ -21,12 +21,14 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
@@ -119,96 +121,87 @@ fun UserCard(
     user: User,
     onSeeMoreClick: (User) -> Unit
 ) {
-    ResultCardTheme {
-        Card(
-            onClick = { onSeeMoreClick(user) },
-            modifier = Modifier
-                .fillMaxWidth()
-                .wrapContentHeight(),
-            shape = RoundedCornerShape(8.dp),
-            border = BorderStroke(2.dp, MaterialTheme.colorScheme.outline),
-            colors = CardDefaults.cardColors(MaterialTheme.colorScheme.surfaceContainer)
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .wrapContentHeight()
+            .clickable {
+                onSeeMoreClick(user)
+            }
+    ) {
+        Row(
+            modifier = Modifier.height(120.dp)
         ) {
-            Row(
-                modifier = Modifier.height(120.dp)
+            AsyncImage(
+                modifier = Modifier
+                    .fillMaxHeight()
+                    .padding(10.dp)
+                    .clip(CircleShape)
+                    .weight(1f),
+                model = ImageRequest.Builder(context = LocalContext.current)
+                    .data(user.avatar)
+                    .crossfade(true)
+                    .build(),
+                contentDescription = null,
+                contentScale = ContentScale.Crop,
+                error = painterResource(id = R.drawable.ic_broken_image),
+                placeholder = painterResource(id = R.drawable.loading_img),
+            )
+            Column(
+                modifier = Modifier
+                    .wrapContentHeight()
+                    .weight(2f)
+                    .padding(10.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                AsyncImage(
+                Text(
+                    text = user.name,
                     modifier = Modifier
-                        .fillMaxHeight()
-                        .padding(10.dp)
-                        .clip(CircleShape)
-                        .weight(1f),
-                    model = ImageRequest.Builder(context = LocalContext.current)
-                        .data(user.avatar)
-                        .crossfade(true)
-                        .build(),
-                    contentDescription = null,
-                    contentScale = ContentScale.Crop,
-                    error = painterResource(id = R.drawable.ic_broken_image),
-                    placeholder = painterResource(id = R.drawable.loading_img),
-                )
-                Column(
-                    modifier = Modifier
-                        .wrapContentHeight()
                         .weight(2f)
-                        .padding(10.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally
+                        .fillMaxWidth()
+                        .wrapContentHeight(),
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 18.sp,
+                    textAlign = TextAlign.Start
+                )
+                Row(
+                    modifier = Modifier
+                        .weight(1f)
+                        .wrapContentHeight()
+                        .align(Alignment.Start),
                 ) {
                     Text(
-                        text = user.name,
-                        modifier = Modifier
-                            .weight(2f)
-                            .fillMaxWidth()
-                            .wrapContentHeight(),
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 18.sp,
-                        textAlign = TextAlign.Start
+                        text = user.totalFollowers.toString(),
+                        fontSize = 15.sp,
+                        fontWeight = FontWeight.Medium
                     )
-                    Row(
-                        modifier = Modifier
-                            .weight(1f)
-                            .wrapContentHeight()
-                            .align(Alignment.Start),
-                    ) {
-                        Text(
-                            text = user.totalFollowers.toString(),
-                            fontSize = 15.sp,
-                            fontWeight = FontWeight.Medium
-                        )
-                        Text(
-                            text = " followers",
-                            fontSize = 15.sp
-                        )
-                    }
-                    Row(
-                        modifier = Modifier
-                            .weight(1f)
-                            .align(Alignment.Start),
-                    ) {
-                        Text(
-                            text = user.totalFollowing.toString(),
-                            fontSize = 15.sp,
-                            fontWeight = FontWeight.Medium
-                        )
-                        Text(
-                            text = " followings",
-                            fontSize = 15.sp
-                        )
-                    }
-//                    if (user.bio == null) {
-//                        return@Column
-//                    }
-//                    Text(
-//                        text = user.bio,
-//                        modifier = Modifier
-//                            .weight(1f)
-//                            .fillMaxWidth()
-//                            .wrapContentHeight(),
-//                        fontSize = 15.sp
-//                    )
+                    Text(
+                        text = " followers",
+                        fontSize = 15.sp
+                    )
+                }
+                Row(
+                    modifier = Modifier
+                        .weight(1f)
+                        .align(Alignment.Start),
+                ) {
+                    Text(
+                        text = user.totalFollowing.toString(),
+                        fontSize = 15.sp,
+                        fontWeight = FontWeight.Medium
+                    )
+                    Text(
+                        text = " followings",
+                        fontSize = 15.sp
+                    )
                 }
             }
         }
+        Spacer(Modifier.height(8.dp))
+        HorizontalDivider(
+            thickness = 1.dp,
+            modifier = Modifier.alpha(0.75F),
+        )
     }
 }
 
@@ -254,7 +247,8 @@ fun SearchAllResultsScreen(
     Text(
         text = "Everyone",
         fontWeight = FontWeight.Bold,
-        fontSize = 20.sp
+        fontSize = 20.sp,
+        modifier = Modifier.padding(start = 10.dp)
     )
     while (usersIndex < maxUsers) {
         Spacer(modifier = Modifier.height(10.dp))
@@ -285,7 +279,8 @@ fun SearchAllResultsScreen(
     Text(
         text = "Posts",
         fontWeight = FontWeight.Bold,
-        fontSize = 20.sp
+        fontSize = 20.sp,
+        modifier = Modifier.padding(start = 10.dp)
     )
     while (postsIndex < maxPosts) {
         Spacer(modifier = Modifier.height(10.dp))

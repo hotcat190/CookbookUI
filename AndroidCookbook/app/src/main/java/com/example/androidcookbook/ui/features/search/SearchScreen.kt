@@ -142,7 +142,7 @@ fun SearchScreen(
                         LazyColumn(
                             state = state,
                             modifier = Modifier
-                                .padding(horizontal = 10.dp, vertical = 5.dp),
+                                .padding(horizontal = 0.dp, vertical = 5.dp),
                             verticalArrangement = Arrangement.spacedBy(10.dp)
                         ) {
                             when (it) {
