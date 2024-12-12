@@ -90,13 +90,12 @@ fun CookbookApp(
             when (uiState.topBarState) {
                 is CookbookUiState.TopBarState.Auth -> {
                     SignLayoutTheme(
-                        darkTheme
-                    ) {
 
+                    ) {
                         updateSystemBarColors(
                             MaterialTheme.colorScheme.onBackground.toArgb(),
                             MaterialTheme.colorScheme.surfaceContainerLowest.toArgb(),
-                            darkTheme
+
                         )
                     }
                 }
