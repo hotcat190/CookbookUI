@@ -345,7 +345,7 @@ export class PostsService {
   }
   */
   async getNewsfeed(userId: number, limit: number): Promise<any> {
-
+    console.log('getNewsfeed1');
     const user = await this.usersRepository
       .createQueryBuilder('user')
       .leftJoinAndSelect('user.viewedPosts', 'viewedPosts')
@@ -354,7 +354,7 @@ export class PostsService {
       .select(['user.id', 'viewedPosts', 'following', 'followingUser.id'])
       .where('user.id = :userId', { userId })
       .getOne();
-    
+      console.log('getNewsfeed2');
     const followedUserIds = user.following.map(f => f.following.id);
     const queryBuilder = this.postsRepository.createQueryBuilder('post')
       .leftJoinAndSelect('post.author', 'author')
@@ -364,7 +364,7 @@ export class PostsService {
       .orWhere('(post.authorId = :userId AND post.totalComment > 0)', { 
         userId 
       });
-  
+    console.log('getNewsfeed3');
     // Get posts and calculate scores
     const posts = await queryBuilder.getMany();
     const currentTime = new Date();
@@ -379,7 +379,7 @@ export class PostsService {
   
       return { post, score: baseScore };
     });
-  
+    console.log('getNewsfeed4');
     // Sort by score and get top posts
     scoredPosts.sort((a, b) => b.score - a.score);
     const topPosts = scoredPosts.slice(0, limit);
