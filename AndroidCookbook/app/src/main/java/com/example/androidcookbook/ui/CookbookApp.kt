@@ -56,6 +56,7 @@ import com.example.androidcookbook.ui.nav.graphs.AppEntryPoint
 import com.example.androidcookbook.ui.nav.graphs.appScreens
 import com.example.androidcookbook.ui.nav.graphs.authScreens
 import com.example.androidcookbook.ui.nav.utils.navigateIfNotOn
+import com.example.androidcookbook.ui.nav.utils.navigateToProfile
 import kotlinx.coroutines.flow.update
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -206,8 +207,15 @@ fun CookbookApp(
                     onBackButtonClick = {
                         navController.navigateUp()
                     },
-                    onSeeMoreClick = {
-                        //Click to see user profile
+                    onSeeMoreClick = { user ->
+                        if (user.id == viewModel.user.value.id) {
+                            navController.navigate(Routes.App.UserProfile(user))
+                        } else {
+                            navController.navigate(Routes.OtherProfile(user))
+                        }
+                    },
+                    onSeeDetailsClick = {
+                        navController.navigate(Routes.App.PostDetails(it))
                     }
                 )
             }
