@@ -33,7 +33,13 @@ export class AuthController {
   @ApiResponse({ status: 200, description: 'Đăng nhập thành công' })
   @ApiResponse({ status: 401, description: 'Sai tên đăng nhập hoặc mật khẩu' })
   login(@Body() loginDto: LoginDto) {
-    return this.authService.login(loginDto);
+    try {
+      return this.authService.login(loginDto);
+    }
+    catch (error) {
+      console.log(error);
+      throw error;
+    }
   }
 
   @Get('auth/verify-email')
