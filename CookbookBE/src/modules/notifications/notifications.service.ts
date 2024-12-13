@@ -77,7 +77,9 @@ export class NotificationsService {
     }
   } 
   async sendNotificationWithImage(userId: number, type_noti: string, relatedId: number, imageU: string, data1?: string, data2?: string, data3?: string) {
+    console.log("sendNotificationWithImage");
     try {
+      
       let title = "Thông báo";
       let message = "Bạn có thông báo mới";
       let body = "Bạn có thông báo mới";
@@ -221,11 +223,11 @@ export class NotificationsService {
         }
       }
 
-
       const token = user.tokenFCM;
       if(!user.tokenFCM || user.tokenFCM == "string"){ 
         return;
       }
+      console.log("sendNotificationWithImage2");
       await admin.messaging().send({
         token,
         android: {

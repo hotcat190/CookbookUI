@@ -33,4 +33,4 @@ async function bootstrap() {
   const appUrl = await app.getUrl();
   console.log(`Application is running on: ${appUrl}`);
 }
-bootstrap();
+bootstrap()
