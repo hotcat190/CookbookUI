@@ -82,10 +82,12 @@ class NewsfeedViewModel @Inject constructor(
         Log.d("NewsfeedViewModel", "loadMore")
         isLoadingMore.update { true }
         viewModelScope.launch {
-            newsfeedOffset += newsfeedLimit
-            val response = newsfeedRepository.getNewsfeed(newsfeedOffset)
+//            newsfeedOffset += newsfeedLimit
+            val response = newsfeedRepository.getNewsfeed(newsfeedLimit)
             response.onSuccess {
-                posts.update { data }
+                val currentPost = posts.value.toMutableList()
+                currentPost.addAll(data)
+                posts.update {  currentPost }
                 isLoadingMore.update { false }
             }.onFailure {
                 viewModelScope.launch {

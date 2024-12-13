@@ -384,7 +384,7 @@ private fun PostDetailsInfo(
                             horizontalArrangement = Arrangement.Center,
                             modifier = Modifier.fillMaxWidth()
                         ) {
-                            Text("No ingredients")
+                            Text("No ingredients", color = MaterialTheme.colorScheme.onSurface)
                         }
                     }
 
@@ -430,7 +430,7 @@ private fun PostDetailsInfo(
                             horizontalArrangement = Arrangement.Center,
                             modifier = Modifier.fillMaxWidth()
                         ) {
-                            Text("No recipe")
+                            Text("No recipe",color = MaterialTheme.colorScheme.onSurface)
                         }
                     }
 
@@ -459,7 +459,12 @@ fun ShareButton(
 ) {
     val sendIntent: Intent = Intent().apply {
         action = Intent.ACTION_SEND
-        putExtra(Intent.EXTRA_TEXT, "${post.title}\n${post.mainImage}\n${post.description}")
+        putExtra(Intent.EXTRA_TEXT, "${post.author.name}\n" +
+                "${LocalDate.parse(post.createdAt, apiDateFormatter)}\n" +
+                "${post.title}\n" +
+                "${post.mainImage}\n" +
+                "${post.description}"
+        )
         type = "text/plain"
     }
     val shareIntent = Intent.createChooser(sendIntent, null)

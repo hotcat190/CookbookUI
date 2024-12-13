@@ -60,6 +60,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.example.androidcookbook.R
@@ -70,11 +71,14 @@ import com.example.androidcookbook.domain.model.recipe.Recipe
 import com.example.androidcookbook.domain.model.user.GUEST_ID
 import com.example.androidcookbook.domain.model.user.User
 import com.example.androidcookbook.ui.CookbookUiState
+import com.example.androidcookbook.ui.common.screens.GuestLoginScreen
+import com.example.androidcookbook.ui.common.screens.LoadingScreen
 import com.example.androidcookbook.ui.features.category.CategoryDetail
 import com.example.androidcookbook.ui.features.newsfeed.NewsfeedCard
 import com.example.androidcookbook.ui.features.newsfeed.NewsfeedScreen
 import com.example.androidcookbook.ui.features.post.details.PostDetailsScreen
 import com.example.androidcookbook.ui.getDarkThemeConfig
+import com.example.androidcookbook.ui.nav.utils.guestNavToAuth
 
 
 @Composable
@@ -85,7 +89,8 @@ fun SearchScreen(
     onBackButtonClick: () -> Unit,
     modifier: Modifier = Modifier,
     onSeeMoreClick: (User) -> Unit = {},
-    onSeeDetailsClick:(Post) -> Unit = {}
+    onSeeDetailsClick:(Post) -> Unit = {},
+    navController: NavHostController,
 ) {
     val pagerState = rememberPagerState(
         pageCount = { 4 }
@@ -155,6 +160,12 @@ fun SearchScreen(
                             when (it) {
                                 0 -> {
                                     item {
+                                        if (currentUser.id == GUEST_ID) {
+                                            GuestLoginScreen {
+                                                navController.guestNavToAuth()
+                                            }
+                                            return@item
+                                        }
                                         SearchAllResultsScreen(
                                             posts = searchUiState.searchALlResults.posts,
                                             users = searchUiState.searchALlResults.users,
@@ -168,6 +179,14 @@ fun SearchScreen(
                                 }
                                 1 -> {
                                     if (searchUiState.postTabState.state != TabState.Idle) {
+                                        if (currentUser.id == GUEST_ID) {
+                                            item {
+                                                GuestLoginScreen {
+                                                    navController.guestNavToAuth()
+                                                }
+                                            }
+                                            return@LazyColumn
+                                        }
                                         items(searchUiState.postTabState.result){
                                             PostCard(
                                                 post = it,
@@ -185,6 +204,7 @@ fun SearchScreen(
                                     } else {
                                         viewModel.searchPost()
                                         item {
+                                            LoadingScreen()
                                             Text(text = searchUiState.postTabState.messageStr)
                                         }
                                     }
@@ -205,11 +225,20 @@ fun SearchScreen(
                                     } else {
                                         viewModel.searchFood()
                                         item {
+                                            LoadingScreen()
                                             Text(text = searchUiState.foodTabState.messageStr)
                                         }
                                     }
                                 }
                                 3 -> {
+                                    if (currentUser.id == GUEST_ID) {
+                                        item {
+                                            GuestLoginScreen {
+                                                navController.guestNavToAuth()
+                                            }
+                                        }
+                                        return@LazyColumn
+                                    }
                                     item {
                                             Row(
                                                 modifier = Modifier
@@ -261,6 +290,9 @@ fun SearchScreen(
                                             searchByUser = userChecked,
                                             resetResult = false
                                         )
+                                        item {
+                                            LoadingScreen()
+                                        }
                                     }
                                 }
                             }

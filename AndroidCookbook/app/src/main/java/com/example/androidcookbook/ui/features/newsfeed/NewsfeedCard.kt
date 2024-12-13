@@ -144,7 +144,7 @@ fun NewsfeedCard(
                 }
                 Spacer(Modifier.weight(1f))
                 Text(
-                    text = "See Details >",
+                    text = "Details »",
                     style = MaterialTheme.typography.titleMedium,
                     color = MaterialTheme.colorScheme.onSurface,
                     modifier = Modifier
@@ -186,7 +186,7 @@ fun PostOptionsButton(
         ) {
             val sendIntent: Intent = Intent().apply {
                 action = Intent.ACTION_SEND
-                putExtra(Intent.EXTRA_TEXT, "${post.title}\n${post.mainImage}\n${post.description}")
+                putExtra(Intent.EXTRA_TEXT, "${post.author.name}\n${LocalDate.parse(post.createdAt, apiDateFormatter)}\n${post.title}\n${post.mainImage}\n${post.description}")
                 type = "text/plain"
             }
             val shareIntent = Intent.createChooser(sendIntent, null)

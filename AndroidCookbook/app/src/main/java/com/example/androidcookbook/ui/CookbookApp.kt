@@ -92,9 +92,10 @@ fun CookbookApp(
                             MaterialTheme.colorScheme.onBackground.toArgb(),
                             MaterialTheme.colorScheme.surfaceContainerLowest.toArgb(),
 
-                        )
+                            )
                     }
                 }
+
                 is CookbookUiState.TopBarState.Custom -> (uiState.topBarState as CookbookUiState.TopBarState.Custom).topAppBar.invoke()
                 is CookbookUiState.TopBarState.Default -> {
                     AppBarTheme(
@@ -108,10 +109,12 @@ fun CookbookApp(
                         CookbookAppBarDefault(
                             showBackButton = uiState.canNavigateBack,
                             onSearchButtonClick = {
+                                viewModel.setTopBarState(false)
                                 navController.navigate(Routes.Search)
                             },
                             notificationCount = CookbookViewModel.notificationCount.collectAsState().value,
                             onNotificationClick = {
+                                viewModel.setTopBarState(false)
                                 navController.navigate(Routes.Notifications)
                                 CookbookViewModel.updateNotificationCount(0)
                             },
@@ -138,7 +141,7 @@ fun CookbookApp(
             when (uiState.bottomBarState) {
                 is CookbookUiState.BottomBarState.NoBottomBar -> {}
                 is CookbookUiState.BottomBarState.Default -> {
-                    AppBarTheme(darkTheme){
+                    AppBarTheme(darkTheme) {
                         CookbookBottomNavigationBar(
                             onCategoryClick = {
                                 navController.navigateIfNotOn(Routes.App.Category, true)
@@ -150,7 +153,10 @@ fun CookbookApp(
                                 navController.navigateIfNotOn(Routes.App.Newsfeed, true)
                             },
                             onUserProfileClick = {
-                                navController.navigateIfNotOn(Routes.App.UserProfile(currentUser.id), true)
+                                navController.navigateIfNotOn(
+                                    Routes.App.UserProfile(currentUser.id),
+                                    true
+                                )
                             },
                             onCreatePostClick = {
                                 navController.navigateIfNotOn(Routes.CreatePost)
@@ -187,8 +193,8 @@ fun CookbookApp(
             authScreens(navController = navController, updateAppBar = {
                 viewModel.updateTopBarState(CookbookUiState.TopBarState.Auth)
                 viewModel.updateBottomBarState(CookbookUiState.BottomBarState.NoBottomBar)
-            }, updateUser = { response,username,password ->
-                viewModel.updateUser(response,username,password)
+            }, updateUser = { response, username, password ->
+                viewModel.updateUser(response, username, password)
             })
 
             appScreens(navController = navController, cookbookViewModel = viewModel)
@@ -197,33 +203,31 @@ fun CookbookApp(
 
                 val searchViewModel = hiltViewModel<SearchViewModel>()
                 val searchUiState = searchViewModel.uiState.collectAsState().value
-                var loadRecipeDetail = searchViewModel.loadCurrentRecipeSuccessful.collectAsState().value
+                var loadRecipeDetail =
+                    searchViewModel.loadCurrentRecipeSuccessful.collectAsState().value
 
-                viewModel.updateBottomBarState(CookbookUiState.BottomBarState.NoBottomBar)
-                viewModel.updateCanNavigateBack(true)
-
-                if (currentUser.id == GUEST_ID) {
-                    GuestLoginScreen {
-                        navController.guestNavToAuth()
-                    }
-                    return@composable
-                }
-
-                viewModel.updateTopBarState(CookbookUiState.TopBarState.Custom {
-                    if (!loadRecipeDetail) {
-                        AppBarTheme(darkTheme) {
-                            SearchBar(
-                                onSearch = {
-                                    searchViewModel.searchAll(it)
-                                    focusManager.clearFocus()
-                                },
-                                navigateBackAction = {
-                                    navController.navigateUp()
-                                },
-                            )
+                if (!viewModel.isTopBarSet.collectAsState().value) {
+                    viewModel.updateBottomBarState(CookbookUiState.BottomBarState.NoBottomBar)
+                    viewModel.updateTopBarState(CookbookUiState.TopBarState.Custom {
+                        if (!loadRecipeDetail) {
+                            AppBarTheme(darkTheme) {
+                                SearchBar(
+                                    onSearch = {
+                                        searchViewModel.searchAll(it)
+                                        focusManager.clearFocus()
+                                    },
+                                    navigateBackAction = {
+                                        viewModel.updateTopBarState(CookbookUiState.TopBarState.Default)
+                                        viewModel.updateBottomBarState(CookbookUiState.BottomBarState.Default)
+                                        viewModel.updateCanNavigateBack(false)
+                                        viewModel.setTopBarState(true)
+                                        navController.navigateUp()
+                                    },
+                                )
+                            }
                         }
-                    }
-                })
+                    })
+                }
 
 
 
@@ -243,7 +247,8 @@ fun CookbookApp(
                     },
                     onSeeDetailsClick = { post ->
                         navController.navigate(Routes.App.PostDetails(post.id))
-                    }
+                    },
+                    navController = navController,
                 )
             }
             createPost(viewModel, currentUser, navController)

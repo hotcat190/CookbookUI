@@ -68,7 +68,7 @@ fun PostHeader(
                 text = createdAt ?: "",
                 fontSize = 12.sp,
                 style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.4f),
+                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
                 modifier = Modifier.padding(start = leftPad)
             )
         }

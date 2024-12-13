@@ -42,24 +42,31 @@ fun NavGraphBuilder.notification(
     composable<Routes.Notifications> {
         var isClearing by remember { mutableStateOf(false) }
 
-        cookbookViewModel.updateBottomBarState(CookbookUiState.BottomBarState.NoBottomBar)
-        cookbookViewModel.updateCanNavigateBack(true)
+        if(!cookbookViewModel.isTopBarSet.collectAsState().value) {
+            cookbookViewModel.updateTopBarState(CookbookUiState.TopBarState.Custom {
+                AppBarTheme(getDarkThemeConfig()) {
+                    NotificationScreenTopBar(
+                        onBackButtonClick =
+                        {
+                            cookbookViewModel.updateTopBarState(CookbookUiState.TopBarState.Default)
+                            cookbookViewModel.updateBottomBarState(CookbookUiState.BottomBarState.Default)
+                            cookbookViewModel.updateCanNavigateBack(false)
+                            cookbookViewModel.setTopBarState(true)
+                            navController.navigateUp()
+                        },
+                        onClearAllClick = {
+                            isClearing = true
+                        }
+                    )
+                }
+            })
+            cookbookViewModel.updateBottomBarState(CookbookUiState.BottomBarState.NoBottomBar)
+            cookbookViewModel.updateCanNavigateBack(true)
+        }
 
         val notificationViewModel = hiltViewModel<NotificationViewModel>()
 
-        cookbookViewModel.updateTopBarState(CookbookUiState.TopBarState.Custom {
-            AppBarTheme(getDarkThemeConfig()) {
-                NotificationScreenTopBar(
-                    onBackButtonClick =
-                    {
-                        navController.navigateUp()
-                    },
-                    onClearAllClick = {
-                        isClearing = true
-                    }
-                )
-            }
-        })
+
 
         val uiState = notificationViewModel.notificationUiState.collectAsState().value
         Log.d("Notification", "notificationUiState: $uiState")
