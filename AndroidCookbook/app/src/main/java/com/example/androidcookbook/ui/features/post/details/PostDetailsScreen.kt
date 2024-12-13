@@ -384,7 +384,7 @@ private fun PostDetailsInfo(
                             horizontalArrangement = Arrangement.Center,
                             modifier = Modifier.fillMaxWidth()
                         ) {
-                            Text("No ingredients")
+                            Text("No ingredients", color = MaterialTheme.colorScheme.onSurface)
                         }
                     }
 
@@ -430,7 +430,7 @@ private fun PostDetailsInfo(
                             horizontalArrangement = Arrangement.Center,
                             modifier = Modifier.fillMaxWidth()
                         ) {
-                            Text("No recipe")
+                            Text("No recipe",color = MaterialTheme.colorScheme.onSurface)
                         }
                     }
 

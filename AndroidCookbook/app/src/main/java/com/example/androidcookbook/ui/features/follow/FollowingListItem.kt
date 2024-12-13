@@ -1,6 +1,7 @@
 package com.example.androidcookbook.ui.features.follow
 
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -31,7 +32,8 @@ fun FollowingListItem(
     modifier: Modifier = Modifier
 ) {
     Row(
-        modifier = modifier.fillMaxWidth()
+        modifier = modifier.fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically
     ) {
         SmallAvatar(
             author = user,
@@ -47,7 +49,8 @@ fun FollowingListItem(
                     start = 8.dp,
                     end = 16.dp
                 )
-                .weight(1F)
+                .weight(1F),
+            verticalArrangement = Arrangement.Center
         ) {
             Text(
                 text = user.name,
@@ -58,7 +61,9 @@ fun FollowingListItem(
 
             )
             Text(
-                text = user.bio ?: "",
+                text = user.totalFollowers.toString() + (if (user.totalFollowers > 1)
+                    " followers" else " follower"
+                ),
                 color = MaterialTheme.colorScheme.onSurface,
                 minLines = 2,
                 maxLines = 2,

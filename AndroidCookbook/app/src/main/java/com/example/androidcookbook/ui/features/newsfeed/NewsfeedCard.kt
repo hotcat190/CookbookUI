@@ -144,7 +144,7 @@ fun NewsfeedCard(
                 }
                 Spacer(Modifier.weight(1f))
                 Text(
-                    text = "See Details >",
+                    text = "Details »",
                     style = MaterialTheme.typography.titleMedium,
                     color = MaterialTheme.colorScheme.onSurface,
                     modifier = Modifier

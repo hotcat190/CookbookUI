@@ -111,6 +111,13 @@ class CookbookViewModel @Inject constructor(
         _uiState.update { it.copy(bottomBarState = bottomBarState) }
     }
 
+    private val _isTopBarSet = MutableStateFlow(false)
+    val isTopBarSet: StateFlow<Boolean> = _isTopBarSet.asStateFlow()
+
+    fun setTopBarState(set: Boolean) {
+        _isTopBarSet.value = set
+    }
+
 
 
     fun updateUser(response: SignInResponse, username: String, password: String) {

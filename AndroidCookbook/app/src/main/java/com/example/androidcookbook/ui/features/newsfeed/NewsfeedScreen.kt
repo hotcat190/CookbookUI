@@ -36,6 +36,7 @@ fun NewsfeedScreen(
         loadMore = onLoadMore,
         isLoadingMore = isLoadingMore,
         modifier = modifier,
+        loadMoreLimit = 5
     ) { post ->
         NewsfeedCard(
             post = post,
