@@ -173,12 +173,12 @@ export class PostsService {
   
     this.postsRepository.save(post);
     const author = post.author;
-    
-    (async () => {
-      const user = await this.usersRepository.findOne({ where: { id: userId } });
-      this.notificationsService.sendNotificationWithImage(author.id,"NEW_POST_LIKE",postId,user.avatar,user.name,`${post.totalLike-1}`,`${post.title}`);
-    })().catch(err => console.error('Error sending notification:', err));
-
+    if(author.id != userId){
+      (async () => {
+        const user = await this.usersRepository.findOne({ where: { id: userId } });
+        this.notificationsService.sendNotificationWithImage(author.id,"NEW_POST_LIKE",postId,user.avatar,user.name,`${post.totalLike-1}`,`${post.title}`);
+      })().catch(err => console.error('Error sending notification:', err));
+    }
     return { message: 'Đã thích bài viết.', totalLike: post.totalLike };
     
   }
@@ -204,8 +204,12 @@ export class PostsService {
     this.commentsRepository.save(comment);
 
     const author = comment.user;
-    const user = await this.usersRepository.findOne({ where: { id: userId } });
-    this.notificationsService.sendNotificationWithImage(author.id,"NEW_COMMENT_LIKE", comment.post.id, user.avatar, user.name, `${comment.likes.length-1}`, `${comment.content}`);
+    if(author.id != userId){
+      (async () => {
+        const user = await this.usersRepository.findOne({ where: { id: userId } });
+        this.notificationsService.sendNotificationWithImage(author.id,"NEW_COMMENT_LIKE", comment.post.id, user.avatar, user.name, `${comment.likes.length-1}`, `${comment.content}`);
+      })().catch(err => console.error('Error sending notification:', err));
+    }
     return { message: 'Đã thích bình luận.' };
   }
   async unlikePost(postId: number, userId: number): Promise<any> {
@@ -429,14 +433,17 @@ export class PostsService {
     }
     post.totalComment += 1;
     this.postsRepository.save(post);
-    const userIds = await this.commentsRepository
-      .createQueryBuilder('comment')
-      .select('comment.userId')
-      .distinct(true)
-      .getRawMany();
     const author = post.author;
-    this.notificationsService.sendNotificationWithImage(author.id,"NEW_POST_COMMENT",postId,user.avatar,user.name,`${userIds.length-1}`,`${createCommentDto.content}`);
-
+    if(author.id != userId){
+      (async () => {
+        const userIds = await this.commentsRepository
+          .createQueryBuilder('comment')
+          .select('comment.userId')
+          .distinct(true)
+          .getRawMany();
+        this.notificationsService.sendNotificationWithImage(author.id,"NEW_POST_COMMENT",postId,user.avatar,user.name,`${userIds.length-1}`,`${createCommentDto.content}`);
+      })().catch(err => console.error('Error sending notification:', err));
+    }
     return { message: 'Thêm bình luận thành công.'};
   }
   async updateComment(commentId: number, createCommentDto: CreateCommentDto, userId: number): Promise<any> {
