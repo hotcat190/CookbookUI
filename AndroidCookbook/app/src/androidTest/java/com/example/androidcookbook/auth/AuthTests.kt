@@ -60,18 +60,18 @@ class AuthTests {
     @Before
     fun setup() {
         hiltTestRule.inject()
-        composeTestRule.activity.setContent {
-            val authViewModel = composeTestRule.activity.viewModels<AuthViewModel>().value
-            LoginScreen(
-                onForgotPasswordClick = {},
-                onNavigateToSignUp = {},
-                onSignInClick = {username, password -> authViewModel.signIn(username, password) {
-
-                } },
-                onUseAsGuest = {},
-                requestState = authViewModel.authRequestState.collectAsState().value
-            )
-        }
+//        composeTestRule.activity.setContent {
+//            val authViewModel = composeTestRule.activity.viewModels<AuthViewModel>().value
+//            LoginScreen(
+//                onForgotPasswordClick = {},
+//                onNavigateToSignUp = {},
+//                onSignInClick = {username, password -> authViewModel.signIn(username, password) {
+//
+//                } },
+//                onUseAsGuest = {},
+//                requestState = authViewModel.authRequestState.collectAsState().value
+//            )
+//        }
     }
 
     @Test
