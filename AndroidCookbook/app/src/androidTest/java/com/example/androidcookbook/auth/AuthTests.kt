@@ -61,20 +61,20 @@ class AuthTests {
     @Before
     fun setup() {
         hiltTestRule.inject()
-//        composeTestRule.activity.setContent {
-//            val authViewModel = composeTestRule.activity.viewModels<AuthViewModel>().value
-//            LoginScreen(
-//                onForgotPasswordClick = {},
-//                onNavigateToSignUp = {},
-//                onSignInClick = { username, password ->
-//                    authViewModel.signIn(username, password) {
-//
-//                    }
-//                },
-//                onUseAsGuest = {},
-//                requestState = authViewModel.authRequestState.collectAsState().value
-//            )
-//        }
+        composeTestRule.activity.setContent {
+            val authViewModel = composeTestRule.activity.viewModels<AuthViewModel>().value
+            LoginScreen(
+                onForgotPasswordClick = {},
+                onNavigateToSignUp = {},
+                onSignInClick = { username, password ->
+                    authViewModel.signIn(username, password) {
+
+                    }
+                },
+                onUseAsGuest = {},
+                requestState = authViewModel.authRequestState.collectAsState().value
+            )
+        }
     }
 
     @Test
@@ -84,21 +84,21 @@ class AuthTests {
         assertEquals("com.example.androidcookbook", appContext.packageName)
     }
 
-//    @Test
-//    fun testLoginSuccess() {
-//        // Mock behavior for a successful login
-//        coEvery { authService.login(SignInRequest(USERNAME, PASSWORD)) } returns
-//                ApiResponse.Success(SignInResponse(TOKEN, SIGN_IN_SUCCESS, User(USER_ID, name = USERNAME)))
-//
-//        composeTestRule.waitForIdle()
-//
-//        composeTestRule.onNodeWithTag(USERNAME_TEXT_FIELD_TEST_TAG).performTextInput(USERNAME)
-//        composeTestRule.onNodeWithTag(PASSWORD_TEXT_FIELD_TEST_TAG).performTextInput(PASSWORD)
-//        composeTestRule.onNodeWithText("Sign In").performClick()
-//
-//        // Add assertions
-//        val authViewModel = composeTestRule.activity.viewModels<AuthViewModel>().value
-//        val uiState = authViewModel.uiState.value
-//        assertTrue(uiState.signInSuccess)
-//    }
+    @Test
+    fun testLoginSuccess() {
+        // Mock behavior for a successful login
+        coEvery { authService.login(SignInRequest(USERNAME, PASSWORD)) } returns
+                ApiResponse.Success(SignInResponse(TOKEN, SIGN_IN_SUCCESS, User(USER_ID, name = USERNAME)))
+
+        composeTestRule.waitForIdle()
+
+        composeTestRule.onNodeWithTag(USERNAME_TEXT_FIELD_TEST_TAG).performTextInput(USERNAME)
+        composeTestRule.onNodeWithTag(PASSWORD_TEXT_FIELD_TEST_TAG).performTextInput(PASSWORD)
+        composeTestRule.onNodeWithText("Sign In").performClick()
+
+        // Add assertions
+        val authViewModel = composeTestRule.activity.viewModels<AuthViewModel>().value
+        val uiState = authViewModel.uiState.value
+        assertTrue(uiState.signInSuccess)
+    }
 }

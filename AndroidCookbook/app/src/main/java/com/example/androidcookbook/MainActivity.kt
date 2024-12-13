@@ -53,12 +53,6 @@ class MainActivity : ComponentActivity() {
         setContent {
 
             AndroidCookbookTheme {
-
-
-                val state = rememberPermissionState(Manifest.permission.POST_NOTIFICATIONS)
-
-                LaunchedEffect(Unit) { state.launchPermissionRequest() }
-
                 CookbookApp()
             }
         }

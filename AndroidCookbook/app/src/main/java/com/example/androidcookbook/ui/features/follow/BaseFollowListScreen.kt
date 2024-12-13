@@ -73,7 +73,6 @@ fun BaseFollowListScreen(
         ) {
             items(
                 items = list,
-                key = { user -> user.id }
             ) { user ->
                 FollowingListItem(
                     user = user,
