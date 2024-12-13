@@ -206,13 +206,6 @@ fun CookbookApp(
                 var loadRecipeDetail =
                     searchViewModel.loadCurrentRecipeSuccessful.collectAsState().value
 
-
-                if (currentUser.id == GUEST_ID) {
-                    GuestLoginScreen {
-                        navController.guestNavToAuth()
-                    }
-                    return@composable
-                }
                 if (!viewModel.isTopBarSet.collectAsState().value) {
                     viewModel.updateBottomBarState(CookbookUiState.BottomBarState.NoBottomBar)
                     viewModel.updateTopBarState(CookbookUiState.TopBarState.Custom {
@@ -254,7 +247,8 @@ fun CookbookApp(
                     },
                     onSeeDetailsClick = { post ->
                         navController.navigate(Routes.App.PostDetails(post.id))
-                    }
+                    },
+                    navController = navController,
                 )
             }
             createPost(viewModel, currentUser, navController)
