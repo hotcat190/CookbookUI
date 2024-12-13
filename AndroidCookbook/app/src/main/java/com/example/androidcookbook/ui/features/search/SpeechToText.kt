@@ -122,16 +122,16 @@ class SpeechToTextViewModel(application: Application) : AndroidViewModel(applica
         speechRecognizerManager = SpeechRecognizerManager(
             context = context,
             onResult = { result ->
-                run {
-                    _speechText.value = result
-                    Log.d("SPEECH", "initializeSpeechRecognizer: ${result}")
-                }
+//                run {
+//                    _speechText.value = result
+//                    Log.d("SPEECH", "initializeSpeechRecognizer: ${result}")
+//                }
             },
             onError = { error ->
-                run {
-                    Toast.makeText(context, error, Toast.LENGTH_SHORT).show()
-                    Log.d("SPEECH", "initializeSpeechRecognizer: ${error}")
-                }
+//                run {
+//                    Toast.makeText(context, error, Toast.LENGTH_SHORT).show()
+//                    Log.d("SPEECH", "initializeSpeechRecognizer: ${error}")
+//                }
             }
         )
     }

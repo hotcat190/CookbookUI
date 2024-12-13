@@ -1,6 +1,10 @@
 package com.example.androidcookbook.ui.nav.dest
 
+import android.Manifest
+import android.os.Build
 import android.util.Log
+import androidx.annotation.RequiresApi
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
@@ -18,7 +22,12 @@ import com.example.androidcookbook.ui.features.newsfeed.NewsfeedViewModel
 import com.example.androidcookbook.ui.nav.Routes
 import com.example.androidcookbook.ui.nav.utils.guestNavToAuth
 import com.example.androidcookbook.ui.nav.utils.sharedViewModel
+import com.google.accompanist.permissions.ExperimentalPermissionsApi
+import com.google.accompanist.permissions.isGranted
+import com.google.accompanist.permissions.rememberPermissionState
 
+@RequiresApi(Build.VERSION_CODES.TIRAMISU)
+@OptIn(ExperimentalPermissionsApi::class)
 fun NavGraphBuilder.newsfeed(
     cookbookViewModel: CookbookViewModel,
     navController: NavHostController,
@@ -35,6 +44,14 @@ fun NavGraphBuilder.newsfeed(
                 navController.guestNavToAuth()
             }
             return@composable
+        }
+
+        val state = rememberPermissionState(Manifest.permission.POST_NOTIFICATIONS)
+
+        LaunchedEffect(state) {
+            if (!state.status.isGranted) {
+                state.launchPermissionRequest()
+            }
         }
 
         val newsfeedViewModel = sharedViewModel<NewsfeedViewModel>(it, navController, Routes.App)

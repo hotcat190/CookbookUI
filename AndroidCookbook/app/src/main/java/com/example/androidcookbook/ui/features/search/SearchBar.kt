@@ -77,7 +77,7 @@ fun SearchBar(
     var isPermissionGranted by remember { mutableStateOf(false) }
 
     TopAppBar(
-        colors = TopAppBarDefaults.topAppBarColors(containerColor = MaterialTheme.colorScheme.primary),
+        colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.Transparent),
         title = {
             Box(modifier = Modifier.height(48.dp)) {
                 TextField(
